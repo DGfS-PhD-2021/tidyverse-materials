@@ -1,0 +1,127 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# What is this "tidyverse"?
+
+## What is tidy data, and why do we use it?
+
+**Characteristics of tidy data:**  
+- each variable in one column  
+- each observation in one row  
+
+**Why this format?**  
+- it works the best for R  
+- complements *vectorised operations*  
+
+
+## Setting up
+
+### Loading packages
+```{r message=TRUE}
+library(tidyverse)
+```
+As you can see when loading the tidyverse package, it's actually a family/collection of packages.
+
+### Reading in data
+Which command you need to read in data depends on the format:  
+- read_csv (separator: ,)  
+- read_csv2 (separator: ; and decimal: ,)  
+- read_tsv  
+
+## Dataframes and tibbles: What's the difference?
+
+## Exploring our data
+summary, str, View, glimpse...
+
+
+## Workflows/code conventions
+
+### The pipe %>% 
+
+# Changing columns
+- rename  
+- reordering columns - arrange, desc  
+
+# Subsets
+
+##Looking at specific cases (rows)
+- filter  
+- distinct  
+- sample (sample_frac, sample_n)  
+- top_n  
+
+### Logical and boolean operators for filter
+- %in%  
+- < <= > >=  
+- is.na(), !is.na()  
+- | &  
+
+## Selecting specific variables (columns)
+select by name or using helper functions
+
+### Helper functions
+- starts with, ends with  
+- contains  
+- everything  
+- matches  
+- num_range  
+- one_of  
+- :  
+- -  
+
+# Creating and changing columns 
+
+## Data types and conversions
+numeric, character, factor
+
+## Summaries
+- summarise(_each), summarise_all, summarise_at, summarise_if  
+- count  
+- first, last  
+- nth, n, n_distict  
+- IQR  
+- min, max  
+- mean, median  
+- var, sd  
+
+## If-else-statements
+conditions
+- if_else
+- case_when (= multi-case if_else)
+
+# Grouping behaviour
+- group_by
+
+# Transforming data 
+-> pivot (wide - long, or long - wide)
+separate and unite
+
+# Joining several data sets
+- left_join, right_join, inner_join, full_join
+- semi_join, anti_join
+- bind_rows, bind_cols
+
+# Simple graphs
+- working with subsets by directly piping them into a plotting/model call
+
+
+CHECK
+- across  
+- nest_by  
+- recode, recode_factor  
+- coalesce  
+- lag and lead  
+- cumulative aggregates  
+
+
+# Getting help
+
+## How to read function documentations
+
+## Reprex?
+
+## Working with Google results
+
+different types of realistic, relevant data: experimental, corpus data/text, questionnaires
