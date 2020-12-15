@@ -80,7 +80,7 @@ numeric, character, factor
 - summarise(_each), summarise_all, summarise_at, summarise_if  
 - count  
 - first, last  
-- nth, n, n_distict  
+- nth, n, n_distinct  
 - IQR  
 - min, max  
 - mean, median  
@@ -93,6 +93,7 @@ conditions
 
 # Grouping behaviour
 - group_by
+- summarize
 
 # Transforming data 
 -> pivot (wide - long, or long - wide)
