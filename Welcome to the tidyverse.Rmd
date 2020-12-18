@@ -1,25 +1,56 @@
 ---
-title: "R Notebook"
+title: "Welcome to the tidyverse!"
 output: html_notebook
 ---
 
-# What is this "tidyverse"?
+**Part of the DGfS PhD students' forum, 23 February 2021**
+
+Instructors: Kyla McConnell and Julia Müller  
+Contact us on Twitter (@McconnellKyla, @JuliaMuellerFr)  
+
+All artwork by the wonderful @allison_horst - find her on [github](https://github.com/allisonhorst/stats-illustrations).
+
+
+# (1) What is this "tidyverse"?
+
+The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to *base-R*) that help you get your data into a useful format (among other things).
+
+![The tidyverse](img/tidyverse_celestial.png){width=50%}
+
+**The following packages are included in the tidyverse:**  
+- *ggplot2*: for data visualisation  
+- *tibble*: for tweaked dataframes  
+- *tidyr*: for data wrangling  
+- *readr*: for reading in files  
+- *purrr*: for functional progamming  
+- *dplyr*: for data manipulation  
+- *stringr*: for string manipulation  
+- *forcats*: for working with categorical variables (factors)  
+
 
 ## What is tidy data, and why do we use it?
 
 **Characteristics of tidy data:**  
-- each variable in one column  
-- each observation in one row  
+
+![What does tidy data look like?](img/tidydata_1.jpg){width=50%}
 
 **Why this format?**  
 - it works the best for R  
 - complements *vectorised operations*  
 
+![Why use tidy data?](img/tidydata_3.jpg){width=50%}
+
 
 ## Setting up
 
+### Installing packages
+```{r installing packages}
+
+```
+
+
 ### Loading packages
-```{r message=TRUE}
+```{r loading packages}
 library(tidyverse)
 ```
 As you can see when loading the tidyverse package, it's actually a family/collection of packages.
@@ -35,22 +66,26 @@ Which command you need to read in data depends on the format:
 ## Exploring our data
 summary, str, View, glimpse...
 
+different types of realistic, relevant data: experimental, corpus data/text, questionnaires
 
 ## Workflows/code conventions
 
 ### The pipe %>% 
 
-# Changing columns
+# (2) Changing columns
 - rename  
 - reordering columns - arrange, desc  
+![Relocate](img/dplyr_relocate.png){width=50%}
 
-# Subsets
+# (3) Subsets
 
-##Looking at specific cases (rows)
+## Looking at specific cases (rows)
 - filter  
 - distinct  
 - sample (sample_frac, sample_n)  
 - top_n  
+
+![Filter](img/dplyr_filter.jpg){width=50%}
 
 ### Logical and boolean operators for filter
 - %in%  
@@ -71,7 +106,9 @@ select by name or using helper functions
 - :  
 - -  
 
-# Creating and changing columns 
+# (4) Creating and changing columns 
+
+![Mutate](img/dplyr_mutate.png){width=50%}
 
 ## Data types and conversions
 numeric, character, factor
@@ -91,22 +128,31 @@ conditions
 - if_else
 - case_when (= multi-case if_else)
 
-# Grouping behaviour
-- group_by
+![Case when: an extension of if-else](img/dplyr_case_when.png){width=50%}
+
+# (5) Grouping behaviour
+
+![Group and ungroup](img/group_by_ungroup.png){width=50%}
+
+- group_by, and ungroup
 - summarize
 
-# Transforming data 
--> pivot (wide - long, or long - wide)
-separate and unite
+# (6) Transforming data 
 
-# Joining several data sets
+![Pivot](img/tidyr_spread_gather.png){width=50%}
+
+-> pivot (wide - long, or long - wide)
+separate (example: tagged corpus text) and unite (example: create participant id from experiment id + number)
+
+# (7) Joining several data sets
 - left_join, right_join, inner_join, full_join
 - semi_join, anti_join
 - bind_rows, bind_cols
 
-# Simple graphs
+# (8) Simple graphs
 - working with subsets by directly piping them into a plotting/model call
 
+![ggplot2](img/ggplot2_exploratory.png){width=50%}
 
 CHECK
 - across  
@@ -117,12 +163,17 @@ CHECK
 - cumulative aggregates  
 
 
-# Getting help
+# (9) Getting help
 
-## How to read function documentations
+## Resources and cheat sheets
+- [R for Data Science](https://r4ds.had.co.nz/index.html)
+- [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
+
+## How to access and read function documentations
+?command/??command or enter it into the help search box
 
 ## Reprex?
 
 ## Working with Google results
 
-different types of realistic, relevant data: experimental, corpus data/text, questionnaires
+
