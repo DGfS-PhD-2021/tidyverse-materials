@@ -256,7 +256,19 @@ short_array - long_array
 ```
 
 ### Loading and using packages
-R has a lot of built-in functions, but most of them are basic operations. To do more advanced 
+R has a lot of built-in functions, but most of them are basic operations. To do more advanced operations, you'll need add-on *packages*. These packages need to be installed only once but loaded every time you want to use them. Think of this as installing light bulbs when you move into a new flat or house. You only need to do that once (like you only need to install a new R package once), but every evening, you need to switch on the lights in the rooms you use (i.e. load the packages you need).
+
+Use install.packages("package_name") to install packages. We'll start with the `tidyverse` which is actually a collection of several very useful packages.
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+Note that the package name needs to be in quotation marks. You can also use vectors to install several packages at once: install_packages(c("some_package", "another_package"))
+
+Then, load the tidyverse with the `library` command:
+```{r}
+library(tidyverse)
+```
+
 
 ### Reading in dataframes / tibbles
 
@@ -268,10 +280,68 @@ You will also need to know where the file is stored. If you are working in an R 
 
 Once you know the file type you're working with and where it's saved, you can read it in using the base-R, i.e. built-in, methods of `read.csv()` and `read.tsv()`. However, I would recommend using the modified calls `read_csv()` and `read_tsv()` because there are some improvements. 
 
+Be aware: Different system languages can affect csv files. Some languages will separate instead with semicolons (;), especially in languages that use a comma as a decimal separator (ex: 8,35). In those cases, use `read_csv2()` instead of `read_csv()`.
+
+When reading in the data, we also need to assign a name to the data frame using <- again, just like we did when we created variables earlier.
+
+For example:
+```{r}
+
+```
+
+### Try it out
+Here are three files that contain the same data (on penguin species - we'll explore it later) but in different formats. For each, find the correct command to read it in.
+```{r}
+penguins_1 <- read_csv("penguin_data_1.csv")
+penguins_2 <- read_csv2("penguin_data_2.csv")
+penguins_3 <- read_tsv("penguin_data_3.txt")
+```
 
 
+### Exploring data
+
+view, glimpse, head
 
 
-Be aware: Different system languages can affect csv files. Some languages will separate instead with semicolons (;), especially in languages that use a comma as a decimal separator (ex: 8,35)
+### Accessing data
+= calling columns
+
+### The pipe %>% 
+
+The pipe %>% is a command from the magrittr package (which is included in tidyverse, so no need to load it explicitly). 
+When the pipe is used, the output from the first line is automatically passed to the second line. Specifically, the output is used as the first argument of the next command.
+
+![Explaining the pipe](tweet_pipe_example.JPG)
+
+```{r}
+summary(penguins)
+# is equivalent to:
+penguins %>% # the line break here is optional, but makes the code more readable
+  summary()
+
+filter(penguins, island == "Dream")
+# is equivalent to:
+penguins %>% 
+  filter(island == "Dream")
+```
+
+Using the pipe has several advantages:
+- code is much more readable (verbs, not nouns), simpler, more intuitive, especially with nested functions 
+- flexible - can extract information without having to assign a name
+- no need to create several subsets of a dataframe/intermediate objects - less cluttered workspace 
+- less typing, fewer mistakes (e.g. calling wrong variable)
+
+Compare:
+foo_foo <- hop(foo_foo, through = forest)
+foo_foo <- scoop(foo_foo, up = field_mice)
+foo_foo <- bop(foo_foo, on = head)
+
+foo_foo %>%
+  hop(through = forest) %>%
+  scoop(up = field_mice) %>%
+  bop(on = head)
+
+Example from R for Data Science (Ch18 - Pipes): https://r4ds.had.co.nz/pipes.html
 
 
+### One final type of data: Factors
