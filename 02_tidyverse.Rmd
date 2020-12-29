@@ -1,0 +1,89 @@
+---
+title: "Intro to R"
+author: "Kyla McConnell"
+output: html_document
+---
+
+# Welcome to the tidyverse
+
+Welcome to the tidyverse! Tidyverse is a package -- really, a whole collection of packages -- that include a LOT of useful functions for all sorts of data analyzing, cleaning and "wrangling". 
+
+To start, make sure you have tidyverse installed. You can do this either through the panel at the lower left hand corner (Packages tab) or by typing into the Console `install.packages("tidyverse")`. Then, call the tidyverse with a `library()` call and let's get started!
+
+```{r}
+library(tidyverse)
+```
+
+Tidyverse loads multiple key packages:
+- dplyr -> for all sorts of data transformation and wrangling
+- ggplot2 -> the best plotting package in R (and ever??)
+- readr & tibble -> for reading in files to tibble format (improvements over R base data.frames)
+- stringr -> for text transformations (removing trailing whitespaces, etc.)
+- magrittr -> for pipes, more on this below
+
+It also loads purr (for vectorized programming), forcats (improvements to factors), readxl (for reading Excel documents), lubridate (for working with dates/times) and more.
+
+### The pipe %>% 
+
+One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctr/Cmd + Shift + M) 
+
+The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first function, this can be used to string together multiple functions. 
+
+Load in the following dataset, which contains IKEA furniture items in Saudi Arabia and their prices (in Saudi Riyals)
+```{r}
+ikea <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/ikea.csv')
+```
+
+First, take a look at the dataset. You can do this with `head(ikea)` or try out using the pipe. 
+
+```{r}
+ikea %>% 
+  head()
+```
+
+You see that this produces the exact same output as `head(ikea)`. Why would this be useful?
+
+Compare the following lines of pseudocode, which would produce the same output:
+
+A.
+bop(
+  scoop(
+    hop(foo_foo, through = forest),
+    up = field_mice
+  ), 
+  on = head
+)
+
+
+B.
+foo_foo %>%
+  hop(through = forest) %>%
+  scoop(up = field_mice) %>%
+  bop(on = head)
+  
+You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! 
+
+### Selecting columns
+
+A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `ikea$category` we can write:
+
+```{r}
+ikea %>% 
+  select(category) %>% 
+  head()
+```
+
+Here, I've piped the output to `head()` to reduce the amount of rows shown in the preview (don't do this if you want to work with the whole column!)
+
+We can then use this column for further calculations, like counting the number of unique categories. Note here that instead of `length(unique(ikea$category))`, we use `count()` -- a tidyverse function that works better here
+```{r}
+ikea %>% 
+  select(category) %>% 
+  unique() %>% 
+  count()
+```
+
+
+
+
+
