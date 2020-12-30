@@ -247,6 +247,8 @@ Try it now with one of the most used packages:
 install.packages("tidyverse")
 ```
 
+Note that the package name needs to be in quotation marks. You can also use vectors to install several packages at once: `install_packages(c("some_package", "another_package"))`.
+
 You may have to pick a CRAN "mirror". This is just meant to streamline your download by sending it from a close source -- pick whichever city is closest to you (it will also work even if you pick one further away.)
 
 ### Using packages
@@ -262,6 +264,8 @@ For example, let's load the tidyverse package for use later in this tutorial.
 ```{r}
 library(tidyverse)
 ```
+
+You can think of this process as installing light bulbs when you move into a new flat or house. You only need to do that once (like you only need to install a new R package once), but every evening, you need to switch on the lights in the rooms you use (i.e. load the packages you need).
 
 ### Reading in dataframes / tibbles
 
@@ -283,6 +287,16 @@ Be aware: Different system languages can affect csv files. Some languages will s
 jump_data <- read_csv("data/jump.csv")
 ```
 
+You can see that the dataset now popped up in the *Environment* panel at the top right in RStudio along with the number of rows (obs. = observations) and columns (variables) it contains. This can help you figure out if a file has been read in correctly (e.g. if R claims a file only contains 1 variable, it's likely that the correct separator wasn't recognised).
+
+### Try it out
+Here are three files that contain the same data (on penguin species - we'll explore it later) but in different formats. For each, find the correct command to read it in.
+```{r}
+penguins_1 <- read_csv("penguin_data_1.csv")
+penguins_2 <- read_csv2("penguin_data_2.csv")
+penguins_3 <- read_tsv("penguin_data_3.txt")
+```
+
 ### Exploring your data
 
 Now you have a data file read in, but how do you see what's in it?
@@ -298,8 +312,14 @@ You can also pass the `head()` call an extra, optional argument to show more row
 head(jump_data, n=3)
 ```
 
-You can also see your dataframe in the upper right panel under the Environment tab. Just click on the name of your dataframe to see it in a separate tab. In this tab, you can also sort columns and Filter rows -- just for viewing purposes though. This tab will get a bit slow if you start having huge dataframes but is often a good first look.
+You can also see your dataframe in the upper right panel under the Environment tab. Just click on the name of your dataframe to see it in a separate tab. In this tab, you can also sort columns and Filter rows -- just for viewing purposes though. This tab will get a bit slow if you start having huge dataframes but is often a good first look. If you do this, you can see that R prints `View(jump_data)`into the console, so instead of clicking on the dataframe, you could also type that command.
+Another way to get a first impression of the data is to click on the little arrow/triangle next to the name of the dataframe. This will show you an overview of the variables and their data types - similar to what will happen if you run the command `str(jump_data)` to see the **str**ucture of the dataframe or `glimpse(jump_data)`.
+```{r}
+str(jump_data)
+```
 
+
+### Summary()
 Another useful call is `summary()`. Call it on a dataframe to get each column and useful info based on the data type. For example, numeric columns will show the min, median, max and the quartiles (25% increments).
 ```{r}
 summary(jump_data)
@@ -324,6 +344,35 @@ jump_data$participant
 ```{r}
 jump_data$height_cm
 ```
+
+### One final type of data: Factors
+
+The penguins dataset contains data from three different penguin species on three different islands. Let's try to find out how many penguins per island we have in the data using a summary call:
+
+```{r}
+summary(penguins_1$species)
+```
+
+R doesn't tell us this information straight away, though. Instead, it informs us that this column contains 344 strings. We need to convert the variable to a factor first:
+
+```{r}
+penguins_1$species <- as_factor(penguins_1$species)
+```
+
+After running this command, R updates the information on the top right: species is now a factor with three levels, i.e. there are three distinct penguin species. Let's try the summary command again:
+
+```{r}
+summary(penguins_1$species)
+```
+The dataset contains data from 152 Adelie, 124 Gentoo, and only 68 Chinstrap penguins.
+
+The "factor" data type in R is commonly used for categorical variables, so variables that represent distinct categories.
+
+
+### Try it out
+How many male, how many female penguins are in the sample? (Hint: Remember to convert the variable into a factor first).
+What do you think "NA" means in this context?
+
 
 ### Descriptive stats
 
