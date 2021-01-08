@@ -175,7 +175,7 @@ my_word <- "hello"
 my_word + 2
 ```
 
-A final common variable type is *logical*. This can be either TRUE or FALSE, nothing else. You can assess logical statements with:
+Another common variable type is *logical*. This can be either TRUE or FALSE, nothing else. You can assess logical statements with:
 test if something is identical with ==
 test if something is not identical with !=
 test if something is greater than with > or less than with <
@@ -193,21 +193,27 @@ or try greater than or equals to >= or less than or equal to with <=
 class("seven" == 7)
 ```
 
+Finally, there is also the data type *factor*, which identifies string variables that should be treated as categories / distinct levels of a grouping -> will become more relevant when we work with datasets
+
 ### Try it out
 
 1. Assign your name to the variable "my_name". What data type is the variable?
-2. Try the command `nchar()` on your name variable. What does it do?
+2. Try the command `nchar()` on your name variable. What does it do? Try also toupper().
 3. What does nchar(my_name) >= 4 return? What does this mean?
 Bonus: What does TRUE == 1 return? What about FALSE == 1? Try them both with 0 too. What does this tell you about how R deals with logical variables?
 
 ### Vectors
 
-A special type of variable is the *vector*. Vectors contain multiple items of the same type and are enclosed in the syntax `c()`. For example:
+A special type of variable is the *vector*. Vectors contain multiple items of the same type and are enclosed in the syntax `c()`.
+
+The command `length()` returns number of items in the vector.
+
+For example:
 
 ```{r}
 grocery_list <- c("apples", "bananas", "bread", "orange juice")
 
-length(grocery_list)
+length(grocery_list) 
 ```
 
 You can also do "vector-wise" operations:
@@ -301,7 +307,7 @@ penguins_3 <- read_tsv("penguin_data_3.txt")
 
 Now you have a data file read in, but how do you see what's in it?
 
-One easy way is using the `head()` function, which will show the first five rows by default. 
+One easy way is using the `head()` function, which will show the first six rows by default. 
 ```{r}
 head(jump_data)
 ```
@@ -392,16 +398,9 @@ range(jump_data$height_cm)
 median(jump_data$height_cm)
 ```
 
-For categorical columns (ones that include group labels), we can use `unique()` to get every unique value with no duplicates:
-
+You can also call summary on just one column:
 ```{r}
-unique(jump_data$participant)
-```
-
-We can also check how many unique values there are by stacking a `length()` call on top of the `unique()` call.
-
-```{r}
-length(unique(jump_data$participant))
+summary(jump_data$height_cm)
 ```
 
 
@@ -410,3 +409,21 @@ length(unique(jump_data$participant))
 1. Use the variable you saved the spr_example data to. What is the range of response times (RT)?
 2. Save the mean RT to a variable called "average_RT". This number is in milliseconds. What would the equivalent be in seconds (hint: divide by 1000)
 3. How many unique words are in this experiment? How many conditions are there?
+
+### Categorical columns
+
+By default, tibbles (the type of dataframe that is produced by a `read_csv()` call and the similar tidyverse calls) will read in any text as a character type. This is because, under the hood, R sometimes does weird things with factors (also, not every time you have text in a dataframe do you want to consider it as a grouping).
+
+However, if you do have a grouping variable (participant, condition, type of something), it will generally work better with a lot of R applications to make sure R knows it is a factor. To change a character column into a factor use `as.factor()` on the column name.
+
+To make a categorical column be read as a factor, you must overwrite the saved column by saving an identical copy of the column converted to a factor over it.
+
+```{r}
+spr_data <- read_csv("../data/spr_example.csv")
+
+class(spr_data$participant)
+
+spr_data$participant <- as.factor(spr_data$participant)
+
+class(spr_data$participant)
+```
