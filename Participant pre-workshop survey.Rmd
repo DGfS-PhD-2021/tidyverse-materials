@@ -1,0 +1,72 @@
+---
+title: "Participant pre-workshop survey"
+author: "Julia Müller"
+date: "19 1 2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+
+registration <- read_csv("Registration.csv", skip = 1, 
+                         col_names = c("time", "email", "name", "pronouns", "institution", "status", "R_proficiency", "tidyverse_experience", "markdown_experience", "data", "use_R", "expectations")) %>% 
+  mutate(status = as_factor(status),
+         tidyverse_experience = as_factor(tidyverse_experience),
+         markdown_experience = as_factor(markdown_experience),
+         data = as_factor(data))
+```
+
+## General information
+```{r}
+registration %>% 
+  count(status) %>% 
+  ggplot +
+  aes(x = reorder(status, n), y = n) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_light() +
+  labs(x = NULL, title = "Participant status")
+```
+
+## R proficiency
+```{r}
+registration %>% 
+  ggplot +
+  aes(x = R_proficiency) +
+  geom_bar() +
+  theme_light() +
+  labs(x = NULL, title = "R proficiency level")
+```
+
+## Tidyverse and Markdown experience
+```{r}
+registration %>% 
+  mutate(tidyverse_experience = relevel(tidyverse_experience, ref = "No, I am new to R")) %>% 
+  ggplot +
+  aes(x = tidyverse_experience) +
+  geom_bar() +
+  theme_light() +
+  labs(x = NULL, title = "Experience with tidyverse")
+
+registration %>% 
+  mutate(markdown_experience = relevel(markdown_experience, ref = "No, I don't use R-Markdown")) %>% 
+  ggplot +
+  aes(x = markdown_experience) +
+  geom_bar() +
+  theme_light() +
+  labs(x = NULL, title = "Experience with Markdown")
+```
+
+
+## Data
+```{r}
+registration %>% 
+  count(data) %>% 
+  ggplot +
+  aes(x = reorder(data, n), y = n) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_light() +
+  labs(x = NULL, y = NULL, title = "Data participants (intend to) use")
+```
+
