@@ -10,7 +10,7 @@ library(tidyverse)
 
 registration <- read_csv("Registration.csv", skip = 1, 
                          col_names = c("time", "email", "name", "pronouns", "institution", "status", "R_proficiency", "tidyverse_experience", "markdown_experience", "data", "use_R", "expectations")) %>% 
-  mutate(status = as_factor(status),
+  mutate(status = as_factor(tolower(status)),
          tidyverse_experience = as_factor(tidyverse_experience),
          markdown_experience = as_factor(markdown_experience),
          data = as_factor(data))

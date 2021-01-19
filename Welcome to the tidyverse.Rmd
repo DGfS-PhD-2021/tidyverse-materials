@@ -35,19 +35,34 @@ The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to
 ![What does tidy data look like?](img/tidydata_1.jpg){width=50%}
 
 **Why this format?**  
-- it works the best for R  
-- complements *vectorised operations*  
+- a lot of wrangling commands are based on the assumption that your data is tidy 
+- is expected for many statistical models
+- works best for plotting 
+- "Tidy datasets are all alike, but every messy dataset is messy in its own way" Hadley Wickham
 
 ![Why use tidy data?](img/tidydata_3.jpg){width=50%}
 
 
-## Setting up
+# (2) Packages
 
 ### Installing packages
-```{r installing packages}
 
+- From the console with `install.packages("-PACKAGENAME-")` or through the Packages pane
+
+- Calling packages with `library()` near the top of the script
+
+1. Try the following command (first remove the hashtag #):
+```{r installing beepr}
+#beep(2)
 ```
+What error message do you get?
 
+Now install the package "beepr" and call the package to this session with a library call somewhere above the beep command (line above is enough.) Try running the command again (make sure your speakers are on -- but not too loud :D) 
+
+2. Install and -load- the "cowsay" package and try the following command (remove the hashtag #):
+```{r installing cowsay}
+#say(what = "Good luck learning R!", by = "chicken")
+```
 
 ### Loading packages
 ```{r loading packages}
@@ -55,63 +70,784 @@ library(tidyverse)
 ```
 As you can see when loading the tidyverse package, it's actually a family/collection of packages.
 
-### Reading in data
-Which command you need to read in data depends on the format:  
-- read_csv (separator: ,)  
-- read_csv2 (separator: ; and decimal: ,)  
-- read_tsv  
+# (3) R basics
+
+## (3.1) Variables
+
+Variables: give name/label to output, saves it (can be used anywhere below in current script)
+
+name_of_variable <- code
+
+For example:
+```{r}
+fav_number <- 12
+
+fav_number * 3
+```
+
+```{r}
+worst_number <- 7
+
+difference <- fav_number - worst_number
+```
+
+```{r}
+difference
+```
+
+```{r}
+double_number <- fav_number * 2
+double_number
+```
+
+
+#### Try it out
+
+1. You are planning a pizza party and want to figure out how many pieces of pizza each of your guests can eat before the pizzas run out. Create a variable called "guests" and assign it to the number of guests you have at your party: 15. 
+2. You order 6 pizzas. Assign the variable "pizzas" to the amount of pizzas you have: 6. Each pizza has 12 slices. Assign the variable "slices" to the amount of slices you have over all pizzas (hint: multiple the slices per pizza by the total number of pizzas -- you can use the pizzas variable here instead of retyping the number)
+4. Divide your "slices" variable by your "guests" variable to figure out how many slices each person can have. 
+5. 5 more people arrive to the party uninvited. Update your "guests" variable to the total number you have now. How many slices can each person have now?
+
+## (3.2) Data types
+
+- Data types -- how R interprets the input you give it
+- Figure out what type something is with `class()` 
+
+```{r}
+class(8.8)
+
+class(double_number)
+```
+
+- Numbers generally treated as *numeric* -> can include decimals 
+
+- *integer* allows only whole numbers -> can force numbers into this form with `as.integer()`
+  - this will truncate the decimal (cut it off), not round
+  - round with `round()`
+
+```{r}
+as.integer(8.8)
+
+integer_variable <- as.integer(8.8)
+integer_variable
+
+class(integer_variable)
+
+round(8.8)
+```
+
+- *character* is text, always enclosed in either double or single quotation marks 
+
+```{r}
+class('hello')
+```
+
+Check out the error here -- it may sound confusing but try to identify what it is telling you.
+
+```{r}
+my_word <- "hello"
+class(my_word)
+
+my_word + 2
+fav_number + 2
+
+other_number <- "2"
+class(other_number)
+other_number + 2
+```
+
+
+- *logical* can be either TRUE or FALSE, nothing else. 
+
+test if something is identical with ==
+test if something is not identical with !=
+test if something is greater than with > or less than with <
+or try greater than or equals to >= or less than or equal to with <=
+
+```{r}
+7 < 8
+
+"dog" == "dogs"
+
+8.8 >= 5.6
+
+logic_test <- "seven" == 7
+
+class(logic_test)
+```
+
+*factor* - string variables that should be treated as categories / distinct levels of a grouping -> will become more relevant when we work with datasets
+
+#### Try it out
+
+1. Assign your name to the variable "my_name". What data type is the variable?
+2. Try the command `nchar()` on your name variable. What does it do? Try also `toupper()`.
+3. What does nchar(my_name) >= 4 return? What does this mean?
+
+Bonus: What does TRUE == 1 return? What about FALSE == 1? Try them both with 0 too. What does this tell you about how R deals with logical variables?
+
+
+## (3.3) Vectors
+
+Special variable type: *vector* -- contains multiple items of the same type, enclosed in the syntax `c()`
+
+- command `length()` returns number of items in the vector
+
+```{r}
+grocery_list <- c("apples", "bananas", "bread", "orange juice")
+
+length(grocery_list)
+```
+
+You can also do "vector-wise" operations:
+```{r}
+my_numbers <- c(12, 14, 26, 57, 82)
+
+my_numbers + 2
+
+my_numbers * 10
+
+my_numbers > 20
+```
+
+Mathematical operation is "broadcast" to each item
+
+
+Add/subtract/multiply/divide a vector by another vector: items matched up one at a time in a loop
+
+```{r}
+my_numbers 
+
+my_numbers + my_numbers
+```
+
+
+You can also take a certain item from a vector using square brackets. For example, take the first item:
+
+```{r}
+my_numbers[5]
+```
+
+#### Try it out
+
+1. Make a variable called long_array and assign it the values 1, 1, 2, 2, 5, 10 (don't forget the `c()` syntax!)
+2. Make a variable called short_array and assign it the values 1, 6, 10
+3. Subtract short_array from long_array
+4. Subtract long_array from short_array
+5. Look at the output. What does this tell you about how R deals with vectors of different lengths?
+
+```{r}
+long_array <- c(1, 1, 2, 2, 5, 10)
+short_array <- c(1, 6, 10)
+
+long_array - short_array
+short_array - long_array
+```
+
+
+
+
+# (4) Reading in data
+- What type of file are you working with?
+  - Excel: go to File -> Save As and select either comma-separated values (csv) or tab-separated values (tsv)
+
+- Where is the file saved?
+
+  - working directory: the location that R should start looking for files -- `setwd()`
+    - ex: `setwd(~Documents/PhD/Rscripts/...)` or `setwd(C:/Documents...)`
+    - can also use Session -> Set Working Directory -> Choose Directory...
+  - R-Markdown automatically sets the working directory to the folder you're in
+  
+```{r}
+getwd()
+```
+  
+  
+  - once you've set the working directory:
+    - can use files with just their short names ("experiment_data.csv")
+    - can use data in a folder ("data/experiment_data.csv")
+    - can use ../ to go backwards one folder
+
+- Read in the file:
+  - base-R: `read.csv()` and `read.tsv()`
+  - tidyverse (improvements, reads as tibble instead of dataframe): `read_csv()` and `read_tsv()`
+    - must have tidyverse installed and loaded with a `library()` call
+    - `read_csv2()` for semicolon-separated csv 
+    - `read_delim(file, delim)` for any other delimiters
+    
+*Save the output to a variable.*
+
+```{r}
+example_data <- read_csv("example.csv")
+```
 
 ## Dataframes and tibbles: What's the difference?
+We already know one command set from the tidyverse: `read_csv()` and `read_tsv()`. These are used to read in data, and they return a structure called the "tibble". 
 
-## Exploring our data
-summary, str, View, glimpse...
+The tibble is the "tidyverse" version of the base-R alternative, the "data.frame". 
 
-different types of realistic, relevant data: experimental, corpus data/text, questionnaires
+In practice, "data.frame"s and "tibble"s are very similar, however:
+- tibbles print a few rows as default
+- tibbles are made to work with the tidyverse calls to come
+- tibbles don't automatically read in text columns as factors (sounds like a disadvantage but is often an advantage, more on this later)
+- tibbles doesn't restrict or change column names -- if they are invalid (have spaces, start with whitespace), they can still be called, you just have to surround them with backticks ``
 
-## Workflows/code conventions
+That's probably enough info for now, but if you want to read more about tibbles as you get more comfortable with R, here is a chapter in R for Data Science: 
+https://r4ds.had.co.nz/tibbles.html
 
-### The pipe %>% 
 
-# (2) Changing columns
-- rename  
-- reordering columns - arrange, desc  
+# (5) Exploring our data
+
+Now you have a data file read in, but how do you see what's in it?
+
+`head()`: shows first six rows 
+```{r}
+head(jump_data)
+```
+
+Can change the amount of rows with the n *argument* 
+```{r}
+head(jump_data, n=3)
+```
+
+Or: click name of dataframe in Environment tab
+  - can also sort columns and Filter rows -- just for viewing purposes
+  - bit slow if you start having huge dataframes but often a good first look
+
+`summary()`: call it on a dataframe to get each column and useful info based on the data type. For example, numeric columns will show the min, median, max and the quartiles (25% increments).
+```{r}
+summary(jump_data)
+```
+
+#### Try it out
+
+1. Load in the dataframe "spr_example.csv" as a tibble, i.e. using the tidyverse call `read_csv()` Make sure to save it to a variable.
+2. Take a look at your dataframe in the Environment tab. 
+3. Try the command `colnames()` on the variable you saved the dataframe to. What does it do?
+4. We already tried the `head()` command, now try the `tail()` command. What does it do?
+
+
+
+# (6) The pipe %>% 
+
+One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctr/Cmd + Shift + M) 
+
+The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first function, this can be used to string together multiple functions. 
+
+First, take a look at the dataset. You can do this with `head(ikea)` or try out using the pipe. 
+
+```{r}
+head(ikea)
+
+ikea %>% 
+  head()
+```
+
+You see that this produces the exact same output as `head(ikea)`. Why would this be useful?
+
+Compare the following lines of pseudocode, which would produce the same output:
+
+A.
+bop(
+  scoop(
+    hop(foo_foo, through = forest),
+    up = field_mice
+  ), 
+  on = head
+)
+
+
+B.
+foo_foo %>%
+  hop(through = forest) %>%
+  scoop(up = field_mice) %>%
+  bop(on = head)
+  
+You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! 
+
+Here are some more examples:
+```{r}
+# Equivalent to summary(ikea)
+ikea %>% 
+  summary()
+
+
+# Equivalent to colnames(ikea), which returns all column names
+colnames(ikea)
+
+ikea %>% 
+  colnames() 
+
+# Equivalent to nrow(ikea), which returns the number of rows in the df
+nrow(ikea)
+
+ikea %>% 
+  nrow()
+```
+
+
+And you can also stack commands by ending each row (except the last one) with a pipe:
+```{r}
+ikea %>% 
+  colnames() %>% #extracts column names
+  toupper() #converts them to uppercase
+
+ikea %>% 
+  colnames() %>% #extracts column names
+  nchar() #counts the number of letters
+```
+
+# (7) Changing columns
+
+## (7.1) rename()
+You can rename columns with the `rename()` function. The syntax is new_name = old_name.
+
+```{r}
+ikea %>% 
+  rename(price_sar = price)
+```
+
+You can also rename multiple columns at once (no need for an array here):
+```{r}
+ikea <- ikea %>% 
+  rename(price_sar = price, 
+         description = short_description)
+```
+Notice above that I've saved output over the ikea dataframe to make the changes 'permanent'.
+
+## (7.2) relocate()
+
 ![Relocate](img/dplyr_relocate.png){width=50%}
 
-# (3) Subsets
+## (7.3) select()
 
-## Looking at specific cases (rows)
-- filter  
-- distinct  
-- sample (sample_frac, sample_n)  
-- top_n  
+- The traditional syntax for dealing with columns is dataframe$column.
+
+A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `ikea$category` we can write:
+
+```{r}
+ikea %>% 
+  select(category) 
+```
+
+We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(ikea$price)`
+```{r}
+ikea %>% 
+  select(price) %>% 
+  summary()
+
+ikea %>% 
+  select(price) %>% 
+  max()
+
+ikea %>% 
+  select(height) %>% 
+  min()
+```
+
+We could, for example, look at the tallest item:
+```{r}
+ikea %>% 
+  select(height) %>% 
+  max()
+```
+
+Or the thinnest:
+```{r}
+ikea %>% 
+  select(width) %>% 
+  min()
+```
+
+
+### Select multiple columns 
+You can also use `select()` to take multiple columns. 
+
+```{r}
+ikea %>% 
+  select(name, price, category)
+```
+
+You can see that these columns are presented in the order you gave them to the select call, too:
+
+```{r}
+ikea %>% 
+  select(category, price, name)
+```
+
+You can also use this to reorder columns in that you give the name of the column(s) you want first, then finish with `everything()` to have all other columns follow:
+
+```{r}
+ikea %>% 
+  select(price, everything())
+```
+
+#### Try it out 
+
+1. We tried piping ikea to `head()` above. Try it now with `tail()`. What does this show you? 
+```{r}
+
+```
+
+2. Pipe the 'ikea' dataset to `colnames()` What does this command do? (Bonus, pipe the columnn names on to the `nchar()` function and figure out what that does.)
+```{r}
+
+```
+
+3. What is the shortest item in the dataset? The widest?
+```{r}
+
+```
+
+4. Select the depth column and pipe it to `range()` to see the full rannge of depths.
+```{r}
+
+```
+
+
+### Preview vs. saving
+- Above: mostly previewing using `select()` for first insights
+  - if you look at the ikea dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
+
+- To save your changes: assigning your call back to the variable name
+
+- Good work flow: Preview then save when you're sure you're happy with the output
+
+```{r}
+ikea %>% 
+  select(name, everything())
+```
+
+```{r}
+ikea <- ikea %>% 
+  select(name, everything())
+```
+
+There is no output here, but the ikea dataframe has been permanently updated (within the R session, not in your file system)
+
+There is also a trick to show a preview and save it to the variable -- wrapping the whole call in parentheses -- use with caution!
+
+```{r}
+(ikea <- ikea %>% 
+  select(name, everything()))
+```
+
+If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
+
+
+### Remove columns with select
+
+You can also remove columns using select if you use the minus sign. For example, here, we have the first column ("X1") which is a sort of row numbering. If you don't want this column, you can drop it with select:
+
+```{r}
+ikea %>% 
+  select(-X1)
+```
+
+You can also remove multiple columns at once by writing them in an array `c()`. Once your preview looks the way you want it --just make sure to save your results by committing it to a variable (over the old one is fine).
+
+```{r}
+(ikea <- ikea %>% 
+  select(-c(X1, old_price)))
+```
+
+### Leveling up select()
+
+Until now, we've used select() in combination with the full column name, but there are helper functions that let you select columns based on other criteria.
+
+For example, here's how we can select both the `price` and the `old_price` column - by specifying `ends_with("price")` in the select() call:
+```{r}
+ikea %>% 
+  select(ends_with("price"))
+```
+
+The opposite is also possible, e.g.
+```{r}
+ikea %>% 
+  select(starts_with("s"))
+```
+returns all columns that start with "s".
+
+`contains` is another helper function. Here, we're using it to show all columns that contain an underscore:
+```{r}
+ikea %>% 
+  select(contains("_"))
+```
+
+If we try to select a column that doesn't exist, we get an error message:
+```{r}
+# ikea %>% 
+#  select(name, translation)
+```
+
+But if we combine select with any_of, we don't see an error. Instead, R just returns the columns that do exist:
+Note here that you have to use an array and enclose the names in quotes!
+```{r}
+ikea %>% 
+  select(any_of(c("name", "translation")))
+```
+
+We can also select a range of  variables using a colon. This works both with variables and (a range of) numbers:
+```{r}
+ikea %>% 
+  select(X1:category)
+
+ikea %>% 
+  select(1:3) # first three columns
+```
+Here, the order of the columns matters!
+
+
+Other helper functions are:
+- matches: similar to contains, but can use regular expressions
+- num_range: in a dataset with the variables X1, X2, X3, X4, Y1, and Y2, select(num_range("X", 1:3)) returns X1, X2, and X3
+
+#### Try it out
+-add-
+
+# (8) Subsets
+
+- Look for rows that fulfill certain conditions
 
 ![Filter](img/dplyr_filter.jpg){width=50%}
 
-### Logical and boolean operators for filter
+## (8.1) filter()
+### Filter based on a condition
+
+You can also select all items that fit a certain condition. For example, you can use:
+- equals to: ==
+- not equal to: !=
+- greater than: > 
+- greater than or equal to: >=
+- less than: <
+- less than or equal to: <=
+- in (i.e. in an array): %in%
+
+```{r}
+ikea %>% 
+  filter(price_sar > 8500)
+```
+
+You can also select items with a specific price:
+```{r}
+ikea %>% 
+  filter(price_sar == 265)
+```
+
+Or you can use it to select all items in a given category. Notice here that category is a character column, so you have to use quotation marks to show you're matching a character string.
+
+Look at the error below:
+```{r}
+ikea %>% 
+  filter(category == Beds)
+```
+
+The correct syntax is: (because you're matching to a string)
+```{r}
+ikea %>% 
+  filter(category == "Beds")
+```
+
+To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
+```{r}
+ikea %>% 
+  filter(name %in% c("BRIMNES", "BILLY", "KALLAX"))
+```
+Note that filter is case-sensitive, so capitalization matters.
+
+#### Try it out
+
+1. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
+
+2. You want to take a look at the results from Par_C only: Filter these data points but don't save the result. 
+
+3. You're not interested in the practice items in the spr dataframe. Filter the dataset to include everything BUT the practice items and save your result.
+
+### Leveling up filter
 - %in%  
 - < <= > >=  
 - is.na(), !is.na()  
 - | &  
 
-## Selecting specific variables (columns)
-select by name or using helper functions
+## (8.2) distinct()
 
-### Helper functions
-- starts with, ends with  
-- contains  
-- everything  
-- matches  
-- num_range  
-- one_of  
-- :  
-- -  
+## (8.3) top_n()
 
-# (4) Creating and changing columns 
+sample()?
+
+# (9) Creating and changing columns 
 
 ![Mutate](img/dplyr_mutate.png){width=50%}
 
-## Data types and conversions
-numeric, character, factor
+## (9.1) mutate()
+
+Let's try to make a column where the prices are in euro. We can call this column price_eur. When I checked, 1 Saudi Riyal was equal to 0.22 euro. So we can multiply the price_sar column by 0.22
+
+```{r}
+ikea %>% 
+  mutate(threes = 3)
+
+ikea <- ikea %>% 
+  mutate(price_eur = price_sar * 0.22)
+```
+Now, there's a new column called price_eur (it's at the very end by default)
+
+You can also save the new column with the same name, and this will update all the items in that column (see below, where I add 100 to every price, but note that I don't save the output)
+
+```{r}
+ikea %>% 
+  mutate(price_sar = price_sar + 100)
+```
+
+You can even create many new columns at the same time. Here, dropping each new column onto a new line is considered new style (but not necessary!)
+
+For example, if we wanted to represent dimensions as meters instead of cm:
+```{r}
+ikea %>% 
+  mutate(depth_m = depth/100, 
+         height_m = height/100, 
+         width_m = width/100)
+
+ikea %>% 
+  mutate(depth_m = depth/100) %>% 
+  mutate(height_m = height/100)
+```
+
+You can also do operations to character columns; for example, 
+```{r}
+ikea %>% 
+  mutate(name = tolower(name))
+```
+
+### Change data type in a column
+
+- Tibbles read in all text columns as character -- if you want something to be a factor, you have to set this explicitly. 
+
+- Factors represent groups (participant, conditions, etc.)
+
+- When R acknowledges something as a factor, it can see that there are repeated groupings, i.e. that c("US", "US", "UK") has two instances of the grouping "US" and one of the grouping "UK".
+
+- Let's see what happens when we use call summary on a character column:
+```{r}
+class(ikea$category)
+
+ikea %>% 
+  select(category) %>% 
+  summary()
+```
+
+It tells us just that there are 3694 character rows.
+
+In reality, category is a grouping that repeats itself. So let's set it to a factor (and save it!):
+```{r}
+ikea <- ikea %>% 
+  mutate(category = as.factor(category))
+
+ikea$category <- as.factor(ikea$category)
+
+class(ikea$category)
+```
+
+Now call summary on the category column:
+```{r}
+ikea %>% 
+  select(category) %>% 
+  summary()
+```
+Now it tells us how many items of each category are present in the dataframe! Factors also have other benefits / allow R to work intuitively with categories -- so converting to factor will enable R to work with this type of column as it should.
+
+Which other columns in this dataframe should be factors?
+```{r}
+ikea <- ikea %>% 
+  mutate(other_colors <- as.factor(other_colors),
+         designer <- as.factor(designer))
+
+ikea$designer <- as.factor(designer)
+
+summary(ikea$designer)
+```
+
+Things like a description, or the item names (if they don't repeat much), don't have to be factors but are more intuitive as character columns, since they don't represent groupings.
+
+Check out the changes in the environment panel too. 
+
+Some calls you can use on factor column include:
+```{r}
+levels(ikea$category) #Shows which unique groupings exist
+levels(ikea$other_colors)
+```
+
+There is also another syntax that does the same job for replacing columns with altered copies. You may like this better -- either works fine! 
+ikea$category <- as.factor(ikea.category)
+
+If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
+`as.numeric()`, `as.character()` etc.
+
+#### Try it out
+
+1. Call summary on the "participant" column of the spr dataframe -- you can do this either the "tidyverse way" with `select()` or with the traditional `$` syntax. What does it show? 
+```{r}
+spr_data <- read_csv("../data/spr_example.csv")
+```
+
+2. Call `class()` on the same column to get the data type. 
+
+3. Now, try changing the column to a factor using `as.factor()`. Remember that you'll have to save this over top of the old variable.
+- Change a character column into a factor using `as.factor()` 
+  - save over the original column
+
+4. What do `class()` and `summary()` return now?
+
+5. Are there any other columns in the spr dataframe that you think should be represented as factors?
+
+
+
+# (10) Summary tables with groupings
+
+To look at summary statistics for specific groupings, we have to use a two- (more like three-) step process. 
+
+First, group by your grouping variable using `group_by()`
+Then, summarize, which creates a column based on a transformation to another column, using `summarize()` or `summarise()`
+Finally, ungroup (so that R forgets that this is a grouping and carries on as normal, with `ungroup()`
+  - usually this makes no difference to what you see but is an important failsafe
+
+You can use multiple different operations in the summarize part, including:
+- mean(col_name)
+- median(col_name)
+- max(col_name)
+- min(col_name)
+
+For example, to return the average price in each category:
+```{r}
+ikea %>% 
+  group_by(category) %>% 
+  summarize(mean(price_eur)) %>% 
+  ungroup()
+```
+
+You can also give a name to your new summary column, and round the output: 
+```{r}
+ikea %>% 
+  group_by(category) %>% 
+  summarize(avg_price = round(mean(price_eur))) %>% 
+  ungroup()
+```
+
+For categorical columns, you can also count how many rows are in each category using `count()` instead of `summarize()`
+
+```{r}
+ikea %>% 
+  group_by(category) %>% 
+  count() %>% 
+  ungroup()
+```
+Similarly, you can use distint() to return the unique items in the category, for example:
+```{r}
+ikea %>% 
+  group_by(category) %>% 
+  distinct(name)
+```
+You can call `distinct()` without an argument, which will make sure that all columns have only unique items, or you can call it on a specific column, which will return only that column and all the unique items in it.
 
 ## Summaries
 - summarise(_each), summarise_all, summarise_at, summarise_if  
@@ -123,6 +859,15 @@ numeric, character, factor
 - mean, median  
 - var, sd  
 
+#### Try it out
+
+1. Starting with the spr dataset, group by participant and use summarize to find the max RT for each participant. 
+
+2. With the same dataset, group by condition and return the mean RT for each condition. This is already a first step towards statistical analysis of your data!
+
+3. Summarize based on condition and count how many full sentences are in each condition. (Here you will realize that this example dataset doesn't make a ton of sense :D)
+
+
 ## If-else-statements
 conditions
 - if_else
@@ -130,26 +875,22 @@ conditions
 
 ![Case when: an extension of if-else](img/dplyr_case_when.png){width=50%}
 
-# (5) Grouping behaviour
 
 ![Group and ungroup](img/group_by_ungroup.png){width=50%}
 
-- group_by, and ungroup
-- summarize
-
-# (6) Transforming data 
+# (11) Transforming data 
 
 ![Pivot](img/tidyr_spread_gather.png){width=50%}
-
+## (11.1) pivot()
 -> pivot (wide - long, or long - wide)
 separate (example: tagged corpus text) and unite (example: create participant id from experiment id + number)
 
-# (7) Joining several data sets
+# (12) Joining several data sets
 - left_join, right_join, inner_join, full_join
 - semi_join, anti_join
 - bind_rows, bind_cols
 
-# (8) Simple graphs
+# (13) Simple graphs
 - working with subsets by directly piping them into a plotting/model call
 
 ![ggplot2](img/ggplot2_exploratory.png){width=50%}
@@ -163,7 +904,7 @@ CHECK
 - cumulative aggregates  
 
 
-# (9) Getting help
+# (14) Getting help
 
 ## Resources and cheat sheets
 - [R for Data Science](https://r4ds.had.co.nz/index.html)
@@ -172,8 +913,12 @@ CHECK
 ## How to access and read function documentations
 ?command/??command or enter it into the help search box
 
+vingettes
+
 ## Reprex?
 
 ## Working with Google results
 
+## Workflows/code conventions
+-add- 
 
