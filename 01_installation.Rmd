@@ -1,0 +1,43 @@
+---
+title: "How to install and use R-Studio"
+author: "Kyla McConnell & Julia Mueller"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## If you're installing R for the first time
+
+R is a programming language that can be written directly into your computer's console/terminal. However, almost all users of R pair it with the program R-Studio, an integrated development environment (IDE) that offers a ton of features that will make your life much easier! 
+
+Download R here (if in Germany): https://ftp.gwdg.de/pub/misc/cran/
+Or select a closer location ("mirror") here to optimize performance: https://ftp.gwdg.de/pub/misc/cran/
+
+Then download R-Studio (Desktop) here: https://rstudio.com/products/rstudio/download/
+
+More installation info here if you have trouble: https://rstudio-education.github.io/hopr/starting.html
+
+Windows users -- you might be prompted to download a program called RTools to use the package panel in R Studio. You can do this directly from the RStudio/CRAN webpage here: https://cran.rstudio.com/bin/windows/Rtools/
+
+Note: You must install both R AND R-Studio in order to use R-Studio for our tutorial. 
+
+## If you need to update R and R-Studio
+If you want to update R, you can simply download the newest version using the link above. Note, however, that you will likely have to reinstall all packages. This is still worth doing every so often so that you don't get too far behind, because new packages might not work on old R versions (but old packages might not work on new R versions). 
+
+You can also update R Studio by re-downloading it with the link above.
+
+If you're on Windows, you can also use the installr package, here is some more info: https://www.r-statistics.com/2013/03/updating-r-from-r-on-windows-using-the-installr-package/
+
+## About R-Studio
+
+R-Studio can make your R journey much easier! With R-Studio, you go from a programming language of text-only to a whole program, not too unlike Microsoft Word in comparison to text files. 
+
+In general, you have four panels: 
+
+Top-left: your scripting panel, in which you can write and save code. This may only open when you open a new file (File -> New File -> R Script / R-Markdown, we'll talk about the difference below)
+
+Bottom-left: the console panel, for input/output that won't be saved.
+
+Top-right: the environment panel, which generally can show you dataframes you are working with as well as other information you've saved to variables (and sometimes has other features too, depending on what you're working with)
+
+Bottom-right: install and update packages, preview plots, read help files, and some other features
