@@ -244,6 +244,106 @@ long_array - short_array
 short_array - long_array
 ```
 
+# Communicating with R
+
+## Understanding warnings and errors
+R will often "talk" to you when you're running code. For example, when you install a package, it'll tell you e.g. where it is downloading a package from, and when it's done. That's nothing to worry about!
+
+When there's a mistake in the code (e.g. misspelling a variable name, forgetting to close quotation marks or brackets), R will give an *error* and be unable to run the line. The error message will give you important information about what went wrong.
+```{r}
+hello <- "hi"
+Hello
+```
+
+In contrast, *warnings* are shown when R thinks there could be an issue with your code or input, but it still runs the line. R is generally just telling you that you MIGHT be making a logical error, not that the code is impossible.
+
+```{r}
+c(1, 2, 3) + c(1, 2)
+```
+
+
+## Reading function documentation
+First, load the cowsay package again (make sure it's installed):
+```{r}
+library(cowsay)
+```
+
+Try the following code again (making sure the cowsay package is installed **and** loaded):
+```{r}
+say(
+  what = "Good luck learning R!", 
+  by = "buffalo")
+```
+
+But what other options are there for this command - which other animals, for example, or can you change the colour? To see the documentation for the `say` command, you can either run this line of code:
+```{r}
+?say
+```
+...or type in `say` in the Help tab on the bottom right.
+
+This will show you the documentation for the command.
+- *Usage* shows an overview of the function arguments and their defaults (e.g. if you typed in `say()` without any arguments in the brackets, you'd get the defaults, i.e. a cat saying "Hello world!")
+```{r}
+say()
+```
+
+- *Arguments* provides more information on each argument. 
+Arguments are the options you can use within a function. Check out the carsay::say() arguments (note this syntax of package::command()).
+- what
+- by 
+- type
+- what_color
+etc. 
+Each of these can be fed the `say()` function to slightly alter what it does.
+
+- *Examples* at the bottom of the help page lists a few examples you can copy-paste into your code to better understand how a function works.
+Don't worry if you don't understand everything in the documentation when you're first starting out. Just try to get an idea for which arguments there are and which options for those arguments. It's good practice to look at help documents often -- this will also help you get more efficient at extracting the info you need from them.
+
+#### Try it out 
+
+1. All of the following code snippets produce errors. What have I done wrong? Correct each snippet.
+
+```{r}
+party_invites <- c(Tracey, Karen, Sandra)
+```
+
+```{r}
+1, 4, 5 + 1
+```
+
+```{r}
+max(price) #from the ikea tibble
+```
+
+```{r}
+ikea %>% 
+  filter(item = "BILLY")
+```
+
+```{r}
+ikea %>% 
+  select(starts_with(item))
+```
+
+```{r}
+ikea %>% 
+  mutate(price * 2 = new_price)
+```
+
+```{r}
+sumary(ikea)
+```
+
+```{r}
+42 + "5"
+```
+
+
+2. Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
+```{r}
+
+```
+
 
 
 
@@ -295,6 +395,21 @@ In practice, "data.frame"s and "tibble"s are very similar, however:
 That's probably enough info for now, but if you want to read more about tibbles as you get more comfortable with R, here is a chapter in R for Data Science: 
 https://r4ds.had.co.nz/tibbles.html
 
+### Writing files to disk
+
+To write files to disk, you also need to select which separator you want to use -- do you want a comma-separated file or a tab-separated file? In theory, this shouldn't matter much,y ou just have to know which you pick. 
+
+CSVs are often saved as .csv (this is also openable in Excel) and TSVs are often saved as .txt
+
+You can save CSVs and TSVs like so:
+```{r}
+# write_tsv(ikea, "ikea_df.txt")
+
+# write_csv(ikea, "ikea_df.csv")
+```
+Syntax: write_tsv(dfname, "filename.ext")
+
+Remember, something like data type in R (ex: character or factor) can't be saved into one of these files -- it just saves the values separated by the separator (and the column names). So you'll still have to do the conversions next time you read the file into R. 
 
 # (5) Exploring our data
 
@@ -603,7 +718,14 @@ Other helper functions are:
 - num_range: in a dataset with the variables X1, X2, X3, X4, Y1, and Y2, select(num_range("X", 1:3)) returns X1, X2, and X3
 
 #### Try it out
--add-
+1. From the ikea dataset, select all columns that start with the letter "d". (Case-sensitive!)
+
+2. Select all the columns of ikea that contain "th".
+
+3. You would like to buy a really cheap chair -- Filter the dataset to include only chairs that cost less than 100 SAR.
+
+4. Show two different ways to filter the name column to include only items named "BILLY" or "KALLAX".
+
 
 # (8) Subsets
 
@@ -613,55 +735,91 @@ Other helper functions are:
 
 ## (8.1) filter()
 ### Filter based on a condition
+### filter()
 
-You can also select all items that fit a certain condition. For example, you can use:
+Use `filter()` to return all items that fit a certain condition. For example, you can use:
 - equals to: ==
 - not equal to: !=
 - greater than: > 
 - greater than or equal to: >=
 - less than: <
 - less than or equal to: <=
-- in (i.e. in an array): %in%
+- in (i.e. in a vector): %in%
+
+Syntax: filter(columnname logical-operator condition)
 
 ```{r}
-ikea %>% 
-  filter(price_sar > 8500)
+penguins %>% 
+  filter(bill_length_mm > 55)
+
+penguins %>% 
+  filter(bill_length_mm < 35)
+
+penguins %>% 
+  filter(bill_depth_mm < 14)
 ```
 
-You can also select items with a specific price:
+You can also select numeric rows with a specific value
 ```{r}
-ikea %>% 
-  filter(price_sar == 265)
+penguins %>% 
+  filter(year == 2009)
 ```
 
-Or you can use it to select all items in a given category. Notice here that category is a character column, so you have to use quotation marks to show you're matching a character string.
+Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
 
 Look at the error below:
 ```{r}
-ikea %>% 
-  filter(category == Beds)
+penguins %>% 
+  filter(island == Biscoe)
 ```
 
 The correct syntax is: (because you're matching to a string)
 ```{r}
-ikea %>% 
-  filter(category == "Beds")
+penguins %>% 
+  filter(island == "Biscoe")
+
+penguins %>% 
+  filter(species == "Gentoo")
 ```
 
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
-ikea %>% 
-  filter(name %in% c("BRIMNES", "BILLY", "KALLAX"))
+penguins %>% 
+  filter(species %in% c("Gentoo", "Chinstrap"))
+
+penguins %>% 
+  filter(year %in% c(2008, 2009))
 ```
 Note that filter is case-sensitive, so capitalization matters.
 
 #### Try it out
 
-1. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
+1. Load in the spr_example dataset again (update the path if you have to). 
+```{r}
+spr <- read_csv("data/spr_example.csv") 
+```
 
-2. You want to take a look at the results from Par_C only: Filter these data points but don't save the result. 
+2. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
+```{r}
+nrow(spr)
 
-3. You're not interested in the practice items in the spr dataframe. Filter the dataset to include everything BUT the practice items and save your result.
+spr <- spr %>% 
+  filter(RT >= 150)
+
+nrow(spr)
+```
+
+3. You want to take a look at the results from Par_C only: Filter these data points but don't save the result. 
+```{r}
+spr %>% 
+  filter(participant == "Par_C")
+```
+
+4. You're not interested in the practice items in the spr dataframe. Filter the dataset to include everything BUT the practice items and save your result.
+```{r}
+spr <- spr %>% 
+  filter(cond != "practice")
+```
 
 ### Leveling up filter
 - %in%  
@@ -804,12 +962,18 @@ spr_data <- read_csv("../data/spr_example.csv")
 
 # (10) Summary tables with groupings
 
+### group_by() & summarize()
+First, load the ikea dataset again:
+```{r}
+ikea <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/ikea.csv') 
+```
+
 To look at summary statistics for specific groupings, we have to use a two- (more like three-) step process. 
 
 First, group by your grouping variable using `group_by()`
 Then, summarize, which creates a column based on a transformation to another column, using `summarize()` or `summarise()`
 Finally, ungroup (so that R forgets that this is a grouping and carries on as normal, with `ungroup()`
-  - usually this makes no difference to what you see but is an important failsafe
+  - usually this makes no difference to what you see but is an important fail-safe
 
 You can use multiple different operations in the summarize part, including:
 - mean(col_name)
@@ -821,15 +985,23 @@ For example, to return the average price in each category:
 ```{r}
 ikea %>% 
   group_by(category) %>% 
-  summarize(mean(price_eur)) %>% 
+  summarize(mean(price)) %>% 
   ungroup()
 ```
 
-You can also give a name to your new summary column, and round the output: 
+You can also give a name to your new summary column: 
 ```{r}
 ikea %>% 
   group_by(category) %>% 
-  summarize(avg_price = round(mean(price_eur))) %>% 
+  summarize(avg_price = mean(price)) %>% 
+  ungroup()
+```
+
+Or further manipulate it:
+```{r}
+ikea %>% 
+  group_by(category) %>% 
+  summarize(avg_price_eur = mean(price) * 0.22) %>% 
   ungroup()
 ```
 
@@ -841,37 +1013,140 @@ ikea %>%
   count() %>% 
   ungroup()
 ```
-Similarly, you can use distint() to return the unique items in the category, for example:
+
+Similarly, you can use distinct() to return the unique items in the category, for example:
 ```{r}
 ikea %>% 
   group_by(category) %>% 
+  distinct(name) %>% 
+  ungroup()
+
+ikea %>% 
   distinct(name)
 ```
 You can call `distinct()` without an argument, which will make sure that all columns have only unique items, or you can call it on a specific column, which will return only that column and all the unique items in it.
 
-## Summaries
-- summarise(_each), summarise_all, summarise_at, summarise_if  
-- count  
-- first, last  
-- nth, n, n_distinct  
-- IQR  
-- min, max  
-- mean, median  
-- var, sd  
+Or both:
+```{r}
+ikea %>% 
+  group_by(category) %>% 
+  distinct(name) %>% 
+  count()
+```
+
 
 #### Try it out
 
 1. Starting with the spr dataset, group by participant and use summarize to find the max RT for each participant. 
+```{r}
+spr %>% 
+  group_by(participant) %>% 
+  summarize(max(RT)) %>% 
+  ungroup()
+```
 
-2. With the same dataset, group by condition and return the mean RT for each condition. This is already a first step towards statistical analysis of your data!
+2. With the same dataset, group by condition and return the mean RT for each condition. This is already a first step towards statistical analysis of your data! Do conditions look like they have similar or very different means?
+```{r}
+spr %>% 
+  group_by(cond) %>% 
+  summarize(mean(RT)) %>% 
+  ungroup()
+```
+
 
 3. Summarize based on condition and count how many full sentences are in each condition. (Here you will realize that this example dataset doesn't make a ton of sense :D)
+```{r}
+spr %>% 
+  group_by(cond) %>% 
+  count(full_sentence) %>% 
+  ungroup()
+
+spr %>% 
+  count(full_sentence)
+```
 
 
 ## If-else-statements
-conditions
-- if_else
-- case_when (= multi-case if_else)
+Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example:
+
+```{r}
+ikea %>% 
+  mutate(price_categorical = ifelse(price > 2000, "expensive", "not expensive")) %>% 
+  select(name, price, price_categorical)
+```
+
+Here is another example (notice the output isn't being saved since we don't really need it):
+```{r}
+ikea %>% 
+  mutate(height_categorical = ifelse(height <= 100, "shorter than 1m", "taller than 1m")) %>% 
+  select(name, height, height_categorical)
+```
+
+You can also use ifelse on categorical / character columns:
+```{r}
+ikea %>% 
+  mutate(fav_designer = ifelse(designer == "Carina Bengs", "Yes", "No")) %>% 
+  select(name, designer, fav_designer)
+```
+
+You can also use this to condense the groups in a certain column. For example, say we want to combine the categories "Beds", "Wardrobes", and "Chests of drawers & drawer units" into one category, "Bedroom":
+```{r}
+ikea %>% 
+  mutate(new_category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
+  select(item_id, category, new_category)
+```
+Notice here that if we want to affect the entry only if the condition is TRUE, leaving it unchanged if it is false, we leave the column name as the else condition. This tells R to take the value that is currently in that column if it finds the condition to be FALSE.
+
+We can use the same idea in-place, replacing the existing column, by just assinging it to the identical column name:
+```{r}
+ikea %>% 
+  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category))
+```
+
+Finally, this is pretty complicated so get ready, you can also combine multiple ifelse statements. Try to follow the logic below:
+
+```{r}
+ikea %>% 
+  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", 
+                          ifelse(category %in% c("Cabinets & shelving units", "Café furniture"," Chairs"), "Kitchen", "Other")))
+
+penguins %>% 
+  mutate(categorical_weight = ifelse(body_mass_g > 3000, "chunky",
+    ifelse(body_mass_g > 2000, "normal",
+           ifelse(flipper_length_mm > 200, "long fins", 
+      "small")
+  )))
+```
+
+Most of the examples above involve labeling different groupings with text, but you can use ifelse for all sorts of operations. Say the price of wood has gone up, so we want to add 100SAR to the price of any furniture taller than 1m. We could:
+```{r}
+ikea %>% 
+  mutate(new_price = ifelse(height >= 100, price + 100, price)) %>% 
+  select(item_id, height, price, new_price)
+```
+Remember, you could also do this in-place by assigning the new column to "price" instead of "new_price".
+
+#### Try it out
+
+1. Create a new column that shows whether or not the word is in the first half of a sentence. If the word number is less than or equal to 3, this new column should read 'first half', if not, it should read 'second half'.
+```{r}
+spr %>% 
+  mutate(sentence_half = ifelse(word_num <= 3, "first half", "second half"))
+```
+
+2. Create a new column that has the part of speech for a word. If the word is in following list, it should be labeled "content", otherwise, it should be labeled "function": c("practice", "sentence", "relative", "clause.", "cats.")
+```{r}
+spr %>% 
+  mutate(POS = ifelse(word %in% c("practice", "sentence", "relative", "clause.", "cats."), "content", "function"))
+```
+
+3. Create a new column that shows how fast a word was read. First, find the mean reading time over the entire dataset. You can do this in the console most easily using the base-R syntax `mean(spr$RT)`. If the RT is greater than or equal to this number, your new column should read "slow", otherwise, it should read "fast". 
+```{r}
+mean(spr$RT)
+
+spr %>% 
+  mutate(fastness = ifelse(RT >= mean(spr$RT), "slow", "fast"))
+```
 
 ![Case when: an extension of if-else](img/dplyr_case_when.png){width=50%}
 
@@ -921,4 +1196,73 @@ vingettes
 
 ## Workflows/code conventions
 -add- 
+
+
+## Challenge questions / thinking tidyverse / chaining commands 
+### Chaining commands
+
+Thinking tidyverse: Now you have a lot of tidy tools that can all be combined or "chained".
+
+See if you can figure out the following challenges. (Some may be a bit tricky, it's alright if you have to skip a couple or come back to them later.)
+
+Penguins: 
+
+1. Make a new column converting body mass to kg, then filter out all penguins under 6kg and save the result to a new tibble called "small_penguins".
+```{r}
+
+```
+
+2. Which penguin species occur on Biscoe island? Filter first to include only this island, then return the distinct species that are found there. 
+```{r}
+
+```
+
+3. Remember that the flipper_length column is represented in mm. Return how many penguins measured in this dataset had a flipper length longer than 2.5cm. Try to do this in one step, without having to permanently add the column to the dataframe (and without using 250cm)
+```{r}
+
+```
+
+
+SPR: 
+1. "Center" the response times around the average. This means take the mean RT and subtract it from every RT, so that 0 is now the average RT and the numbers reflect how much faster or slower the RT was from average. Save these centered RTs as a column called RT_c
+```{r}
+
+```
+
+2. Create a new column that is called word_length and assign it to the number of characters in the word. Save the output.
+```{r}
+
+```
+
+Ikea:
+1. Return the most expensive bed.
+```{r}
+
+```
+
+2. Count how many chairs are available in other colors.
+```{r}
+
+```
+
+
+3. There is some junk in the designer column. Look at it using distinct(), then remove it with the following code: 
+
+ikea <- ikea %>% 
+  filter(!str_detect(designer, "[0-9]"))
+  
+Note: str_detect looks for regular expressions. Here, the regular expression [0-9] matches any number. If this is true, str_detect returns TRUE -- However, it is proceeded by ! which means NOT. Thus, the filter is satisfied only if str_detect returns FALSE, i.e. there are no numbers present.
+  
+Then, find which designer makes the most expensive furniture. Return the average price for each designer's products, and arrange them from largest to smallest. (Hint, give your summary column a name.)
+```{r}
+
+```
+
+
+4. How many products did each designer design? You can use count, but can also just save this variable as a factor and look at a summary. 
+```{r}
+
+```
+
+
 
