@@ -1,0 +1,89 @@
+participant,item_type,sentence_num,cond,word_num,word,RT,full_sentence
+Par_A,DashedSentence,2,practice,1,This,180,This is a practice sentence.
+Par_A,DashedSentence,2,practice,2,is,177,This is a practice sentence.
+Par_A,DashedSentence,2,practice,3,a,181,This is a practice sentence.
+Par_A,DashedSentence,2,practice,4,practice,181,This is a practice sentence.
+Par_A,DashedSentence,2,practice,5,sentence.,178,This is a practice sentence.
+Par_A,DashedSentence,3,cond_A,1,A,156,A sentence that has a relative clause.
+Par_A,DashedSentence,3,cond_A,2,sentence,135,A sentence that has a relative clause.
+Par_A,DashedSentence,3,cond_A,3,that,135,A sentence that has a relative clause.
+Par_A,DashedSentence,3,cond_A,4,has,158,A sentence that has a relative clause.
+Par_A,DashedSentence,3,cond_A,5,a,158,A sentence that has a relative clause.
+Par_A,DashedSentence,3,cond_A,6,relative,157,A sentence that has a relative clause.
+Par_A,DashedSentence,3,cond_A,7,clause.,181,A sentence that has a relative clause.
+Par_A,DashedSentence,5,cond_A,1,This,202,This is a sentence about cats.
+Par_A,DashedSentence,5,cond_A,2,is,181,This is a sentence about cats.
+Par_A,DashedSentence,5,cond_A,3,a,160,This is a sentence about cats.
+Par_A,DashedSentence,5,cond_A,4,sentence,177,This is a sentence about cats.
+Par_A,DashedSentence,5,cond_A,5,about,160,This is a sentence about cats.
+Par_A,DashedSentence,5,cond_A,6,cats.,180,This is a sentence about cats.
+Par_A,DashedSentence,4,cond_B,1,A,112,A sentence that doesn't.
+Par_A,DashedSentence,4,cond_B,2,sentence,135,A sentence that doesn't.
+Par_A,DashedSentence,4,cond_B,3,that,136,A sentence that doesn't.
+Par_A,DashedSentence,4,cond_B,4,doesn't.,134,A sentence that doesn't.
+Par_B,DashedSentence,2,practice,1,This,200,This is a practice sentence.
+Par_B,DashedSentence,2,practice,2,is,143,This is a practice sentence.
+Par_B,DashedSentence,2,practice,3,a,164,This is a practice sentence.
+Par_B,DashedSentence,2,practice,4,practice,188,This is a practice sentence.
+Par_B,DashedSentence,2,practice,5,sentence.,190,This is a practice sentence.
+Par_B,DashedSentence,3,cond_A,1,A,125,A sentence that has a relative clause.
+Par_B,DashedSentence,3,cond_A,2,sentence,224,A sentence that has a relative clause.
+Par_B,DashedSentence,3,cond_A,3,that,176,A sentence that has a relative clause.
+Par_B,DashedSentence,3,cond_A,4,has,156,A sentence that has a relative clause.
+Par_B,DashedSentence,3,cond_A,5,a,155,A sentence that has a relative clause.
+Par_B,DashedSentence,3,cond_A,6,relative,178,A sentence that has a relative clause.
+Par_B,DashedSentence,3,cond_A,7,clause.,199,A sentence that has a relative clause.
+Par_B,DashedSentence,5,cond_A,1,This,261,This is a sentence about cats.
+Par_B,DashedSentence,5,cond_A,2,is,245,This is a sentence about cats.
+Par_B,DashedSentence,5,cond_A,3,a,215,This is a sentence about cats.
+Par_B,DashedSentence,5,cond_A,4,sentence,216,This is a sentence about cats.
+Par_B,DashedSentence,5,cond_A,5,about,267,This is a sentence about cats.
+Par_B,DashedSentence,5,cond_A,6,cats.,134,This is a sentence about cats.
+Par_B,DashedSentence,4,cond_B,1,A,188,A sentence that doesn't.
+Par_B,DashedSentence,4,cond_B,2,sentence,251,A sentence that doesn't.
+Par_B,DashedSentence,4,cond_B,3,that,202,A sentence that doesn't.
+Par_B,DashedSentence,4,cond_B,4,doesn't.,300,A sentence that doesn't.
+Par_C,DashedSentence,2,practice,1,This,199,This is a practice sentence.
+Par_C,DashedSentence,2,practice,2,is,189,This is a practice sentence.
+Par_C,DashedSentence,2,practice,3,a,176,This is a practice sentence.
+Par_C,DashedSentence,2,practice,4,practice,223,This is a practice sentence.
+Par_C,DashedSentence,2,practice,5,sentence.,290,This is a practice sentence.
+Par_C,DashedSentence,3,cond_A,1,A,177,A sentence that has a relative clause.
+Par_C,DashedSentence,3,cond_A,2,sentence,301,A sentence that has a relative clause.
+Par_C,DashedSentence,3,cond_A,3,that,299,A sentence that has a relative clause.
+Par_C,DashedSentence,3,cond_A,4,has,199,A sentence that has a relative clause.
+Par_C,DashedSentence,3,cond_A,5,a,167,A sentence that has a relative clause.
+Par_C,DashedSentence,3,cond_A,6,relative,250,A sentence that has a relative clause.
+Par_C,DashedSentence,3,cond_A,7,clause.,304,A sentence that has a relative clause.
+Par_C,DashedSentence,5,cond_A,1,This,299,This is a sentence about cats.
+Par_C,DashedSentence,5,cond_A,2,is,167,This is a sentence about cats.
+Par_C,DashedSentence,5,cond_A,3,a,187,This is a sentence about cats.
+Par_C,DashedSentence,5,cond_A,4,sentence,250,This is a sentence about cats.
+Par_C,DashedSentence,5,cond_A,5,about,289,This is a sentence about cats.
+Par_C,DashedSentence,5,cond_A,6,cats.,342,This is a sentence about cats.
+Par_C,DashedSentence,4,cond_B,1,A,178,A sentence that doesn't.
+Par_C,DashedSentence,4,cond_B,2,sentence,280,A sentence that doesn't.
+Par_C,DashedSentence,4,cond_B,3,that,180,A sentence that doesn't.
+Par_C,DashedSentence,4,cond_B,4,doesn't.,299,A sentence that doesn't.
+Par_D,DashedSentence,2,practice,1,This,204,This is a practice sentence.
+Par_D,DashedSentence,2,practice,2,is,190,This is a practice sentence.
+Par_D,DashedSentence,2,practice,3,a,188,This is a practice sentence.
+Par_D,DashedSentence,2,practice,4,practice,287,This is a practice sentence.
+Par_D,DashedSentence,2,practice,5,sentence.,267,This is a practice sentence.
+Par_D,DashedSentence,3,cond_A,1,A,169,A sentence that has a relative clause.
+Par_D,DashedSentence,3,cond_A,2,sentence,289,A sentence that has a relative clause.
+Par_D,DashedSentence,3,cond_A,3,that,199,A sentence that has a relative clause.
+Par_D,DashedSentence,3,cond_A,4,has,204,A sentence that has a relative clause.
+Par_D,DashedSentence,3,cond_A,5,a,178,A sentence that has a relative clause.
+Par_D,DashedSentence,3,cond_A,6,relative,300,A sentence that has a relative clause.
+Par_D,DashedSentence,3,cond_A,7,clause.,320,A sentence that has a relative clause.
+Par_D,DashedSentence,5,cond_A,1,This,248,This is a sentence about cats.
+Par_D,DashedSentence,5,cond_A,2,is,200,This is a sentence about cats.
+Par_D,DashedSentence,5,cond_A,3,a,190,This is a sentence about cats.
+Par_D,DashedSentence,5,cond_A,4,sentence,300,This is a sentence about cats.
+Par_D,DashedSentence,5,cond_A,5,about,297,This is a sentence about cats.
+Par_D,DashedSentence,5,cond_A,6,cats.,320,This is a sentence about cats.
+Par_D,DashedSentence,4,cond_B,1,A,180,A sentence that doesn't.
+Par_D,DashedSentence,4,cond_B,2,sentence,229,A sentence that doesn't.
+Par_D,DashedSentence,4,cond_B,3,that,300,A sentence that doesn't.
+Par_D,DashedSentence,4,cond_B,4,doesn't.,320,A sentence that doesn't.
