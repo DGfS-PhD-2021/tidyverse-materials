@@ -265,6 +265,7 @@ Let's read in a small self-paced reading dataset (saved in the data folder, so w
 spr_data <- read_csv("data/spr_example.csv")
 ```
 
+
 ## Dataframes and tibbles: What's the difference?
 We already know one command set from the tidyverse: `read_csv()` and `read_tsv()`. These are used to read in data, and they return a structure called the "tibble". 
 
@@ -300,6 +301,8 @@ Or: click name of dataframe in Environment tab
 `summary()`: call it on a dataframe to get each column and useful info based on the data type. For example, numeric columns will show the min, median, max and the quartiles (25% increments).
 ```{r}
 summary(spr_data)
+
+summary(spr_data$RT)
 ```
 
 #### Try it out - delete?
@@ -309,6 +312,21 @@ summary(spr_data)
 3. Try the command `colnames()` on the variable you saved the dataframe to. What does it do?
 4. We already tried the `head()` command, now try the `tail()` command. What does it do?
 
+## Back to factors
+
+In the environment panel (or using `str()`), you can see that all the variables in this data are read in as either numeric or character data. However, some variables should be treated as factors because they represent categories, not text data. Let's convert them. 
+```{r}
+spr_data$participant <- as_factor(spr_data$participant)
+spr_data$item_type <- as_factor(spr_data$item_type)
+spr_data$cond <- as_factor(spr_data$cond)
+```
+
+This way, the summary output also works as expected. For example, we can have a look at how many different participants and conditions:
+```{r}
+summary(spr_data$participant)
+
+summary(spr_data$cond)
+```
 
 # (6) The pipe %>% 
 
@@ -385,6 +403,8 @@ spr_data %>%
   rename(condition = cond)
 ```
 
+This is just a preview because we didn't assign the changed dataframe to any name. This is useful for testing code and making sure it does what you expect and want it to do.
+
 You can also rename multiple columns at once (no need for an array here):
 ```{r}
 spr_data <- spr_data %>% 
@@ -398,7 +418,7 @@ Notice above that I've saved output over the spr_data dataframe to make the chan
 
 ![Relocate](img/dplyr_relocate.png){width=50%}
 
-The `relocate` function lets you change the order of variables in the data. The following command moves the participant id, full sentence, and word to the beginning: 
+The `relocate` function lets you change the order of variables in the data. The following command moves the participant id, full sentence, and word columns to the beginning: 
 ```{r}
 spr_data %>% 
   relocate(participant, sentence, word)
@@ -411,52 +431,44 @@ spr_data %>%
   relocate(sentence, .before = sentence_num)
 ```
 
-Another option is to sort by data type, e.g. if you'd like all character variables to be shown first:
+Another option is to sort by data type:
 ```{r}
 spr_data %>% 
-  relocate(where(is_character))
-```
-Other options: is_numeric for numbers, is_factor?
+  relocate(where(is.character))
 
-This is particularly useful if you have large datasets with lots of variables.
+spr_data %>% 
+  relocate(where(is.factor))
+
+spr_data %>% 
+  relocate(where(is.numeric))
+```
+
+Reordering variables is particularly useful if you have large datasets with lots of variables.
+
 
 ## (7.3) select()
 
 - The traditional syntax for dealing with columns is dataframe$column.
 
-A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `spr_data$category` we can write:
+A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `spr_data$RT` we can write:
 
 ```{r}
 spr_data %>% 
-  select(category) 
+  select(RT) 
 ```
 
-We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(spr_data$price)`
+We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(spr_data$RT)`
 ```{r}
 spr_data %>% 
-  select(price) %>% 
+  select(RT) %>% 
   summary()
 
 spr_data %>% 
-  select(price) %>% 
+  select(RT) %>% 
   max()
 
 spr_data %>% 
-  select(height) %>% 
-  min()
-```
-
-We could, for example, look at the tallest item:
-```{r}
-spr_data %>% 
-  select(height) %>% 
-  max()
-```
-
-Or the thinnest:
-```{r}
-spr_data %>% 
-  select(width) %>% 
+  select(RT) %>% 
   min()
 ```
 
@@ -466,21 +478,21 @@ You can also use `select()` to take multiple columns.
 
 ```{r}
 spr_data %>% 
-  select(name, price, category)
+  select(word, word_num, RT)
 ```
 
 You can see that these columns are presented in the order you gave them to the select call, too:
 
 ```{r}
 spr_data %>% 
-  select(category, price, name)
+  select(RT, word, word_num)
 ```
 
 You can also use this to reorder columns in that you give the name of the column(s) you want first, then finish with `everything()` to have all other columns follow:
 
 ```{r}
 spr_data %>% 
-  select(price, everything())
+  select(RT, everything())
 ```
 
 #### Try it out 
@@ -491,16 +503,6 @@ spr_data %>%
 ```
 
 2. Pipe the 'spr_data' dataset to `colnames()` What does this command do? (Bonus, pipe the columnn names on to the `nchar()` function and figure out what that does.)
-```{r}
-
-```
-
-3. What is the shortest item in the dataset? The widest?
-```{r}
-
-```
-
-4. Select the depth column and pipe it to `range()` to see the full rannge of depths.
 ```{r}
 
 ```
@@ -530,7 +532,7 @@ There is also a trick to show a preview and save it to the variable -- wrapping 
 
 ```{r}
 (spr_data <- spr_data %>% 
-  select(name, everything()))
+  select(item_type, everything()))
 ```
 
 If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
@@ -538,36 +540,35 @@ If you make a mistake: arrow with a line under it in the code block of R-Markdow
 
 ### Remove columns with select
 
-You can also remove columns using select if you use the minus sign. For example, here, we have the first column ("X1") which is a sort of row numbering. If you don't want this column, you can drop it with select:
+You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
 
 ```{r}
-spr_data %>% 
-  select(-X1)
+spr_data <- spr_data %>% 
+  select(-item_type)
 ```
 
-You can also remove multiple columns at once by writing them in an array `c()`. Once your preview looks the way you want it --just make sure to save your results by committing it to a variable (over the old one is fine).
-
+You can also remove multiple columns at once by writing them in an array `c()`. 
 ```{r}
-(spr_data <- spr_data %>% 
-  select(-c(X1, old_price)))
+spr_data %>% 
+  select(-c(word_num, sentence_num))
 ```
 
 ### Leveling up select()
 
 Until now, we've used select() in combination with the full column name, but there are helper functions that let you select columns based on other criteria.
 
-For example, here's how we can select both the `price` and the `old_price` column - by specifying `ends_with("price")` in the select() call:
+For example, here's how we can select both the `sentence_num` and the `word_num` column - by specifying `ends_with("_num")` in the select() call:
 ```{r}
 spr_data %>% 
-  select(ends_with("price"))
+  select(ends_with("_num"))
 ```
 
 The opposite is also possible, e.g.
 ```{r}
 spr_data %>% 
-  select(starts_with("s"))
+  select(starts_with("sentence"))
 ```
-returns all columns that start with "s".
+returns all columns that start with "sentence".
 
 `contains` is another helper function. Here, we're using it to show all columns that contain an underscore:
 ```{r}
@@ -578,50 +579,41 @@ spr_data %>%
 If we try to select a column that doesn't exist, we get an error message:
 ```{r}
 # spr_data %>% 
-#  select(name, translation)
+#  select(word, word_number)
 ```
 
 But if we combine select with any_of, we don't see an error. Instead, R just returns the columns that do exist:
 Note here that you have to use an array and enclose the names in quotes!
 ```{r}
 spr_data %>% 
-  select(any_of(c("name", "translation")))
+  select(any_of(c("word", "word_number")))
 ```
 
 We can also select a range of  variables using a colon. This works both with variables and (a range of) numbers:
 ```{r}
 spr_data %>% 
-  select(X1:category)
+  select(condition:word) # shows condition, word_num, word
 
 spr_data %>% 
   select(1:3) # first three columns
 ```
 Here, the order of the columns matters!
 
-
 Other helper functions are:
 - matches: similar to contains, but can use regular expressions
 - num_range: in a dataset with the variables X1, X2, X3, X4, Y1, and Y2, select(num_range("X", 1:3)) returns X1, X2, and X3
 
-#### Try it out
-1. From the spr_data dataset, select all columns that start with the letter "d". (Case-sensitive!)
-
-2. Select all the columns of spr_data that contain "th".
-
-3. You would like to buy a really cheap chair -- Filter the dataset to include only chairs that cost less than 100 SAR.
-
-4. Show two different ways to filter the name column to include only items named "BILLY" or "KALLAX".
-
 
 # (8) Subsets
+
+
+## (8.1) filter()
+
+### Filter based on a condition
 
 - Look for rows that fulfill certain conditions
 
 ![Filter](img/dplyr_filter.jpg){width=50%}
-
-## (8.1) filter()
-### Filter based on a condition
-### filter()
 
 Use `filter()` to return all items that fit a certain condition. For example, you can use:
 - equals to: ==
