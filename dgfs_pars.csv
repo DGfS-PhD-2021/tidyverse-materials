@@ -1,0 +1,13 @@
+participant,age,nationality,pet_interest,gender,education,preference
+Par_A,24,US,2,female,4,cats
+Par_B,28,US,3,male,2,cats
+Par_C,18,UK,4,female,3,dogs
+Par_D,32,US,3,male,3,cats
+Par_E,36,UK,1,female,1,cats
+Par_F,25,UK,4,female,2,cats
+Par_G,21,UK,3,male,2,dogs
+Par_H,68,US,2,female,3,cats
+Par_I,34,DE,5,nonbinary,2,cats
+Par_J,22,UK,4,male,2,dogs
+Par_K,28,US,3,male,3,cats
+Par_M,33,US,4,female,4,dogs

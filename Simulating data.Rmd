@@ -42,10 +42,143 @@ animal_corpus <- data.frame(
     animal = c(rep("cat", 70), rep("dog", 193))
 )
 
+## add: 
+
 # to randomise the order of the rows:
 rows <- sample(nrow(animal_corpus))
 animal_corpus <- animal_corpus[rows, ]
 ```
 
+### SPR
+```{r}
+## Design: 
+## cond_a is matching collocates (5 about cats, 5 about dogs),
+## cond_b is mismatching collocates (5 with dog collocates + cat, 5 with cat collocates + dog)
+
+library(tidytext)
+
+set.seed(2021)
+
+sentence_array <- c("This is a practice sentence to get you used to reading sentences like this.",
+                    "Please read as normally as possible.",
+                    "The experiment will start on the next sentence.",
+                    "Mary saw a beautiful Siamese cat on her way home from work.",
+                    "Joshua said that purring cats are one of the most relaxing things to him.",
+                    "There was a contented cat looking out from the bookstore window.",
+                    "The child told me that ginger cats are by far the cutest of them all.",
+                    "A large tom cat was often seen hanging out near the butcher shop.",
+                    "My closest neighbor has a guide dog to help him navigate.",
+                    "The students were worried that a mad dog had been spotted in town.",
+                    "Although the barking dog was noisy, he was quite cute.",
+                    "My grandmother had a lap dog that she loved very much.",
+                    "Tracey was the best dog Jenny's family ever had.",
+                    "Lisa has heard of Siamese dogs, but has never seen one.",
+                    "It has been reported that purring dogs are not uncommon.",
+                    "My best friend Jerry has a contented dog that loves to lounge around.",
+                    "On a walk through the woods, Randy saw a ginger dog that was quite regal.",
+                    "The baker said that he saw a tom dog on the loose by the bay.",
+                    "Louise was interested to hear how the guide cat was adapting to his new home.",
+                    "The entire city was talking about a mad cat that was seen digging through trash cans.",
+                    "Poppy read in the newspaper that a barking cat had been identified.",
+                    "The doctor had a lap cat to keep her company after her shifts.",
+                    "Georgie was the best cat that had ever taken part in the contest.")
+
+RT <- rep(c(
+  rnorm(780/12, mean=26, sd= 53), #cond_A_cat
+  rnorm(648/12, mean=-65, sd= 35), #cond_A_dog
+  rnorm(768/12, mean=356, sd = 54), #cond_B_cat
+  rnorm(828/12, mean=469, sd = 112), #cond_B_dog
+  rnorm(336/12, mean=600, sd = 70) #practice
+  ), 12)
+
+catdog_spr <- tibble(participant = rep(c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"), each = 23),
+       item_type = rep("DashedSentence", 276), 
+       cond = rep(c(rep("practice", 3), rep("cond_A_cat", 5), rep("cond_A_dog", 5),  rep("cond_B_cat", 5),  rep("cond_B_dog", 5)), 12), 
+       sentence_num = rep(1:23, 12),
+       full_sentence = rep(sentence_array, 12)) %>% 
+  unnest_tokens(word, full_sentence, to_lower = FALSE, drop = FALSE) %>%
+  arrange(cond) %>% 
+  mutate(word_len = nchar(word),
+         RT = round(RT),
+         RT = ifelse(participant == "Par_C", RT - 100, #young, so faster
+                     ifelse(participant == "Par_G", RT + 200, #old
+                            ifelse( participant == "Par_E", RT + 50, #doesnt care about pets
+                                    ifelse(participant == "Par_I", RT - 80, #cares about pets
+                                           ifelse(participant == "Par_H", RT + 500, #distracted
+                                           RT)
+                                    )))),
+         RT = ifelse(cond == "cond_B_cat", RT + 210, 
+                     ifelse(cond == "practice", RT + 278,
+                            ifelse(cond == "cond_A_cat", RT - 27, 
+                                    ifelse(cond == "cond_A_dog", RT - 113, 
+                                           ifelse(cond == "cond_B_dog", RT + 410, 
+                                           RT)
+                                    )))),
+         RT = ifelse(word_len > 4, RT - 100,
+                     ifelse(word_len > 6, RT,
+                            ifelse(word_len > 8, RT + 100,
+                                   RT + 200))),
+         RT = ifelse(RT < 95, sample(c(110:234), 1), RT)
+                     ) %>% 
+  select(participant, item_type, sentence_num, cond, word, RT, full_sentence)
+
+participant_data <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"),
+       age = c(24, 28, 18, 32, 36, 25, 21, 68, 34, 22, 28, 33),
+       nationality = c("US", "US", "UK", "US", "UK", "UK", "UK", "US", "DE", "UK", "US", "US"),
+       pet_interest = c(2, 3, 4, 3, 1, 4, 3, 2, 5, 4, 3, 4),
+       gender = c("female","male","female","male","female","female","male","female","nonbinary","male","male","female"),
+       education = c(4, 2, 3, 3, 1, 2, 2, 3, 2, 2, 3, 4),
+       preference = c("cats", "cats", "dogs", "cats", "cats", "cats", "dogs", "cats", "cats", "dogs", "cats", "dogs"))
+  
+write_csv(catdog_spr, "dgfs_spr.csv")
+write_csv(participant_data, "dgfs_pars.csv")
+```
+
+### Check out that everything looks good
+
+```{r}
+ggplot(data=catdog_spr, aes(x=participant, y=RT)) +
+  geom_boxplot()
+```
+```{r}
+ggplot(data=catdog_spr, aes(x=cond, y=RT)) +
+  geom_boxplot()
+```
+
+```{r}
+full_data <- participant_data %>% 
+  pivot_longer(participant, values_to="participant") %>% 
+  full_join(catdog_spr)
+```
+
+```{r}
+ggplot(data=full_data, aes(x=gender, y=RT)) +
+  geom_boxplot()
+```
+
+```{r}
+full_data %>% 
+  group_by(pet_interest) %>% 
+  summarize(avg_RT = mean(RT)) %>% 
+ggplot(aes(x=pet_interest, y=avg_RT)) +
+  geom_col()
+```
+
+```{r}
+ggplot(data=full_data, aes(x=nationality, y=RT)) +
+  geom_boxplot()
+```
+
+```{r}
+full_data %>% 
+  group_by(education) %>% 
+  summarize(avg_RT = mean(RT)) %>% 
+ggplot(aes(x=education, y=avg_RT)) +
+  geom_col()
+```
 
 
+```{r}
+mean(catdog_spr$RT)
+range(catdog_spr$RT)
+```
