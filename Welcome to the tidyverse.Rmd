@@ -43,125 +43,7 @@ The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to
 ![Why use tidy data?](img/tidydata_3.jpg){width=50%}
 
 
-# (2) R basics
-
-## Installing and loading packages
-
-- Install a new package with `install.packages("PACKAGENAME")` or through the Packages pane (bottom right) - only if you haven't used a package before
-- Every time you start a new R session, load the package(s) you need with `library()` near the top of the script
-
-```{r loading packages}
-library(tidyverse)
-```
-As you can see when loading the tidyverse package, it's actually a family/collection of packages.
-
-
-## Variables
-
-Variables: give name/label to output, saves it (can be used anywhere below in current script)
-
-name_of_variable <- code
-
-For example:
-```{r}
-fav_number <- 12
-
-fav_number * 3
-
-worst_number <- 7
-
-difference <- fav_number - worst_number
-
-difference
-```
-
-## Data types
-
-- Data types -- how R interprets the input you give it
-- Figure out what type something is with `class()` 
-
-```{r}
-class(8.8)
-
-class(double_number)
-```
-
-- Numbers generally treated as *numeric* -> can include decimals 
-
-- *integer* allows only whole numbers -> can force numbers into this form with `as.integer()`
-  - this will truncate the decimal (cut it off), not round
-  - round with `round()`
-
-```{r}
-as.integer(8.8)
-
-integer_variable <- as.integer(8.8)
-integer_variable
-
-class(integer_variable)
-
-round(8.8)
-```
-
-- *character* is text, always enclosed in either double or single quotation marks 
-
-```{r}
-class('hello')
-```
-
-- *logical* can be either TRUE or FALSE, nothing else. 
-
-test if something is identical with ==
-test if something is not identical with !=
-test if something is greater than with > or less than with <
-or try greater than or equals to >= or less than or equal to with <=
-
-```{r}
-7 < 8
-
-"dog" == "dogs"
-
-8.8 >= 5.6
-
-logic_test <- "seven" == 7
-
-class(logic_test)
-```
-
-*factor* - string variables that should be treated as categories / distinct levels of a grouping -> will become more relevant when we work with datasets
-
-
-## Vectors
-
-Special variable type: *vector* -- contains multiple items of the same type, enclosed in the syntax `c()`
-
-- command `length()` returns number of items in the vector
-
-```{r}
-grocery_list <- c("apples", "bananas", "bread", "orange juice")
-
-length(grocery_list)
-```
-
-You can also do "vector-wise" operations:
-```{r}
-my_numbers <- c(12, 14, 26, 57, 82)
-
-my_numbers + 2
-```
-
-Mathematical operation is "broadcast" to each item
-
-Add/subtract/multiply/divide a vector by another vector: items matched up one at a time in a loop
-
-You can also take a certain item from a vector using square brackets. For example, take the first item:
-
-```{r}
-my_numbers[5]
-```
-
-
-# (3) Communicating with R
+# (2) Communicating with R
 
 ## Understanding warnings and errors
 R will often "talk" to you when you're running code. For example, when you install a package, it'll tell you e.g. where it is downloading a package from, and when it's done. Similarly, when you loaded the tidyverse collection of packages, R listed them all. That's nothing to worry about!
@@ -228,7 +110,7 @@ Call the `say()` function including the arguments what, by, and what_color. Try 
 ```
 
 
-# (4) Reading in data
+# (3) Reading in and exploring data
 
 What type of file are you working with? Specifically, what's used to separate the values in the different columns? To find out, open the file in a text editor. Common options are either commas or semicolons (in which cases, the file often has the ending .csv) or tabs (often .txt files).
 
@@ -283,7 +165,7 @@ That's probably enough info for now, but if you want to read more about tibbles 
 https://r4ds.had.co.nz/tibbles.html
 
 
-# (5) Exploring our data
+## Exploring our data
 
 Now you have a data file read in, but how do you see what's in it?
 
@@ -307,12 +189,9 @@ summary(spr_data)
 summary(spr_data$RT)
 ```
 
-#### Try it out - delete?
-
-1. Load in the dataframe "spr_example.csv" as a tibble, i.e. using the tidyverse call `read_csv()` Make sure to save it to a variable.
-2. Take a look at your dataframe in the Environment tab. 
-3. Try the command `colnames()` on the variable you saved the dataframe to. What does it do?
-4. We already tried the `head()` command, now try the `tail()` command. What does it do?
+### Exercise
+Read in and explore the example data
+How many rows and columns does it have?
 
 ## Back to factors
 
@@ -333,8 +212,11 @@ summary(spr_data$cond)
 If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
 `as.numeric()`, `as.character()` etc.
 
+### Exercise
+Have a look at the data you read in. Are all variables the correct type?
 
-# (6) The pipe %>% 
+
+# (4) The pipe %>% 
 
 One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctr/Cmd + Shift + M) .
 
@@ -374,7 +256,6 @@ Here are some more examples:
 spr_data %>% 
   summary()
 
-
 # Equivalent to colnames(spr_data), which returns all column names
 colnames(spr_data)
 
@@ -400,9 +281,9 @@ spr_data %>%
 ```
 
 
-# (7) Changing columns
+# (5) Renaming and rearranging data
 
-## (7.1) rename()
+## rename()
 You can rename columns with the `rename()` function. The syntax is new_name = old_name. Let's rename the `cond` variable:
 ```{r}
 spr_data %>% 
@@ -420,7 +301,7 @@ spr_data <- spr_data %>%
 Notice above that I've saved output over the spr_data dataframe to make the changes 'permanent'.
 
 
-## (7.2) relocate()
+## relocate()
 
 ![Relocate](img/dplyr_relocate.png){width=50%}
 
@@ -451,8 +332,21 @@ spr_data %>%
 
 Reordering variables is particularly useful if you have large datasets with lots of variables.
 
+## arrange()
 
-## (7.3) select()
+There's also a corresponding command that lets you sort by row values: `arrange()`. By default, this sorts by lowest to highest value, but you can add `desc()` to reverse that.
+```{r}
+spr_data %>% 
+  arrange(RT)
+
+spr_data %>% 
+  arrange(desc(RT))
+```
+
+
+# (6) Subsets
+
+## select()
 
 - The traditional syntax for dealing with columns is dataframe$column.
 
@@ -609,10 +503,7 @@ Other helper functions are:
 - matches: similar to contains, but can use regular expressions
 - num_range: in a dataset with the variables X1, X2, X3, X4, Y1, and Y2, select(num_range("X", 1:3)) returns X1, X2, and X3
 
-
-# (8) Subsets
-
-## (8.1) filter()
+## filter()
 
 ### Filter based on a condition
 
@@ -717,8 +608,82 @@ spr <- spr %>%
   filter(cond != "practice")
 ```
 
+# (7) Separating and uniting columns
 
-# (9) Creating and changing columns with mutate()
+For the next two examples, we'll use a different dataset called `animal_corpus`. Read it in and familiarise yourself with its contents.
+
+This contains corpus data of "cat" and "dog" together with the words that precede "cat" and "dog". These are called "collocates" and, in our example, also include part of speech tags (the format is word_tag).
+
+This data is not tidy. Why?
+
+The collocates column contains two variables (word and tag) although according to tidy data principles, each variable should be saved in its own column.
+
+## separate()
+
+Luckily, the tidyverse has a command for that: `separate()`. It takes the following arguments:
+- data: our dataframe, we'll pipe it
+- col: which column needs to be separated
+- into: a vector that contains the names of the new columns
+- sep: which symbol separates the values
+- remove (optional): by default, the original column will be deleted. Set `remove` to FALSE to keep it.
+
+```{r}
+animal_corpus %>% 
+  separate(col = collocate, 
+           into = c("coll", "coll_tag"), 
+           sep = "_")
+```
+
+
+## unite()
+
+The opposite of `separate()`. This lets you glue columns together. 
+- col is the name of the new column
+- the next argument, a vector, lists the columns that should be united
+- sep, as above, lets you specify how the values should be separated
+```{r}
+animal_corpus %>% 
+  unite(col = "coll_word",
+        c("collocate", "animal"),
+        sep = " ")
+```
+
+Another example: Let's say we'd like our data to be in the format "collocate cat/dog", so without the tag, but in one column. We can first separate to put tags and collocates in different columns and then unite the tag with the animal in a second step:
+```{r}
+animal_corpus %>% 
+  separate(col = collocate, 
+           into = c("coll", "coll_tag"), 
+           sep = "_") %>% 
+  unite(col = "coll_word",
+        c("coll", "animal"),
+        sep = " ")
+```
+
+This leads to a lot of repetition. "Mad dog", for example, turns up twice in just our preview. To remedy this, we can use `distinct()`, which only keeps unique rows:
+```{r}
+animal_corpus %>% 
+  separate(col = collocate, 
+           into = c("coll", "coll_tag"), 
+           sep = "_") %>% 
+  unite(col = "coll_word",
+        c("coll", "animal"),
+        sep = " ") %>% 
+  distinct()
+```
+
+Some entries still turn up several times because the same word can be tagged differently. To make clear that we want unique collocate cat/dog combinations, we can put `coll_word` into `distinct()` to make clear that this is the relevant column and tags should be ignored.
+```{r}
+animal_corpus %>% 
+  separate(col = collocate, 
+           into = c("coll", "coll_tag"), 
+           sep = "_") %>% 
+  unite(col = "coll_word",
+        c("coll", "animal"),
+        sep = " ") %>% 
+  distinct(coll_word)
+```
+
+# (8) Creating and changing columns with mutate()
 
 With the `mutate()` function, you can change existing columns and add new ones.
 
@@ -1002,7 +967,7 @@ Remember, something like data type in R (ex: character or factor) can't be saved
 ![ggplot2](img/ggplot2_exploratory.png){width=50%}
 
 # Missing commands
-
+arrange
 count? 
 - across  
 - nest_by  
@@ -1103,34 +1068,4 @@ Then, find which designer makes the most expensive furniture. Return the average
 
 ```
 
-
-
-
-# Simulating corpus data
-
-collocates from COCA, one position left of CAT/DOG lemma search
-```{r}
-collocate = c(rep("tom_np1", 9),
-              rep("tom_nn1", 8),
-              rep("siamese_jj", 17),
-              rep("tortoiseshell_nn1", 9),
-              rep("ginger_jj", 8),
-              rep("purring_jj", 5),
-              rep("purring_vvg", 1),
-              rep("playing_vvg", 4),
-              rep("because_cs", 5),
-              rep("contented_jj", 4),
-              #dog:
-              rep("guide_nn1", 60),
-              rep("guide_vv0", 7),
-              rep("guide_vvi", 1),
-              rep("mad_jj", 52),
-              rep("barking_jj", 7),
-              rep("barking_vvg", 1),
-              rep("barking_np1", 1),
-              rep("has_vhz", 19),
-              rep("lap_nn1", 17),
-              rep("dangerous_jj", 24),
-              rep("best_jjt", 4))
-```
 
