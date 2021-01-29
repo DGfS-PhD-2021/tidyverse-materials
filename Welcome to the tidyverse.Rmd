@@ -229,7 +229,9 @@ Call the `say()` function including the arguments what, by, and what_color. Try 
 
 
 # (4) Reading in data
+
 What type of file are you working with? Specifically, what's used to separate the values in the different columns? To find out, open the file in a text editor. Common options are either commas or semicolons (in which cases, the file often has the ending .csv) or tabs (often .txt files).
+
 Where is the file saved? If you are working in a Markdown and the data file is saved in the same location as the script file, you can use the name of the file with its ending, e.g. "new_data.csv" or "final_data.txt". This is possible because RMarkdown automatically sets the working directory, i.e. the location R tries to find the file, to where it is saved. This is very convenient especially when you share your script and data. Your contributor doesn't need to type in any long paths but can directly start working.
 If the file is saved in a subfolder called "data", use  "data/example_file.csv"). ../ allows you to go backwards one folder.
 
@@ -327,6 +329,10 @@ summary(spr_data$participant)
 
 summary(spr_data$cond)
 ```
+
+If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
+`as.numeric()`, `as.character()` etc.
+
 
 # (6) The pipe %>% 
 
@@ -606,12 +612,11 @@ Other helper functions are:
 
 # (8) Subsets
 
-
 ## (8.1) filter()
 
 ### Filter based on a condition
 
-- Look for rows that fulfill certain conditions
+While with `select()`, you can pick **columns** by name or if they fulfill conditions, `filter()` lets you look for **rows** that fulfill certain conditions. 
 
 ![Filter](img/dplyr_filter.jpg){width=50%}
 
@@ -624,58 +629,71 @@ Use `filter()` to return all items that fit a certain condition. For example, yo
 - less than or equal to: <=
 - in (i.e. in a vector): %in%
 
-Syntax: filter(columnname logical-operator condition)
+*Syntax:*
+filter(data, columnname logical-operator condition)
+or, using the pipe:
+data %>% 
+  filter(columnname logical-operator condition)
 
+Let's look at reaction times that are shorter than 200 ms:
 ```{r}
-penguins %>% 
-  filter(bill_length_mm > 55)
-
-penguins %>% 
-  filter(bill_length_mm < 35)
-
-penguins %>% 
-  filter(bill_depth_mm < 14)
+spr_data %>% 
+  filter(RT < 200)
 ```
 
-You can also select numeric rows with a specific value
+...reaction times longer than or equal to 250 ms:
 ```{r}
-penguins %>% 
-  filter(year == 2009)
+spr_data %>% 
+  filter(RT >= 250)
+```
+
+...reaction times equal to 200 ms:
+```{r}
+spr_data %>% 
+  filter(RT == 200)
 ```
 
 Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
-
 Look at the error below:
 ```{r}
-penguins %>% 
-  filter(island == Biscoe)
+spr_data %>% 
+  filter(word == relative)
 ```
 
 The correct syntax is: (because you're matching to a string)
 ```{r}
-penguins %>% 
-  filter(island == "Biscoe")
-
-penguins %>% 
-  filter(species == "Gentoo")
+spr_data %>% 
+  filter(word == "relative")
 ```
 
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
-penguins %>% 
-  filter(species %in% c("Gentoo", "Chinstrap"))
+spr_data %>% 
+  filter(word %in% c("relative", "clause"))
 
-penguins %>% 
-  filter(year %in% c(2008, 2009))
+spr_data %>% 
+  filter(sentence_num %in% c(2, 4))
 ```
 Note that filter is case-sensitive, so capitalization matters.
 
-#### Try it out
-
-1. Load in the spr_example dataset again (update the path if you have to). 
+We can also specify several conditions in one `filter()` call, e.g. 
 ```{r}
-spr <- read_csv("data/spr_example.csv") 
+spr_data %>% 
+  filter(word == "relative" & RT > 200)
+
+spr_data %>% 
+  filter(RT > 300 | RT < 150)
 ```
+
+We can also "chain" different functions, which is one of the things that makes the pipe so useful. For example, we could filter for data in condition B, which is an incomplete sentence, and only look at the words and their response times:
+```{r}
+spr_data %>% 
+  filter(condition == "cond_B") %>% 
+  select(word, RT)
+```
+
+
+#### Try it out - move to extra files?
 
 2. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
 ```{r}
@@ -699,43 +717,41 @@ spr <- spr %>%
   filter(cond != "practice")
 ```
 
-### Leveling up filter
-- %in%  
-- < <= > >=  
-- is.na(), !is.na()  
-- | &  
 
-## (8.2) distinct()
+# (9) Creating and changing columns with mutate()
 
-## (8.3) top_n()
-
-sample()?
-
-# (9) Creating and changing columns 
+With the `mutate()` function, you can change existing columns and add new ones.
 
 ![Mutate](img/dplyr_mutate.png){width=50%}
 
-## (9.1) mutate()
+### Change data type in a column
 
-Let's try to make a column where the prices are in euro. We can call this column price_eur. When I checked, 1 Saudi Riyal was equal to 0.22 euro. So we can multiply the price_sar column by 0.22
+For example, we could change data types by using `mutate()`. The syntax is:
+mutate(data, col_name = some_operation), or, with the pipe: data %>% mutate(col_name = some_operation).
 
+Instead of the code we used earlier to convert participant, item type, and condition to factors, we could write: 
 ```{r}
-spr_data %>% 
-  mutate(threes = 3)
-
 spr_data <- spr_data %>% 
-  mutate(price_eur = price_sar * 0.22)
+  mutate(participant = as_factor(participant),
+         item_type = as_factor(item_type),
+         condition = as_factor(condition))
 ```
-Now, there's a new column called price_eur (it's at the very end by default)
+As you can see, we can change several variables within one `mutate()`  call.
 
-You can also save the new column with the same name, and this will update all the items in that column (see below, where I add 100 to every price, but note that I don't save the output)
+The response times are measured in ms. Let's convert them to seconds by dividing by 1000:
+```{r}
+spr_data <- spr_data %>% 
+  mutate(RT_s = RT / 1000)
+```
+Now, there's a new column called RT_s (it's at the very end by default).
 
+You can also save the new column with the same name, and this will update all the items in that column (see below, where I divide reponse times by 1000, but note that I don't save the output):
 ```{r}
 spr_data %>% 
-  mutate(price_sar = price_sar + 100)
+  mutate(RT = RT / 1000)
 ```
 
-You can even create many new columns at the same time. Here, dropping each new column onto a new line is considered new style (but not necessary!)
+You can create many new columns at the same time. Here, dropping each new column onto a new line is considered new style (but not necessary!)
 
 For example, if we wanted to represent dimensions as meters instead of cm:
 ```{r}
@@ -755,86 +771,89 @@ spr_data %>%
   mutate(name = tolower(name))
 ```
 
-### Change data type in a column
+## If-else-statements
+Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example:
 
-- Tibbles read in all text columns as character -- if you want something to be a factor, you have to set this explicitly. 
-
-- Factors represent groups (participant, conditions, etc.)
-
-- When R acknowledges something as a factor, it can see that there are repeated groupings, i.e. that c("US", "US", "UK") has two instances of the grouping "US" and one of the grouping "UK".
-
-- Let's see what happens when we use call summary on a character column:
-```{r}
-class(spr_data$category)
-
-spr_data %>% 
-  select(category) %>% 
-  summary()
-```
-
-It tells us just that there are 3694 character rows.
-
-In reality, category is a grouping that repeats itself. So let's set it to a factor (and save it!):
-```{r}
-spr_data <- spr_data %>% 
-  mutate(category = as.factor(category))
-
-spr_data$category <- as.factor(spr_data$category)
-
-class(spr_data$category)
-```
-
-Now call summary on the category column:
 ```{r}
 spr_data %>% 
-  select(category) %>% 
-  summary()
+  mutate(price_categorical = ifelse(price > 2000, "expensive", "not expensive")) %>% 
+  select(name, price, price_categorical)
 ```
-Now it tells us how many items of each category are present in the dataframe! Factors also have other benefits / allow R to work intuitively with categories -- so converting to factor will enable R to work with this type of column as it should.
 
-Which other columns in this dataframe should be factors?
+Here is another example (notice the output isn't being saved since we don't really need it):
 ```{r}
-spr_data <- spr_data %>% 
-  mutate(other_colors <- as.factor(other_colors),
-         designer <- as.factor(designer))
-
-spr_data$designer <- as.factor(designer)
-
-summary(spr_data$designer)
+spr_data %>% 
+  mutate(height_categorical = ifelse(height <= 100, "shorter than 1m", "taller than 1m")) %>% 
+  select(name, height, height_categorical)
 ```
 
-Things like a description, or the item names (if they don't repeat much), don't have to be factors but are more intuitive as character columns, since they don't represent groupings.
-
-Check out the changes in the environment panel too. 
-
-Some calls you can use on factor column include:
+You can also use ifelse on categorical / character columns:
 ```{r}
-levels(spr_data$category) #Shows which unique groupings exist
-levels(spr_data$other_colors)
+spr_data %>% 
+  mutate(fav_designer = ifelse(designer == "Carina Bengs", "Yes", "No")) %>% 
+  select(name, designer, fav_designer)
 ```
 
-There is also another syntax that does the same job for replacing columns with altered copies. You may like this better -- either works fine! 
-spr_data$category <- as.factor(spr_data.category)
+You can also use this to condense the groups in a certain column. For example, say we want to combine the categories "Beds", "Wardrobes", and "Chests of drawers & drawer units" into one category, "Bedroom":
+```{r}
+spr_data %>% 
+  mutate(new_category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
+  select(item_id, category, new_category)
+```
+Notice here that if we want to affect the entry only if the condition is TRUE, leaving it unchanged if it is false, we leave the column name as the else condition. This tells R to take the value that is currently in that column if it finds the condition to be FALSE.
 
-If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
-`as.numeric()`, `as.character()` etc.
+We can use the same idea in-place, replacing the existing column, by just assinging it to the identical column name:
+```{r}
+spr_data %>% 
+  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category))
+```
+
+Finally, this is pretty complicated so get ready, you can also combine multiple ifelse statements. Try to follow the logic below:
+
+```{r}
+spr_data %>% 
+  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", 
+                          ifelse(category %in% c("Cabinets & shelving units", "Café furniture"," Chairs"), "Kitchen", "Other")))
+
+penguins %>% 
+  mutate(categorical_weight = ifelse(body_mass_g > 3000, "chunky",
+    ifelse(body_mass_g > 2000, "normal",
+           ifelse(flipper_length_mm > 200, "long fins", 
+      "small")
+  )))
+```
+
+Most of the examples above involve labeling different groupings with text, but you can use ifelse for all sorts of operations. Say the price of wood has gone up, so we want to add 100SAR to the price of any furniture taller than 1m. We could:
+```{r}
+spr_data %>% 
+  mutate(new_price = ifelse(height >= 100, price + 100, price)) %>% 
+  select(item_id, height, price, new_price)
+```
+Remember, you could also do this in-place by assigning the new column to "price" instead of "new_price".
 
 #### Try it out
 
-1. Call summary on the "participant" column of the spr dataframe -- you can do this either the "tidyverse way" with `select()` or with the traditional `$` syntax. What does it show? 
+1. Create a new column that shows whether or not the word is in the first half of a sentence. If the word number is less than or equal to 3, this new column should read 'first half', if not, it should read 'second half'.
 ```{r}
-spr_data <- read_csv("../data/spr_example.csv")
+spr %>% 
+  mutate(sentence_half = ifelse(word_num <= 3, "first half", "second half"))
 ```
 
-2. Call `class()` on the same column to get the data type. 
+2. Create a new column that has the part of speech for a word. If the word is in following list, it should be labeled "content", otherwise, it should be labeled "function": c("practice", "sentence", "relative", "clause.", "cats.")
+```{r}
+spr %>% 
+  mutate(POS = ifelse(word %in% c("practice", "sentence", "relative", "clause.", "cats."), "content", "function"))
+```
 
-3. Now, try changing the column to a factor using `as.factor()`. Remember that you'll have to save this over top of the old variable.
-- Change a character column into a factor using `as.factor()` 
-  - save over the original column
+3. Create a new column that shows how fast a word was read. First, find the mean reading time over the entire dataset. You can do this in the console most easily using the base-R syntax `mean(spr$RT)`. If the RT is greater than or equal to this number, your new column should read "slow", otherwise, it should read "fast". 
+```{r}
+mean(spr$RT)
 
-4. What do `class()` and `summary()` return now?
+spr %>% 
+  mutate(fastness = ifelse(RT >= mean(spr$RT), "slow", "fast"))
+```
 
-5. Are there any other columns in the spr dataframe that you think should be represented as factors?
+![Case when: an extension of if-else](img/dplyr_case_when.png){width=50%}
 
 
 
@@ -944,90 +963,6 @@ spr %>%
 ```
 
 
-## If-else-statements
-Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example:
-
-```{r}
-spr_data %>% 
-  mutate(price_categorical = ifelse(price > 2000, "expensive", "not expensive")) %>% 
-  select(name, price, price_categorical)
-```
-
-Here is another example (notice the output isn't being saved since we don't really need it):
-```{r}
-spr_data %>% 
-  mutate(height_categorical = ifelse(height <= 100, "shorter than 1m", "taller than 1m")) %>% 
-  select(name, height, height_categorical)
-```
-
-You can also use ifelse on categorical / character columns:
-```{r}
-spr_data %>% 
-  mutate(fav_designer = ifelse(designer == "Carina Bengs", "Yes", "No")) %>% 
-  select(name, designer, fav_designer)
-```
-
-You can also use this to condense the groups in a certain column. For example, say we want to combine the categories "Beds", "Wardrobes", and "Chests of drawers & drawer units" into one category, "Bedroom":
-```{r}
-spr_data %>% 
-  mutate(new_category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
-  select(item_id, category, new_category)
-```
-Notice here that if we want to affect the entry only if the condition is TRUE, leaving it unchanged if it is false, we leave the column name as the else condition. This tells R to take the value that is currently in that column if it finds the condition to be FALSE.
-
-We can use the same idea in-place, replacing the existing column, by just assinging it to the identical column name:
-```{r}
-spr_data %>% 
-  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category))
-```
-
-Finally, this is pretty complicated so get ready, you can also combine multiple ifelse statements. Try to follow the logic below:
-
-```{r}
-spr_data %>% 
-  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", 
-                          ifelse(category %in% c("Cabinets & shelving units", "Café furniture"," Chairs"), "Kitchen", "Other")))
-
-penguins %>% 
-  mutate(categorical_weight = ifelse(body_mass_g > 3000, "chunky",
-    ifelse(body_mass_g > 2000, "normal",
-           ifelse(flipper_length_mm > 200, "long fins", 
-      "small")
-  )))
-```
-
-Most of the examples above involve labeling different groupings with text, but you can use ifelse for all sorts of operations. Say the price of wood has gone up, so we want to add 100SAR to the price of any furniture taller than 1m. We could:
-```{r}
-spr_data %>% 
-  mutate(new_price = ifelse(height >= 100, price + 100, price)) %>% 
-  select(item_id, height, price, new_price)
-```
-Remember, you could also do this in-place by assigning the new column to "price" instead of "new_price".
-
-#### Try it out
-
-1. Create a new column that shows whether or not the word is in the first half of a sentence. If the word number is less than or equal to 3, this new column should read 'first half', if not, it should read 'second half'.
-```{r}
-spr %>% 
-  mutate(sentence_half = ifelse(word_num <= 3, "first half", "second half"))
-```
-
-2. Create a new column that has the part of speech for a word. If the word is in following list, it should be labeled "content", otherwise, it should be labeled "function": c("practice", "sentence", "relative", "clause.", "cats.")
-```{r}
-spr %>% 
-  mutate(POS = ifelse(word %in% c("practice", "sentence", "relative", "clause.", "cats."), "content", "function"))
-```
-
-3. Create a new column that shows how fast a word was read. First, find the mean reading time over the entire dataset. You can do this in the console most easily using the base-R syntax `mean(spr$RT)`. If the RT is greater than or equal to this number, your new column should read "slow", otherwise, it should read "fast". 
-```{r}
-mean(spr$RT)
-
-spr %>% 
-  mutate(fastness = ifelse(RT >= mean(spr$RT), "slow", "fast"))
-```
-
-![Case when: an extension of if-else](img/dplyr_case_when.png){width=50%}
-
 
 ![Group and ungroup](img/group_by_ungroup.png){width=50%}
 
@@ -1066,13 +1001,21 @@ Remember, something like data type in R (ex: character or factor) can't be saved
 
 ![ggplot2](img/ggplot2_exploratory.png){width=50%}
 
-CHECK
+# Missing commands
+
+count? 
 - across  
 - nest_by  
 - recode, recode_factor  
 - coalesce  
 - lag and lead  
 - cumulative aggregates  
+
+distinct()
+
+top_n()
+
+sample()?
 
 
 # (14) Getting help
@@ -1161,4 +1104,33 @@ Then, find which designer makes the most expensive furniture. Return the average
 ```
 
 
+
+
+# Simulating corpus data
+
+collocates from COCA, one position left of CAT/DOG lemma search
+```{r}
+collocate = c(rep("tom_np1", 9),
+              rep("tom_nn1", 8),
+              rep("siamese_jj", 17),
+              rep("tortoiseshell_nn1", 9),
+              rep("ginger_jj", 8),
+              rep("purring_jj", 5),
+              rep("purring_vvg", 1),
+              rep("playing_vvg", 4),
+              rep("because_cs", 5),
+              rep("contented_jj", 4),
+              #dog:
+              rep("guide_nn1", 60),
+              rep("guide_vv0", 7),
+              rep("guide_vvi", 1),
+              rep("mad_jj", 52),
+              rep("barking_jj", 7),
+              rep("barking_vvg", 1),
+              rep("barking_np1", 1),
+              rep("has_vhz", 19),
+              rep("lap_nn1", 17),
+              rep("dangerous_jj", 24),
+              rep("best_jjt", 4))
+```
 
