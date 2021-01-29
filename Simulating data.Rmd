@@ -1,0 +1,51 @@
+---
+title: "Simulating data"
+author: "Julia Müller"
+date: "29 1 2021"
+output: html_document
+---
+
+# Workshop data - cats <3 and dogs
+
+```{r}
+library(tidyverse)
+```
+
+
+## Corpus data
+
+collocates from BNC with tags, one position left of CAT/DOG lemma search
+```{r}
+animal_corpus <- data.frame(
+  collocate = c(rep("tom_np1", 9), #cat collocates
+              rep("tom_nn1", 8),
+              rep("siamese_jj", 17),
+              rep("tortoiseshell_nn1", 9),
+              rep("ginger_jj", 8),
+              rep("purring_jj", 5),
+              rep("purring_vvg", 1),
+              rep("playing_vvg", 4),
+              rep("because_cs", 5),
+              rep("contented_jj", 4),
+              #dog:
+              rep("guide_nn1", 60),
+              rep("guide_vv0", 7),
+              rep("guide_vvi", 1),
+              rep("mad_jj", 52),
+              rep("barking_jj", 7),
+              rep("barking_vvg", 1),
+              rep("barking_np1", 1),
+              rep("has_vhz", 19),
+              rep("lap_nn1", 17),
+              rep("dangerous_jj", 24),
+              rep("best_jjt", 4)),
+    animal = c(rep("cat", 70), rep("dog", 193))
+)
+
+# to randomise the order of the rows:
+rows <- sample(nrow(animal_corpus))
+animal_corpus <- animal_corpus[rows, ]
+```
+
+
+
