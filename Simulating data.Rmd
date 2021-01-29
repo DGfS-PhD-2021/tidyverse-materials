@@ -118,9 +118,10 @@ catdog_spr <- tibble(participant = rep(c("Par_A", "Par_B", "Par_C", "Par_D", "Pa
                      ifelse(word_len > 6, RT,
                             ifelse(word_len > 8, RT + 100,
                                    RT + 200))),
-         RT = ifelse(RT < 95, sample(c(110:234), 1), RT)
+         RT = ifelse(RT < 95, sample(c(110:284), 1), RT),
+         X1 = 1:nrow(catdog_spr)
                      ) %>% 
-  select(participant, item_type, sentence_num, cond, word, RT, full_sentence)
+  select(X1, participant, item_type, sentence_num, cond, word, RT, full_sentence)
 
 participant_data <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"),
        age = c(24, 28, 18, 32, 36, 25, 21, 68, 34, 22, 28, 33),
@@ -181,4 +182,11 @@ ggplot(aes(x=education, y=avg_RT)) +
 ```{r}
 mean(catdog_spr$RT)
 range(catdog_spr$RT)
+```
+
+### Uhhhh not sure why this is happening? ideas?
+```{r}
+ggplot(data=full_data, aes(x=RT)) +
+  geom_histogram(bins = 50) + 
+  geom_vline(aes(xintercept=175))
 ```
