@@ -103,12 +103,6 @@ Each of these can be fed the `say()` function to slightly alter what it does.
 
 Don't worry if you don't understand everything in the documentation when you're first starting out. Just try to get an idea for which arguments there are and which options for those arguments. It's good practice to look at help documents often -- this will also help you get more efficient at extracting the info you need from them.
 
-### Try it out
-Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
-```{r}
-
-```
-
 
 # (3) Reading in and exploring data
 
@@ -146,7 +140,7 @@ We're also providing several files for you to practise on later, so you can pick
 
 Let's read in a small self-paced reading dataset (saved in the data folder, so we need to add `data/` to tell R that):
 ```{r}
-spr_data <- read_csv("data/spr_example.csv")
+catdog_spr <- read_csv("data/spr_example.csv")
 ```
 
 
@@ -170,12 +164,12 @@ https://r4ds.had.co.nz/tibbles.html
 Now you have a data file read in, but how do you see what's in it?
 
 ```{r}
-head(spr_data)
+head(catdog_spr)
 ```
 
 You can change the amount of rows with the `n` *argument*: 
 ```{r}
-head(spr_data, n=3)
+head(catdog_spr, n=3)
 ```
 
 Or: click name of dataframe in Environment tab
@@ -184,9 +178,9 @@ Or: click name of dataframe in Environment tab
 
 `summary()`: call it on a dataframe to get each column and useful info based on the data type. For example, numeric columns will show the min, median, max and the quartiles (25% increments).
 ```{r}
-summary(spr_data)
+summary(catdog_spr)
 
-summary(spr_data$RT)
+summary(catdog_spr$RT)
 ```
 
 ### Exercise
@@ -197,23 +191,20 @@ How many rows and columns does it have?
 
 In the environment panel (or using `str()`), you can see that all the variables in this data are read in as either numeric or character data. However, some variables should be treated as factors because they represent categories, not text data. Let's convert them. 
 ```{r}
-spr_data$participant <- as_factor(spr_data$participant)
-spr_data$item_type <- as_factor(spr_data$item_type)
-spr_data$cond <- as_factor(spr_data$cond)
+catdog_spr$participant <- as_factor(catdog_spr$participant)
+catdog_spr$item_type <- as_factor(catdog_spr$item_type)
+catdog_spr$cond <- as_factor(catdog_spr$cond)
 ```
 
 This way, the summary output also works as expected. For example, we can have a look at how many different participants and conditions:
 ```{r}
-summary(spr_data$participant)
+summary(catdog_spr$participant)
 
-summary(spr_data$cond)
+summary(catdog_spr$cond)
 ```
 
 If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
 `as.numeric()`, `as.character()` etc.
-
-### Exercise
-Have a look at the data you read in. Are all variables the correct type?
 
 
 # (4) The pipe %>% 
@@ -224,11 +215,11 @@ The pipe takes the item before it and feeds it to the following command as the f
 
 So to re-write the `head()` function with the pipe:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   head()
 ```
 
-This produces the exact same output as `head(spr_data)`. Why would this be useful?
+This produces the exact same output as `head(catdog_spr)`. Why would this be useful?
 
 Compare the following lines of pseudocode, which would produce the same output:
 
@@ -252,30 +243,30 @@ You can see that the version with the pipe is easier to read when more than one 
 
 Here are some more examples:
 ```{r}
-# Equivalent to summary(spr_data)
-spr_data %>% 
+# Equivalent to summary(catdog_spr)
+catdog_spr %>% 
   summary()
 
-# Equivalent to colnames(spr_data), which returns all column names
-colnames(spr_data)
+# Equivalent to colnames(catdog_spr), which returns all column names
+colnames(catdog_spr)
 
-spr_data %>% 
+catdog_spr %>% 
   colnames() 
 
-# Equivalent to nrow(spr_data), which returns the number of rows in the df
-nrow(spr_data)
+# Equivalent to nrow(catdog_spr), which returns the number of rows in the df
+nrow(catdog_spr)
 
-spr_data %>% 
+catdog_spr %>% 
   nrow()
 ```
 
 And you can also stack commands by ending each row (except the last one) with a pipe:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   colnames() %>% #extracts column names
   toupper() #converts them to uppercase
 
-spr_data %>% 
+catdog_spr %>% 
   colnames() %>% #extracts column names
   nchar() #counts the number of letters
 ```
@@ -286,7 +277,7 @@ spr_data %>%
 ## rename()
 You can rename columns with the `rename()` function. The syntax is new_name = old_name. Let's rename the `cond` variable:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   rename(condition = cond)
 ```
 
@@ -294,11 +285,11 @@ This is just a preview because we didn't assign the changed dataframe to any nam
 
 You can also rename multiple columns at once (no need for an array here):
 ```{r}
-spr_data <- spr_data %>% 
+catdog_spr <- catdog_spr %>% 
   rename(condition = cond, 
          sentence = full_sentence)
 ```
-Notice above that I've saved output over the spr_data dataframe to make the changes 'permanent'.
+Notice above that I've saved output over the catdog_spr dataframe to make the changes 'permanent'.
 
 
 ## relocate()
@@ -307,26 +298,26 @@ Notice above that I've saved output over the spr_data dataframe to make the chan
 
 The `relocate` function lets you change the order of variables in the data. The following command moves the participant id, full sentence, and word columns to the beginning: 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   relocate(participant, sentence, word)
 ```
 
 You can also specify that a variable should be placed before or after another variable:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   relocate(word_num, .after = word) %>% 
   relocate(sentence, .before = sentence_num)
 ```
 
 Another option is to sort by data type:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   relocate(where(is.character))
 
-spr_data %>% 
+catdog_spr %>% 
   relocate(where(is.factor))
 
-spr_data %>% 
+catdog_spr %>% 
   relocate(where(is.numeric))
 ```
 
@@ -336,10 +327,10 @@ Reordering variables is particularly useful if you have large datasets with lots
 
 There's also a corresponding command that lets you sort by row values: `arrange()`. By default, this sorts by lowest to highest value, but you can add `desc()` to reverse that.
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   arrange(RT)
 
-spr_data %>% 
+catdog_spr %>% 
   arrange(desc(RT))
 ```
 
@@ -350,24 +341,24 @@ spr_data %>%
 
 - The traditional syntax for dealing with columns is dataframe$column.
 
-A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `spr_data$RT` we can write:
+A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `catdog_spr$RT` we can write:
 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(RT) 
 ```
 
-We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(spr_data$RT)`
+We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(catdog_spr$RT)`
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(RT) %>% 
   summary()
 
-spr_data %>% 
+catdog_spr %>% 
   select(RT) %>% 
   max()
 
-spr_data %>% 
+catdog_spr %>% 
   select(RT) %>% 
   min()
 ```
@@ -377,61 +368,49 @@ spr_data %>%
 You can also use `select()` to take multiple columns. 
 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(word, word_num, RT)
 ```
 
 You can see that these columns are presented in the order you gave them to the select call, too:
 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(RT, word, word_num)
 ```
 
 You can also use this to reorder columns in that you give the name of the column(s) you want first, then finish with `everything()` to have all other columns follow:
 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(RT, everything())
-```
-
-#### Try it out 
-
-1. We tried piping spr_data to `head()` above. Try it now with `tail()`. What does this show you? 
-```{r}
-
-```
-
-2. Pipe the 'spr_data' dataset to `colnames()` What does this command do? (Bonus, pipe the columnn names on to the `nchar()` function and figure out what that does.)
-```{r}
-
 ```
 
 
 ### Preview vs. saving
 - Above: mostly previewing using `select()` for first insights
-  - if you look at the spr_data dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
+  - if you look at the catdog_spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
 
 - To save your changes: assigning your call back to the variable name
 
 - Good work flow: Preview then save when you're sure you're happy with the output
 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(name, everything())
 ```
 
 ```{r}
-spr_data <- spr_data %>% 
+catdog_spr <- catdog_spr %>% 
   select(name, everything())
 ```
 
-There is no output here, but the spr_data dataframe has been permanently updated (within the R session, not in your file system)
+There is no output here, but the catdog_spr dataframe has been permanently updated (within the R session, not in your file system)
 
 There is also a trick to show a preview and save it to the variable -- wrapping the whole call in parentheses -- use with caution!
 
 ```{r}
-(spr_data <- spr_data %>% 
+(catdog_spr <- catdog_spr %>% 
   select(item_type, everything()))
 ```
 
@@ -443,15 +422,16 @@ If you make a mistake: arrow with a line under it in the code block of R-Markdow
 You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
 
 ```{r}
-spr_data <- spr_data %>% 
+catdog_spr <- catdog_spr %>% 
   select(-item_type)
 ```
 
 You can also remove multiple columns at once by writing them in an array `c()`. 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(-c(word_num, sentence_num))
 ```
+
 
 ### Leveling up select()
 
@@ -459,42 +439,42 @@ Until now, we've used select() in combination with the full column name, but the
 
 For example, here's how we can select both the `sentence_num` and the `word_num` column - by specifying `ends_with("_num")` in the select() call:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(ends_with("_num"))
 ```
 
 The opposite is also possible, e.g.
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(starts_with("sentence"))
 ```
 returns all columns that start with "sentence".
 
 `contains` is another helper function. Here, we're using it to show all columns that contain an underscore:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(contains("_"))
 ```
 
 If we try to select a column that doesn't exist, we get an error message:
 ```{r}
-# spr_data %>% 
+# catdog_spr %>% 
 #  select(word, word_number)
 ```
 
 But if we combine select with any_of, we don't see an error. Instead, R just returns the columns that do exist:
 Note here that you have to use an array and enclose the names in quotes!
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(any_of(c("word", "word_number")))
 ```
 
 We can also select a range of  variables using a colon. This works both with variables and (a range of) numbers:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   select(condition:word) # shows condition, word_num, word
 
-spr_data %>% 
+catdog_spr %>% 
   select(1:3) # first three columns
 ```
 Here, the order of the columns matters!
@@ -528,89 +508,68 @@ data %>%
 
 Let's look at reaction times that are shorter than 200 ms:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(RT < 200)
 ```
 
 ...reaction times longer than or equal to 250 ms:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(RT >= 250)
 ```
 
 ...reaction times equal to 200 ms:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(RT == 200)
 ```
 
 Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
 Look at the error below:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(word == relative)
 ```
 
 The correct syntax is: (because you're matching to a string)
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(word == "relative")
 ```
 
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(word %in% c("relative", "clause"))
 
-spr_data %>% 
+catdog_spr %>% 
   filter(sentence_num %in% c(2, 4))
 ```
 Note that filter is case-sensitive, so capitalization matters.
 
 We can also specify several conditions in one `filter()` call, e.g. 
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(word == "relative" & RT > 200)
 
-spr_data %>% 
+catdog_spr %>% 
   filter(RT > 300 | RT < 150)
 ```
 
 We can also "chain" different functions, which is one of the things that makes the pipe so useful. For example, we could filter for data in condition B, which is an incomplete sentence, and only look at the words and their response times:
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   filter(condition == "cond_B") %>% 
   select(word, RT)
 ```
 
 
-#### Try it out - move to extra files?
-
-2. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
-```{r}
-nrow(spr)
-
-spr <- spr %>% 
-  filter(RT >= 150)
-
-nrow(spr)
-```
-
-3. You want to take a look at the results from Par_C only: Filter these data points but don't save the result. 
-```{r}
-spr %>% 
-  filter(participant == "Par_C")
-```
-
-4. You're not interested in the practice items in the spr dataframe. Filter the dataset to include everything BUT the practice items and save your result.
-```{r}
-spr <- spr %>% 
-  filter(cond != "practice")
-```
-
 # (7) Separating and uniting columns
 
 For the next two examples, we'll use a different dataset called `animal_corpus`. Read it in and familiarise yourself with its contents.
+```{r}
+animal_corpus <- read_csv2("data/cat_dog_corpus_data.csv")
+```
 
 This contains corpus data of "cat" and "dog" together with the words that precede "cat" and "dog". These are called "collocates" and, in our example, also include part of speech tags (the format is word_tag).
 
@@ -628,10 +587,19 @@ Luckily, the tidyverse has a command for that: `separate()`. It takes the follow
 - remove (optional): by default, the original column will be deleted. Set `remove` to FALSE to keep it.
 
 ```{r}
-animal_corpus %>% 
+(animal_corpus <- animal_corpus %>% 
   separate(col = collocate, 
            into = c("coll", "coll_tag"), 
-           sep = "_")
+           sep = "_"))
+```
+
+The self-paced reading data also has a column that needs separating - the condition column. Because it contains three pieces (cond_A/B_cat/dog), we pipe into a select command to remove "cond" afterwards:
+```{r}
+(catdog_spr <- catdog_spr %>% 
+  separate(col = cond,
+           into = c("drop", "condition", "target"),
+           sep = "_") %>% 
+  select(-drop))
 ```
 
 
@@ -650,16 +618,13 @@ animal_corpus %>%
 
 Another example: Let's say we'd like our data to be in the format "collocate cat/dog", so without the tag, but in one column. We can first separate to put tags and collocates in different columns and then unite the tag with the animal in a second step:
 ```{r}
-animal_corpus %>% 
-  separate(col = collocate, 
-           into = c("coll", "coll_tag"), 
-           sep = "_") %>% 
+ animal_corpus %>% 
   unite(col = "coll_word",
         c("coll", "animal"),
         sep = " ")
 ```
 
-This leads to a lot of repetition. "Mad dog", for example, turns up twice in just our preview. To remedy this, we can use `distinct()`, which only keeps unique rows:
+This leads to a lot of repetition - some bigrams appear several times in just our preview. To remedy this, we can use `distinct()`, which only keeps unique rows:
 ```{r}
 animal_corpus %>% 
   separate(col = collocate, 
@@ -689,153 +654,155 @@ With the `mutate()` function, you can change existing columns and add new ones.
 
 ![Mutate](img/dplyr_mutate.png){width=50%}
 
-### Change data type in a column
+## Change data type in a column
 
 For example, we could change data types by using `mutate()`. The syntax is:
 mutate(data, col_name = some_operation), or, with the pipe: data %>% mutate(col_name = some_operation).
 
 Instead of the code we used earlier to convert participant, item type, and condition to factors, we could write: 
 ```{r}
-spr_data <- spr_data %>% 
+catdog_spr <- catdog_spr %>% 
   mutate(participant = as_factor(participant),
          item_type = as_factor(item_type),
          condition = as_factor(condition))
 ```
-As you can see, we can change several variables within one `mutate()`  call.
+As you can see, we can change several variables within one `mutate()`  call. In the same way, we could create several new columns at the same time. Here, dropping each new column onto a new line is considered good style and makes the code more readable (but it's not necessary).
 
 The response times are measured in ms. Let's convert them to seconds by dividing by 1000:
 ```{r}
-spr_data <- spr_data %>% 
+catdog_spr <- catdog_spr %>% 
   mutate(RT_s = RT / 1000)
 ```
 Now, there's a new column called RT_s (it's at the very end by default).
 
-You can also save the new column with the same name, and this will update all the items in that column (see below, where I divide reponse times by 1000, but note that I don't save the output):
+You can also save the new column with the same name, and this will update all the items in that column (see below, where I divide response times by 1000, but note that I don't save the output):
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   mutate(RT = RT / 1000)
 ```
 
-You can create many new columns at the same time. Here, dropping each new column onto a new line is considered new style (but not necessary!)
-
-For example, if we wanted to represent dimensions as meters instead of cm:
+You can also do operations to character columns - for example: 
 ```{r}
-spr_data %>% 
-  mutate(depth_m = depth/100, 
-         height_m = height/100, 
-         width_m = width/100)
-
-spr_data %>% 
-  mutate(depth_m = depth/100) %>% 
-  mutate(height_m = height/100)
+catdog_spr %>% 
+  mutate(word = tolower(word))
 ```
 
-You can also do operations to character columns; for example, 
+## Relabel factors
+In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is old label = "new label".
 ```{r}
-spr_data %>% 
-  mutate(name = tolower(name))
+catdog_spr %>% 
+  mutate(condition = recode(condition, A = "match", B = "mismatch"))
 ```
+
 
 ## If-else-statements
-Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example:
+
+Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example, we could create a column called "RT_short" that contains "short" if the response time is faster than 100 ms and "long" if it isn't:
 
 ```{r}
-spr_data %>% 
-  mutate(price_categorical = ifelse(price > 2000, "expensive", "not expensive")) %>% 
-  select(name, price, price_categorical)
+catdog_spr %>% 
+  mutate(RT_short = ifelse(RT < 100, "short", "long")) %>% 
+  select(RT, RT_short)
 ```
 
 Here is another example (notice the output isn't being saved since we don't really need it):
 ```{r}
-spr_data %>% 
-  mutate(height_categorical = ifelse(height <= 100, "shorter than 1m", "taller than 1m")) %>% 
-  select(name, height, height_categorical)
+catdog_spr %>% 
+  mutate(RT_category = ifelse(RT < 100 | RT > 500, "extreme", "normal")) %>% 
+  select(RT, RT_category)
 ```
+Here, we're once again using the logical operators.
 
 You can also use ifelse on categorical / character columns:
 ```{r}
-spr_data %>% 
-  mutate(fav_designer = ifelse(designer == "Carina Bengs", "Yes", "No")) %>% 
-  select(name, designer, fav_designer)
+catdog_spr %>% 
+  mutate(position = ifelse(word %in% c("cat", "dog"), "critical", "not critical")) %>% 
+  select(word, position)
 ```
 
+CHANGE EXAMPLE
 You can also use this to condense the groups in a certain column. For example, say we want to combine the categories "Beds", "Wardrobes", and "Chests of drawers & drawer units" into one category, "Bedroom":
 ```{r}
-spr_data %>% 
-  mutate(new_category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
-  select(item_id, category, new_category)
+catdog_spr %>% 
+  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
+  select(category)
 ```
 Notice here that if we want to affect the entry only if the condition is TRUE, leaving it unchanged if it is false, we leave the column name as the else condition. This tells R to take the value that is currently in that column if it finds the condition to be FALSE.
 
-We can use the same idea in-place, replacing the existing column, by just assinging it to the identical column name:
-```{r}
-spr_data %>% 
-  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category))
-```
-
-Finally, this is pretty complicated so get ready, you can also combine multiple ifelse statements. Try to follow the logic below:
-
-```{r}
-spr_data %>% 
-  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", 
-                          ifelse(category %in% c("Cabinets & shelving units", "Café furniture"," Chairs"), "Kitchen", "Other")))
-
-penguins %>% 
-  mutate(categorical_weight = ifelse(body_mass_g > 3000, "chunky",
-    ifelse(body_mass_g > 2000, "normal",
-           ifelse(flipper_length_mm > 200, "long fins", 
-      "small")
-  )))
-```
-
 Most of the examples above involve labeling different groupings with text, but you can use ifelse for all sorts of operations. Say the price of wood has gone up, so we want to add 100SAR to the price of any furniture taller than 1m. We could:
+CHANGE EXAMPLE
 ```{r}
-spr_data %>% 
+catdog_spr %>% 
   mutate(new_price = ifelse(height >= 100, price + 100, price)) %>% 
   select(item_id, height, price, new_price)
 ```
 Remember, you could also do this in-place by assigning the new column to "price" instead of "new_price".
 
-#### Try it out
-
-1. Create a new column that shows whether or not the word is in the first half of a sentence. If the word number is less than or equal to 3, this new column should read 'first half', if not, it should read 'second half'.
-```{r}
-spr %>% 
-  mutate(sentence_half = ifelse(word_num <= 3, "first half", "second half"))
-```
-
-2. Create a new column that has the part of speech for a word. If the word is in following list, it should be labeled "content", otherwise, it should be labeled "function": c("practice", "sentence", "relative", "clause.", "cats.")
-```{r}
-spr %>% 
-  mutate(POS = ifelse(word %in% c("practice", "sentence", "relative", "clause.", "cats."), "content", "function"))
-```
-
-3. Create a new column that shows how fast a word was read. First, find the mean reading time over the entire dataset. You can do this in the console most easily using the base-R syntax `mean(spr$RT)`. If the RT is greater than or equal to this number, your new column should read "slow", otherwise, it should read "fast". 
-```{r}
-mean(spr$RT)
-
-spr %>% 
-  mutate(fastness = ifelse(RT >= mean(spr$RT), "slow", "fast"))
-```
+## Several conditions: case_when()
+What if you have several conditions? For example, if RTs are shorter than 100 ms, they should be labelled "short", if they're longer than 500 ms, "long", and "normal" for all other RTs. While it's possible to chain several `if_else()` statements, it gets confusing and hard to read. Instead, we should use `case_when()`.
 
 ![Case when: an extension of if-else](img/dplyr_case_when.png){width=50%}
 
-
-
-# (10) Summary tables with groupings
-
-### group_by() & summarize()
-First, load the spr_data dataset again:
+The syntax within `case_when()` is:
+condition ~ what to do if it is true (can be used as often as you want and can even refer to different variables!),
+TRUE ~ what to do in all other cases.
 ```{r}
-spr_data <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-11-03/spr_data.csv') 
+catdog_spr %>% 
+  mutate(RT_category = case_when(
+    RT < 100 ~ "short",
+    RT > 500 ~ "long",
+    TRUE ~ "normal"
+  )) %>% 
+  select(RT, RT_category)
 ```
 
-To look at summary statistics for specific groupings, we have to use a two- (more like three-) step process. 
+To use another example: In the corpus data, we'd like to simplify the part-of-speech tags a bit. To see the different tags that are in the data right now, we can use `unique()`, which will show us all factor labels.
+```{r}
+unique(animal_corpus$coll_tag)
+```
 
-First, group by your grouping variable using `group_by()`
+Then, within a `case_when()` command, we can create a simplified tag variable to tell us whether something is a noun, adjective, or verb. As you can see in the code below, we can immediately convert this new variable into a factor within the same `mutate()` command.
+```{r}
+(animal_corpus <- animal_corpus %>% 
+  mutate(coll_tag_simple = case_when(
+    coll_tag %in% c("np1", "nn1") ~ "noun",
+    coll_tag %in% c("jj", "jjt") ~ "adjective",
+    coll_tag %in% c("vhz", "vvg", "vv0", "vvi") ~ "verb"
+  ),
+  coll_tag_simple = as_factor(coll_tag_simple)))
+```
+ 
+Let's have a look:
+```{r}
+summary(animal_corpus$coll_tag_simple)
+```
+ Some NAs were introduced! To figure out why that's the case, let's use `is.na` within a `filter()` command:
+```{r}
+animal_corpus %>% 
+  filter(is.na(coll_tag_simple))
+```
+ 
+Looks like we didn't account for the "cs" (conjunction) tag. Since we know that "because" doesn't refer to "cat/dog", we might as well remove these cases from the data by adding an exclamation mark in front of `is.na`:
+```{r}
+animal_corpus <- animal_corpus %>% 
+  filter(!is.na(coll_tag_simple))
+```
+
+
+# (9) Summary tables with groupings
+
+### group_by() & summarize()
+
+In our SPR experiment, we showed matching and mismatching collocate + cat/dog combinations, so we might assume that the mismatched combinations were read more slowly. We'd like to see the average RTs for each condition.
+
+To look at summary statistics for specific groupings like these, we have to use a two- (more like three-) step process. 
+
+First, group by your grouping variable (here: condition) using `group_by()`
 Then, summarize, which creates a column based on a transformation to another column, using `summarize()` or `summarise()`
 Finally, ungroup (so that R forgets that this is a grouping and carries on as normal, with `ungroup()`
-  - usually this makes no difference to what you see but is an important fail-safe
+Usually this makes no difference to what you see but is an important fail-safe if you're continuing in the code block. For example, if you need to drop the former grouping variable and don't use `ungroup()`, R will refuse to drop it.
+
+![Group and ungroup](img/group_by_ungroup.png){width=50%}
 
 You can use multiple different operations in the summarize part, including:
 - mean(col_name)
@@ -843,98 +810,53 @@ You can use multiple different operations in the summarize part, including:
 - max(col_name)
 - min(col_name)
 
-For example, to return the average price in each category:
+For example, to return the average RT in each condition:
 ```{r}
-spr_data %>% 
-  group_by(category) %>% 
-  summarize(mean(price)) %>% 
+catdog_spr %>% 
+  group_by(condition) %>% 
+  summarize(mean(RT)) %>% 
   ungroup()
 ```
 
 You can also give a name to your new summary column: 
 ```{r}
-spr_data %>% 
-  group_by(category) %>% 
-  summarize(avg_price = mean(price)) %>% 
+catdog_spr %>% 
+  group_by(condition) %>% 
+  summarize(average_RT = mean(RT)) %>% 
   ungroup()
 ```
 
-Or further manipulate it:
+Or further manipulate it, e.g. converting ms to seconds:
 ```{r}
-spr_data %>% 
-  group_by(category) %>% 
-  summarize(avg_price_eur = mean(price) * 0.22) %>% 
+catdog_spr %>% 
+  group_by(condition) %>% 
+  summarize(average_RT_s = mean(RT) / 1000) %>% 
   ungroup()
 ```
 
-For categorical columns, you can also count how many rows are in each category using `count()` instead of `summarize()`
-
+For categorical columns, you can also count how many rows are in each category using `count()` instead of `summarize()`. Here, we're counting how often which word appeared in the experiment. The count is displayed in the new "n" column:
 ```{r}
-spr_data %>% 
-  group_by(category) %>% 
+catdog_spr %>% 
+  group_by(word) %>% 
+  freq = count() %>% 
+  ungroup()
+```
+
+This is sorted alphabetically, but we can pipe it into the `arrange()` call we discussed earlier to sort by frequency, in descending order.
+```{r}
+catdog_spr %>% 
+  group_by(word) %>% 
   count() %>% 
-  ungroup()
-```
-
-Similarly, you can use distinct() to return the unique items in the category, for example:
-```{r}
-spr_data %>% 
-  group_by(category) %>% 
-  distinct(name) %>% 
-  ungroup()
-
-spr_data %>% 
-  distinct(name)
-```
-You can call `distinct()` without an argument, which will make sure that all columns have only unique items, or you can call it on a specific column, which will return only that column and all the unique items in it.
-
-Or both:
-```{r}
-spr_data %>% 
-  group_by(category) %>% 
-  distinct(name) %>% 
-  count()
+  ungroup() %>% 
+  arrange(desc(n))
 ```
 
 
-#### Try it out
-
-1. Starting with the spr dataset, group by participant and use summarize to find the max RT for each participant. 
-```{r}
-spr %>% 
-  group_by(participant) %>% 
-  summarize(max(RT)) %>% 
-  ungroup()
-```
-
-2. With the same dataset, group by condition and return the mean RT for each condition. This is already a first step towards statistical analysis of your data! Do conditions look like they have similar or very different means?
-```{r}
-spr %>% 
-  group_by(cond) %>% 
-  summarize(mean(RT)) %>% 
-  ungroup()
-```
-
-
-3. Summarize based on condition and count how many full sentences are in each condition. (Here you will realize that this example dataset doesn't make a ton of sense :D)
-```{r}
-spr %>% 
-  group_by(cond) %>% 
-  count(full_sentence) %>% 
-  ungroup()
-
-spr %>% 
-  count(full_sentence)
-```
-
-
-
-![Group and ungroup](img/group_by_ungroup.png){width=50%}
-
-# (11) Transforming data 
+# (10) Transforming data 
 
 ![Pivot](img/tidyr_spread_gather.png){width=50%}
-## (11.1) pivot()
+
+## pivot()
 -> pivot (wide - long, or long - wide)
 separate (example: tagged corpus text) and unite (example: create participant id from experiment id + number)
 
@@ -952,9 +874,9 @@ CSVs are often saved as .csv (this is also openable in Excel) and TSVs are often
 
 You can save CSVs and TSVs like so:
 ```{r}
-# write_tsv(spr_data, "spr_data_df.txt")
+# write_tsv(catdog_spr, "catdog_spr_df.txt")
 
-# write_csv(spr_data, "spr_data_df.csv")
+# write_csv(catdog_spr, "catdog_spr_df.csv")
 ```
 Syntax: write_tsv(dfname, "filename.ext")
 
@@ -967,20 +889,13 @@ Remember, something like data type in R (ex: character or factor) can't be saved
 ![ggplot2](img/ggplot2_exploratory.png){width=50%}
 
 # Missing commands
-arrange
-count? 
 - across  
 - nest_by  
-- recode, recode_factor  
 - coalesce  
 - lag and lead  
 - cumulative aggregates  
-
-distinct()
-
-top_n()
-
-sample()?
+- top_n()
+- sample()?
 
 
 # (14) Getting help
@@ -1038,7 +953,7 @@ SPR:
 
 ```
 
-spr_data:
+catdog_spr:
 1. Return the most expensive bed.
 ```{r}
 
@@ -1052,7 +967,7 @@ spr_data:
 
 3. There is some junk in the designer column. Look at it using distinct(), then remove it with the following code: 
 
-spr_data <- spr_data %>% 
+catdog_spr <- catdog_spr %>% 
   filter(!str_detect(designer, "[0-9]"))
   
 Note: str_detect looks for regular expressions. Here, the regular expression [0-9] matches any number. If this is true, str_detect returns TRUE -- However, it is proceeded by ! which means NOT. Thus, the filter is satisfied only if str_detect returns FALSE, i.e. there are no numbers present.

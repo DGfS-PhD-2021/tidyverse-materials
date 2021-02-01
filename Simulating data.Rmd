@@ -47,9 +47,11 @@ animal_corpus <- data.frame(
 # to randomise the order of the rows:
 rows <- sample(nrow(animal_corpus))
 animal_corpus <- animal_corpus[rows, ]
+
+write.csv2(animal_corpus, "cat_dog_corpus_data.csv")
 ```
 
-### SPR
+## SPR
 ```{r}
 ## Design: 
 ## cond_a is matching collocates (5 about cats, 5 about dogs),
@@ -97,7 +99,10 @@ catdog_spr <- tibble(participant = rep(c("Par_A", "Par_B", "Par_C", "Par_D", "Pa
        sentence_num = rep(1:23, 12),
        full_sentence = rep(sentence_array, 12)) %>% 
   unnest_tokens(word, full_sentence, to_lower = FALSE, drop = FALSE) %>%
-  arrange(cond) %>% 
+  arrange(cond) 
+
+# had to interrupt here because you refer to nrow(catdog_spr) which hasn't been created yet
+catdog_spr <- catdog_spr %>% 
   mutate(word_len = nchar(word),
          RT = round(RT),
          RT = ifelse(participant == "Par_C", RT - 100, #young, so faster
@@ -141,6 +146,7 @@ write_csv(participant_data, "dgfs_pars.csv")
 ggplot(data=catdog_spr, aes(x=participant, y=RT)) +
   geom_boxplot()
 ```
+
 ```{r}
 ggplot(data=catdog_spr, aes(x=cond, y=RT)) +
   geom_boxplot()
@@ -185,8 +191,11 @@ range(catdog_spr$RT)
 ```
 
 ### Uhhhh not sure why this is happening? ideas?
+Not sure either but how do you get rid of the negative RT in the original RT variable? Maybe you're adding the same value to a bunch of RTs and that's why?
 ```{r}
 ggplot(data=full_data, aes(x=RT)) +
   geom_histogram(bins = 50) + 
   geom_vline(aes(xintercept=175))
 ```
+
+

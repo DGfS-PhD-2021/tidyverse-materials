@@ -1,0 +1,149 @@
+---
+title: "Exercises"
+author: "Julia Müller"
+date: "1 2 2021"
+output: html_document
+---
+
+At the moment this is just a dump of exercises I took out of the main doc!
+
+# Functions and arguments
+Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
+```{r}
+
+```
+
+
+# Reading in
+Read in the files you'll need for the exercises (in the exercises folder). Have a look at the data you read in. Is the separator recognised correctly? Are all variables the correct type? If not, convert them.
+
+# Piping 
+
+1. We tried piping catdog_spr to `head()` above. Try it now with `tail()`. What does this show you? 
+```{r}
+
+```
+
+2. Pipe the 'catdog_spr' dataset to `colnames()` What does this command do? (Bonus, pipe the columnn names on to the `nchar()` function and figure out what that does.)
+```{r}
+
+```
+
+
+# Fixing code errors
+
+All of the following code snippets produce errors. What have I done wrong? Correct each snippet.
+
+```{r}
+party_invites <- c(Tracey, Karen, Sandra)
+```
+
+```{r}
+1, 4, 5 + 1
+```
+
+```{r}
+max(price) #from the ikea tibble
+```
+
+```{r}
+ikea %>% 
+  filter(item = "BILLY")
+```
+
+```{r}
+ikea %>% 
+  select(starts_with(item))
+```
+
+```{r}
+ikea %>% 
+  mutate(price * 2 = new_price)
+```
+
+```{r}
+sumary(ikea)
+```
+
+```{r}
+42 + "5"
+```
+
+
+# filter
+
+2. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
+```{r}
+nrow(spr)
+
+spr <- spr %>% 
+  filter(RT >= 150)
+
+nrow(spr)
+```
+
+3. You want to take a look at the results from Par_C only: Filter these data points but don't save the result. 
+```{r}
+spr %>% 
+  filter(participant == "Par_C")
+```
+
+4. You're not interested in the practice items in the spr dataframe. Filter the dataset to include everything BUT the practice items and save your result.
+```{r}
+spr <- spr %>% 
+  filter(cond != "practice")
+```
+
+
+# If-else
+
+1. Create a new column that shows whether or not the word is in the first half of a sentence. If the word number is less than or equal to 3, this new column should read 'first half', if not, it should read 'second half'.
+```{r}
+spr %>% 
+  mutate(sentence_half = ifelse(word_num <= 3, "first half", "second half"))
+```
+
+2. Create a new column that has the part of speech for a word. If the word is in following list, it should be labeled "content", otherwise, it should be labeled "function": c("practice", "sentence", "relative", "clause.", "cats.")
+```{r}
+spr %>% 
+  mutate(POS = ifelse(word %in% c("practice", "sentence", "relative", "clause.", "cats."), "content", "function"))
+```
+
+3. Create a new column that shows how fast a word was read. First, find the mean reading time over the entire dataset. You can do this in the console most easily using the base-R syntax `mean(spr$RT)`. If the RT is greater than or equal to this number, your new column should read "slow", otherwise, it should read "fast". 
+```{r}
+mean(spr$RT)
+
+spr %>% 
+  mutate(fastness = ifelse(RT >= mean(spr$RT), "slow", "fast"))
+```
+
+# Group by, summarise
+
+1. Starting with the spr dataset, group by participant and use summarize to find the max RT for each participant. 
+```{r}
+spr %>% 
+  group_by(participant) %>% 
+  summarize(max(RT)) %>% 
+  ungroup()
+```
+
+2. With the same dataset, group by condition and return the mean RT for each condition. This is already a first step towards statistical analysis of your data! Do conditions look like they have similar or very different means?
+```{r}
+spr %>% 
+  group_by(cond) %>% 
+  summarize(mean(RT)) %>% 
+  ungroup()
+```
+
+
+3. Summarize based on condition and count how many full sentences are in each condition. (Here you will realize that this example dataset doesn't make a ton of sense :D)
+```{r}
+spr %>% 
+  group_by(cond) %>% 
+  count(full_sentence) %>% 
+  ungroup()
+
+spr %>% 
+  count(full_sentence)
+```
+
