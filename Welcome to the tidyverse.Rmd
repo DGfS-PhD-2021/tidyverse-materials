@@ -682,9 +682,37 @@ spr %>%
   mutate(condition = recode(condition, A = "match", B = "mismatch"))
 ```
 
+Let's look at our third dataset, animal_survey. It contains data from the same participants who answered a few sociodemographic questions and also indicated how cute they think animals are, how much they('d) like look at, pet, and own an animal (scale: 1-5). Besides that, they were also asked to rate cats and dogs (scale: 1-7).
+```{r}
+animal_survey <- read_csv("animal_survey.csv")
+```
+
+In our animal_survey data, education is represented by numeric codes, 1-4. We could turn these into labels like so:
+```{r}
+animal_survey %>% 
+  mutate(education = recode(education,
+                            "1" = "elementary school",
+                            "2" = "high school",
+                            "3" = "Bachelor's degree",
+                            "4" = "Master's degree or higher"
+                            ))
+```
+Because these numbers should be treated as characters, we need to put them in quotation marks!
+
+We'd also like the information that it stored in the columns starting with "animals" to be summarised in one column called "pet_interest". Here's code that achieves that:
+```{r}
+animal_survey %>% 
+  mutate(pet_interest = (animals_cute + animals_look + animals_pet + animals_have)/4)
+```
+
+Here's more elegant code that uses a `select` statement to pick the relevant rows and `rowMeans` to return the averages: 
+```{r}
+animal_survey %>% 
+  mutate(pet_interest = rowMeans(select(., starts_with("animals"))))
+```
+
 
 ## If-else-statements
-## CHANGE TO JUST CASE_WHEN?
 
 Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example, we could create a column called "RT_short" that contains "short" if the response time is faster than 100 ms and "long" if it isn't:
 
@@ -765,7 +793,8 @@ Let's have a look:
 ```{r}
 summary(animal_corpus$coll_tag_simple)
 ```
- Some NAs were introduced! To figure out why that's the case, let's use `is.na` within a `filter()` command:
+
+Some NAs were introduced! The `case_when()` function assigns NA to any value that isn't covered in the code unless you have an "else" case with `TRUE ~ "do something"`. To figure out where the NAs are, let's use `is.na` within a `filter()` command:
 ```{r}
 animal_corpus %>% 
   filter(is.na(coll_tag_simple))
@@ -776,6 +805,17 @@ Looks like we didn't account for the "cs" (conjunction) tag. Since we know that 
 animal_corpus <- animal_corpus %>% 
   filter(!is.na(coll_tag_simple))
 ```
+
+Another example: In the questionnaire, participants were asked to indicate how much they like cats and dogs, respectively. We can convert this information into a category. To create a variable called "preference", we can use the following `case_when()` statement:
+```{r}
+animal_survey %>% 
+  mutate(preference = case_when(
+    cats > dogs ~ "cats",
+    dogs > cats ~ "dogs",
+    TRUE ~ "undecided"
+  ))
+```
+If we look at the output, we see that the "else/TRUE" condition wasn't necessary, strictly speaking, but it's good to account for all the potential cases in the data so you don't end up with superfluous NAs.
 
 
 # (9) Summary tables with groupings
@@ -841,13 +881,37 @@ spr %>%
 ```
 
 
-# (10) Transforming data 
+# (10) Reshaping data 
+
+Now, let's look into how to change the shape of your data. There are two options here:
+- making your data "longer", i.e. increase the number of rows and decrease the number of columns
+  - useful for tidying data, especially common with "wild-caught" data
+  - command: `pivot_longer()` (older command: `gather()`)
+- making your data "wider", i.e. decrease the number of rows and increase the number of columns
+  - not (as) common for tidying but for creating summary tables
+  - command: `pivot_wider()` (older command: `spread()`)
 
 ![Pivot](img/tidyr_spread_gather.png){width=50%}
 
-## pivot()
--> pivot (wide - long, or long - wide)
-separate (example: tagged corpus text) and unite (example: create participant id from experiment id + number)
+## pivot_longer()
+Let's take another look at the questionnaire data.The format it is in is typical for questionnaire data as you would export it from host sites. The data from each person is represented on one line. This can be useful for some operations (like in the `case_when()` we used to create the "preference" variable) but a problem for other applications, so let's tidy this using `pivot_longer`. 
+Specifically, we have an issue with the dog and cat ratings being in separate columns. Instead, we should have a column called "animal", which contains either "cats" or "dogs", and another column that contains the rating.
+
+The basic `pivot_longer` arguments are:
+cols: which columns should be reshaped?
+names_to: the name of the variable that the original column names ("cats" and "dogs") should be stored in as values
+values_to: the name of the variable that the contents of the variables should be stored in
+```{r}
+animal_survey %>% 
+  pivot_longer(cols = c("cats", "dogs"),
+               names_to = "animal",
+               values_to = "rating")
+```
+
+
+## pivot_wider()
+
+
 
 # (12) Joining several data sets
 - left_join, right_join, inner_join, full_join
