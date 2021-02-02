@@ -140,11 +140,15 @@ We're also providing several files for you to practise on later, so you can pick
 
 Let's read in a small self-paced reading dataset (saved in the data folder, so we need to add `data/` to tell R that):
 ```{r}
+<<<<<<< Updated upstream
 catdog_spr <- read_csv("data/spr_example.csv")
+=======
+spr_data <- read_csv("data/dgfs_spr.csv")
+>>>>>>> Stashed changes
 ```
+The current dataframe is a self-paced reading experiment where 12 participants read 20 sentences each, plus 3 practice sentences to get them warmed up. Half the sentences were about dogs and half the sentences were about cats. In one condition (A), all sentences were paired with appropriate adjectivcal collocates according to the BNC (lap dog vs. tortiseshell cat), in the other, these were reverse (lap cat vs. tortiseshell dog). All sentences were presented in otherwise natural-sounding sentences. 
 
-
-## Dataframes and tibbles: What's the difference?
+## REMOVE? Dataframes and tibbles: What's the difference?
 We already know one command set from the tidyverse: `read_csv()` and `read_tsv()`. These are used to read in data, and they return a structure called the "tibble". 
 
 The tibble is the "tidyverse" version of the base-R alternative, the "data.frame". 
@@ -157,7 +161,6 @@ In practice, "data.frame"s and "tibble"s are very similar, however:
 
 That's probably enough info for now, but if you want to read more about tibbles as you get more comfortable with R, here is a chapter in R for Data Science: 
 https://r4ds.had.co.nz/tibbles.html
-
 
 ## Exploring our data
 
@@ -176,6 +179,11 @@ Or: click name of dataframe in Environment tab
   - can also sort columns and Filter rows -- just for viewing purposes
   - bit slow if you start having huge dataframes but often a good first look
 
+There's also an easy way to see what the columns are:
+```{r}
+colnames(spr_data)
+```
+
 `summary()`: call it on a dataframe to get each column and useful info based on the data type. For example, numeric columns will show the min, median, max and the quartiles (25% increments).
 ```{r}
 summary(catdog_spr)
@@ -187,7 +195,7 @@ summary(catdog_spr$RT)
 Read in and explore the example data
 How many rows and columns does it have?
 
-## Back to factors
+## Character vs. factor columns
 
 In the environment panel (or using `str()`), you can see that all the variables in this data are read in as either numeric or character data. However, some variables should be treated as factors because they represent categories, not text data. Let's convert them. 
 ```{r}
@@ -283,6 +291,12 @@ catdog_spr %>%
 
 This is just a preview because we didn't assign the changed dataframe to any name. This is useful for testing code and making sure it does what you expect and want it to do.
 
+- if you look at the spr_data dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
+
+- To save your changes: assigning your call back to the variable name
+
+- Good work flow: Preview then save when you're sure you're happy with the output
+
 You can also rename multiple columns at once (no need for an array here):
 ```{r}
 catdog_spr <- catdog_spr %>% 
@@ -291,6 +305,16 @@ catdog_spr <- catdog_spr %>%
 ```
 Notice above that I've saved output over the catdog_spr dataframe to make the changes 'permanent'.
 
+There is no output when you simply save the response, but the spr_data dataframe has been permanently updated (within the R session, not in your file system)
+
+There is also a trick to show a preview and save it to the variable -- wrapping the whole call in parentheses -- use with caution!
+```{r}
+(spr_data <- spr_data %>% 
+  rename(condition = cond, 
+         sentence = full_sentence))
+```
+
+If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
 
 ## relocate()
 
@@ -304,8 +328,13 @@ catdog_spr %>%
 
 You can also specify that a variable should be placed before or after another variable:
 ```{r}
+<<<<<<< Updated upstream
 catdog_spr %>% 
   relocate(word_num, .after = word) %>% 
+=======
+spr_data %>% 
+  #relocate(word_num, .after = word) %>% #col doesnt exist anymore (can add it but wasnt sure how)
+>>>>>>> Stashed changes
   relocate(sentence, .before = sentence_num)
 ```
 
@@ -333,7 +362,6 @@ catdog_spr %>%
 catdog_spr %>% 
   arrange(desc(RT))
 ```
-
 
 # (6) Subsets
 
@@ -368,15 +396,25 @@ catdog_spr %>%
 You can also use `select()` to take multiple columns. 
 
 ```{r}
+<<<<<<< Updated upstream
 catdog_spr %>% 
   select(word, word_num, RT)
+=======
+spr_data %>% 
+  select(participant, word, RT)
+>>>>>>> Stashed changes
 ```
 
 You can see that these columns are presented in the order you gave them to the select call, too:
 
 ```{r}
+<<<<<<< Updated upstream
 catdog_spr %>% 
   select(RT, word, word_num)
+=======
+spr_data %>% 
+  select(RT, word, participant)
+>>>>>>> Stashed changes
 ```
 
 You can also use this to reorder columns in that you give the name of the column(s) you want first, then finish with `everything()` to have all other columns follow:
@@ -387,15 +425,20 @@ catdog_spr %>%
 ```
 
 
+<<<<<<< Updated upstream
 ### Preview vs. saving
 - Above: mostly previewing using `select()` for first insights
   - if you look at the catdog_spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
 
 - To save your changes: assigning your call back to the variable name
+=======
+### Remove columns with select
+>>>>>>> Stashed changes
 
-- Good work flow: Preview then save when you're sure you're happy with the output
+You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
 
 ```{r}
+<<<<<<< Updated upstream
 catdog_spr %>% 
   select(name, everything())
 ```
@@ -412,16 +455,22 @@ There is also a trick to show a preview and save it to the variable -- wrapping 
 ```{r}
 (catdog_spr <- catdog_spr %>% 
   select(item_type, everything()))
+=======
+spr_data %>% 
+  select(-item_type)
 ```
 
-If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
+You can also remove multiple columns at once by writing them in an array `c()`. 
+```{r}
+spr_data %>% 
+  select(-c(item_type, X1))
+>>>>>>> Stashed changes
+```
 
-
-### Remove columns with select
-
-You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
+Make sure to save!
 
 ```{r}
+<<<<<<< Updated upstream
 catdog_spr <- catdog_spr %>% 
   select(-item_type)
 ```
@@ -430,6 +479,10 @@ You can also remove multiple columns at once by writing them in an array `c()`.
 ```{r}
 catdog_spr %>% 
   select(-c(word_num, sentence_num))
+=======
+spr_data <- spr_data %>% 
+  select(-c(item_type, X1))
+>>>>>>> Stashed changes
 ```
 
 
