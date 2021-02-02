@@ -136,8 +136,8 @@ participant_data <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "
        education = c(4, 2, 3, 3, 1, 2, 2, 3, 2, 2, 3, 4),
        preference = c("cats", "cats", "dogs", "cats", "cats", "cats", "dogs", "cats", "cats", "dogs", "cats", "dogs"))
   
-write_csv(catdog_spr, "dgfs_spr.csv")
-write_csv(participant_data, "dgfs_pars.csv")
+write_csv(catdog_spr, "data/dgfs_spr.csv")
+write_csv(participant_data, "data/dgfs_pars.csv")
 ```
 
 ### Check out that everything looks good
