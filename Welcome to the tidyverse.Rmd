@@ -13,6 +13,11 @@ Unless indicated, artwork is by the wonderful @allison_horst - find her on [gith
 
 # (1) What is this "tidyverse"?
 
+Let's jump right in and load the package:
+```{r}
+library(tidyverse)
+```
+
 The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to *base-R*) that help you get your data into a useful format (among other things).
 
 ![The tidyverse](img/tidyverse_celestial.png){width=50%}
@@ -25,7 +30,7 @@ The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to
 - *purrr*: for functional progamming  
 - *dplyr*: for data manipulation  
 - *stringr*: for string manipulation  
-- *forcats*: for working with categorical variables (factors)  
+- *forcats*: for working with categorical variables (factors) 
 
 
 ## What is tidy data, and why do we use it?
@@ -140,39 +145,21 @@ We're also providing several files for you to practise on later, so you can pick
 
 Let's read in a small self-paced reading dataset (saved in the data folder, so we need to add `data/` to tell R that):
 ```{r}
-<<<<<<< Updated upstream
-catdog_spr <- read_csv("data/spr_example.csv")
-=======
-spr_data <- read_csv("data/dgfs_spr.csv")
->>>>>>> Stashed changes
+spr <- read_csv("data/dgfs_spr.csv")
 ```
-The current dataframe is a self-paced reading experiment where 12 participants read 20 sentences each, plus 3 practice sentences to get them warmed up. Half the sentences were about dogs and half the sentences were about cats. In one condition (A), all sentences were paired with appropriate adjectivcal collocates according to the BNC (lap dog vs. tortiseshell cat), in the other, these were reverse (lap cat vs. tortiseshell dog). All sentences were presented in otherwise natural-sounding sentences. 
-
-## REMOVE? Dataframes and tibbles: What's the difference?
-We already know one command set from the tidyverse: `read_csv()` and `read_tsv()`. These are used to read in data, and they return a structure called the "tibble". 
-
-The tibble is the "tidyverse" version of the base-R alternative, the "data.frame". 
-
-In practice, "data.frame"s and "tibble"s are very similar, however:
-- tibbles print a few rows as default
-- tibbles are made to work with the tidyverse calls to come
-- tibbles don't automatically read in text columns as factors (sounds like a disadvantage but is often an advantage, more on this later)
-- tibbles doesn't restrict or change column names -- if they are invalid (have spaces, start with whitespace), they can still be called, you just have to surround them with backticks ``
-
-That's probably enough info for now, but if you want to read more about tibbles as you get more comfortable with R, here is a chapter in R for Data Science: 
-https://r4ds.had.co.nz/tibbles.html
+The current dataframe is a self-paced reading experiment where 12 participants read 20 sentences each, plus 3 practice sentences to get them warmed up. Half the sentences were about dogs and half the sentences were about cats. In one condition (A), all sentences were paired with appropriate adjectival collocates according to the BNC (lap dog vs. tortoiseshell cat), in the other, these were reverse (lap cat vs. tortoiseshell dog). All sentences were presented in otherwise natural-sounding sentences. 
 
 ## Exploring our data
 
 Now you have a data file read in, but how do you see what's in it?
 
 ```{r}
-head(catdog_spr)
+head(spr)
 ```
 
 You can change the amount of rows with the `n` *argument*: 
 ```{r}
-head(catdog_spr, n=3)
+head(spr, n=3)
 ```
 
 Or: click name of dataframe in Environment tab
@@ -181,14 +168,14 @@ Or: click name of dataframe in Environment tab
 
 There's also an easy way to see what the columns are:
 ```{r}
-colnames(spr_data)
+colnames(spr)
 ```
 
 `summary()`: call it on a dataframe to get each column and useful info based on the data type. For example, numeric columns will show the min, median, max and the quartiles (25% increments).
 ```{r}
-summary(catdog_spr)
+summary(spr)
 
-summary(catdog_spr$RT)
+summary(spr$RT)
 ```
 
 ### Exercise
@@ -199,16 +186,16 @@ How many rows and columns does it have?
 
 In the environment panel (or using `str()`), you can see that all the variables in this data are read in as either numeric or character data. However, some variables should be treated as factors because they represent categories, not text data. Let's convert them. 
 ```{r}
-catdog_spr$participant <- as_factor(catdog_spr$participant)
-catdog_spr$item_type <- as_factor(catdog_spr$item_type)
-catdog_spr$cond <- as_factor(catdog_spr$cond)
+spr$participant <- as_factor(spr$participant)
+spr$item_type <- as_factor(spr$item_type)
+spr$cond <- as_factor(spr$cond)
 ```
 
 This way, the summary output also works as expected. For example, we can have a look at how many different participants and conditions:
 ```{r}
-summary(catdog_spr$participant)
+summary(spr$participant)
 
-summary(catdog_spr$cond)
+summary(spr$cond)
 ```
 
 If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
@@ -223,11 +210,11 @@ The pipe takes the item before it and feeds it to the following command as the f
 
 So to re-write the `head()` function with the pipe:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   head()
 ```
 
-This produces the exact same output as `head(catdog_spr)`. Why would this be useful?
+This produces the exact same output as `head(spr)`. Why would this be useful?
 
 Compare the following lines of pseudocode, which would produce the same output:
 
@@ -251,30 +238,30 @@ You can see that the version with the pipe is easier to read when more than one 
 
 Here are some more examples:
 ```{r}
-# Equivalent to summary(catdog_spr)
-catdog_spr %>% 
+# Equivalent to summary(spr)
+spr %>% 
   summary()
 
-# Equivalent to colnames(catdog_spr), which returns all column names
-colnames(catdog_spr)
+# Equivalent to colnames(spr), which returns all column names
+colnames(spr)
 
-catdog_spr %>% 
+spr %>% 
   colnames() 
 
-# Equivalent to nrow(catdog_spr), which returns the number of rows in the df
-nrow(catdog_spr)
+# Equivalent to nrow(spr), which returns the number of rows in the df
+nrow(spr)
 
-catdog_spr %>% 
+spr %>% 
   nrow()
 ```
 
 And you can also stack commands by ending each row (except the last one) with a pipe:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   colnames() %>% #extracts column names
   toupper() #converts them to uppercase
 
-catdog_spr %>% 
+spr %>% 
   colnames() %>% #extracts column names
   nchar() #counts the number of letters
 ```
@@ -285,13 +272,13 @@ catdog_spr %>%
 ## rename()
 You can rename columns with the `rename()` function. The syntax is new_name = old_name. Let's rename the `cond` variable:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   rename(condition = cond)
 ```
 
 This is just a preview because we didn't assign the changed dataframe to any name. This is useful for testing code and making sure it does what you expect and want it to do.
 
-- if you look at the spr_data dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
+- if you look at the spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
 
 - To save your changes: assigning your call back to the variable name
 
@@ -299,20 +286,13 @@ This is just a preview because we didn't assign the changed dataframe to any nam
 
 You can also rename multiple columns at once (no need for an array here):
 ```{r}
-catdog_spr <- catdog_spr %>% 
+spr <- spr %>% 
   rename(condition = cond, 
          sentence = full_sentence)
 ```
-Notice above that I've saved output over the catdog_spr dataframe to make the changes 'permanent'.
+Notice above that I've saved output over the spr dataframe to make the changes 'permanent'.
 
-There is no output when you simply save the response, but the spr_data dataframe has been permanently updated (within the R session, not in your file system)
-
-There is also a trick to show a preview and save it to the variable -- wrapping the whole call in parentheses -- use with caution!
-```{r}
-(spr_data <- spr_data %>% 
-  rename(condition = cond, 
-         sentence = full_sentence))
-```
+There is no output when you simply save the response, but the spr dataframe has been permanently updated (within the R session, not in your file system)
 
 If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
 
@@ -322,31 +302,25 @@ If you make a mistake: arrow with a line under it in the code block of R-Markdow
 
 The `relocate` function lets you change the order of variables in the data. The following command moves the participant id, full sentence, and word columns to the beginning: 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   relocate(participant, sentence, word)
 ```
 
 You can also specify that a variable should be placed before or after another variable:
 ```{r}
-<<<<<<< Updated upstream
-catdog_spr %>% 
-  relocate(word_num, .after = word) %>% 
-=======
-spr_data %>% 
-  #relocate(word_num, .after = word) %>% #col doesnt exist anymore (can add it but wasnt sure how)
->>>>>>> Stashed changes
+spr %>% 
   relocate(sentence, .before = sentence_num)
 ```
 
 Another option is to sort by data type:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   relocate(where(is.character))
 
-catdog_spr %>% 
+spr %>% 
   relocate(where(is.factor))
 
-catdog_spr %>% 
+spr %>% 
   relocate(where(is.numeric))
 ```
 
@@ -356,10 +330,10 @@ Reordering variables is particularly useful if you have large datasets with lots
 
 There's also a corresponding command that lets you sort by row values: `arrange()`. By default, this sorts by lowest to highest value, but you can add `desc()` to reverse that.
 ```{r}
-catdog_spr %>% 
+spr %>% 
   arrange(RT)
 
-catdog_spr %>% 
+spr %>% 
   arrange(desc(RT))
 ```
 
@@ -369,24 +343,24 @@ catdog_spr %>%
 
 - The traditional syntax for dealing with columns is dataframe$column.
 
-A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `catdog_spr$RT` we can write:
+A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `spr$RT` we can write:
 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(RT) 
 ```
 
-We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(catdog_spr$RT)`
+We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(spr$RT)`
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(RT) %>% 
   summary()
 
-catdog_spr %>% 
+spr %>% 
   select(RT) %>% 
   max()
 
-catdog_spr %>% 
+spr %>% 
   select(RT) %>% 
   min()
 ```
@@ -396,31 +370,21 @@ catdog_spr %>%
 You can also use `select()` to take multiple columns. 
 
 ```{r}
-<<<<<<< Updated upstream
-catdog_spr %>% 
-  select(word, word_num, RT)
-=======
-spr_data %>% 
+spr %>% 
   select(participant, word, RT)
->>>>>>> Stashed changes
 ```
 
 You can see that these columns are presented in the order you gave them to the select call, too:
 
 ```{r}
-<<<<<<< Updated upstream
-catdog_spr %>% 
-  select(RT, word, word_num)
-=======
-spr_data %>% 
+spr %>% 
   select(RT, word, participant)
->>>>>>> Stashed changes
 ```
 
 You can also use this to reorder columns in that you give the name of the column(s) you want first, then finish with `everything()` to have all other columns follow:
 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(RT, everything())
 ```
 
@@ -428,7 +392,7 @@ catdog_spr %>%
 <<<<<<< Updated upstream
 ### Preview vs. saving
 - Above: mostly previewing using `select()` for first insights
-  - if you look at the catdog_spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
+  - if you look at the spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
 
 - To save your changes: assigning your call back to the variable name
 =======
@@ -438,53 +402,24 @@ catdog_spr %>%
 You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
 
 ```{r}
-<<<<<<< Updated upstream
-catdog_spr %>% 
+spr %>% 
   select(name, everything())
 ```
 
-```{r}
-catdog_spr <- catdog_spr %>% 
-  select(name, everything())
-```
-
-There is no output here, but the catdog_spr dataframe has been permanently updated (within the R session, not in your file system)
-
-There is also a trick to show a preview and save it to the variable -- wrapping the whole call in parentheses -- use with caution!
+There is no output here, but the spr dataframe has been permanently updated (within the R session, not in your file system)
 
 ```{r}
-(catdog_spr <- catdog_spr %>% 
-  select(item_type, everything()))
-=======
-spr_data %>% 
+spr %>% 
   select(-item_type)
 ```
 
 You can also remove multiple columns at once by writing them in an array `c()`. 
 ```{r}
-spr_data %>% 
+spr %>% 
   select(-c(item_type, X1))
->>>>>>> Stashed changes
 ```
 
 Make sure to save!
-
-```{r}
-<<<<<<< Updated upstream
-catdog_spr <- catdog_spr %>% 
-  select(-item_type)
-```
-
-You can also remove multiple columns at once by writing them in an array `c()`. 
-```{r}
-catdog_spr %>% 
-  select(-c(word_num, sentence_num))
-=======
-spr_data <- spr_data %>% 
-  select(-c(item_type, X1))
->>>>>>> Stashed changes
-```
-
 
 ### Leveling up select()
 
@@ -492,42 +427,42 @@ Until now, we've used select() in combination with the full column name, but the
 
 For example, here's how we can select both the `sentence_num` and the `word_num` column - by specifying `ends_with("_num")` in the select() call:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(ends_with("_num"))
 ```
 
 The opposite is also possible, e.g.
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(starts_with("sentence"))
 ```
 returns all columns that start with "sentence".
 
 `contains` is another helper function. Here, we're using it to show all columns that contain an underscore:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(contains("_"))
 ```
 
 If we try to select a column that doesn't exist, we get an error message:
 ```{r}
-# catdog_spr %>% 
+# spr %>% 
 #  select(word, word_number)
 ```
 
 But if we combine select with any_of, we don't see an error. Instead, R just returns the columns that do exist:
 Note here that you have to use an array and enclose the names in quotes!
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(any_of(c("word", "word_number")))
 ```
 
 We can also select a range of  variables using a colon. This works both with variables and (a range of) numbers:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   select(condition:word) # shows condition, word_num, word
 
-catdog_spr %>% 
+spr %>% 
   select(1:3) # first three columns
 ```
 Here, the order of the columns matters!
@@ -561,57 +496,57 @@ data %>%
 
 Let's look at reaction times that are shorter than 200 ms:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(RT < 200)
 ```
 
 ...reaction times longer than or equal to 250 ms:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(RT >= 250)
 ```
 
 ...reaction times equal to 200 ms:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(RT == 200)
 ```
 
 Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
 Look at the error below:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(word == relative)
 ```
 
 The correct syntax is: (because you're matching to a string)
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(word == "relative")
 ```
 
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(word %in% c("relative", "clause"))
 
-catdog_spr %>% 
+spr %>% 
   filter(sentence_num %in% c(2, 4))
 ```
 Note that filter is case-sensitive, so capitalization matters.
 
 We can also specify several conditions in one `filter()` call, e.g. 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(word == "relative" & RT > 200)
 
-catdog_spr %>% 
+spr %>% 
   filter(RT > 300 | RT < 150)
 ```
 
 We can also "chain" different functions, which is one of the things that makes the pipe so useful. For example, we could filter for data in condition B, which is an incomplete sentence, and only look at the words and their response times:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   filter(condition == "cond_B") %>% 
   select(word, RT)
 ```
@@ -648,7 +583,7 @@ Luckily, the tidyverse has a command for that: `separate()`. It takes the follow
 
 The self-paced reading data also has a column that needs separating - the condition column. Because it contains three pieces (cond_A/B_cat/dog), we pipe into a select command to remove "cond" afterwards:
 ```{r}
-(catdog_spr <- catdog_spr %>% 
+(spr <- spr %>% 
   separate(col = cond,
            into = c("drop", "condition", "target"),
            sep = "_") %>% 
@@ -714,7 +649,7 @@ mutate(data, col_name = some_operation), or, with the pipe: data %>% mutate(col_
 
 Instead of the code we used earlier to convert participant, item type, and condition to factors, we could write: 
 ```{r}
-catdog_spr <- catdog_spr %>% 
+spr <- spr %>% 
   mutate(participant = as_factor(participant),
          item_type = as_factor(item_type),
          condition = as_factor(condition))
@@ -723,44 +658,45 @@ As you can see, we can change several variables within one `mutate()`  call. In 
 
 The response times are measured in ms. Let's convert them to seconds by dividing by 1000:
 ```{r}
-catdog_spr <- catdog_spr %>% 
+spr <- spr %>% 
   mutate(RT_s = RT / 1000)
 ```
 Now, there's a new column called RT_s (it's at the very end by default).
 
 You can also save the new column with the same name, and this will update all the items in that column (see below, where I divide response times by 1000, but note that I don't save the output):
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(RT = RT / 1000)
 ```
 
 You can also do operations to character columns - for example: 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(word = tolower(word))
 ```
 
 ## Relabel factors
 In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is old label = "new label".
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(condition = recode(condition, A = "match", B = "mismatch"))
 ```
 
 
 ## If-else-statements
+## CHANGE TO JUST CASE_WHEN?
 
 Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example, we could create a column called "RT_short" that contains "short" if the response time is faster than 100 ms and "long" if it isn't:
 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(RT_short = ifelse(RT < 100, "short", "long")) %>% 
   select(RT, RT_short)
 ```
 
 Here is another example (notice the output isn't being saved since we don't really need it):
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(RT_category = ifelse(RT < 100 | RT > 500, "extreme", "normal")) %>% 
   select(RT, RT_category)
 ```
@@ -768,7 +704,7 @@ Here, we're once again using the logical operators.
 
 You can also use ifelse on categorical / character columns:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(position = ifelse(word %in% c("cat", "dog"), "critical", "not critical")) %>% 
   select(word, position)
 ```
@@ -776,7 +712,7 @@ catdog_spr %>%
 CHANGE EXAMPLE
 You can also use this to condense the groups in a certain column. For example, say we want to combine the categories "Beds", "Wardrobes", and "Chests of drawers & drawer units" into one category, "Bedroom":
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
   select(category)
 ```
@@ -785,7 +721,7 @@ Notice here that if we want to affect the entry only if the condition is TRUE, l
 Most of the examples above involve labeling different groupings with text, but you can use ifelse for all sorts of operations. Say the price of wood has gone up, so we want to add 100SAR to the price of any furniture taller than 1m. We could:
 CHANGE EXAMPLE
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(new_price = ifelse(height >= 100, price + 100, price)) %>% 
   select(item_id, height, price, new_price)
 ```
@@ -800,7 +736,7 @@ The syntax within `case_when()` is:
 condition ~ what to do if it is true (can be used as often as you want and can even refer to different variables!),
 TRUE ~ what to do in all other cases.
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(RT_category = case_when(
     RT < 100 ~ "short",
     RT > 500 ~ "long",
@@ -865,7 +801,7 @@ You can use multiple different operations in the summarize part, including:
 
 For example, to return the average RT in each condition:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   group_by(condition) %>% 
   summarize(mean(RT)) %>% 
   ungroup()
@@ -873,7 +809,7 @@ catdog_spr %>%
 
 You can also give a name to your new summary column: 
 ```{r}
-catdog_spr %>% 
+spr %>% 
   group_by(condition) %>% 
   summarize(average_RT = mean(RT)) %>% 
   ungroup()
@@ -881,7 +817,7 @@ catdog_spr %>%
 
 Or further manipulate it, e.g. converting ms to seconds:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   group_by(condition) %>% 
   summarize(average_RT_s = mean(RT) / 1000) %>% 
   ungroup()
@@ -889,7 +825,7 @@ catdog_spr %>%
 
 For categorical columns, you can also count how many rows are in each category using `count()` instead of `summarize()`. Here, we're counting how often which word appeared in the experiment. The count is displayed in the new "n" column:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   group_by(word) %>% 
   freq = count() %>% 
   ungroup()
@@ -897,7 +833,7 @@ catdog_spr %>%
 
 This is sorted alphabetically, but we can pipe it into the `arrange()` call we discussed earlier to sort by frequency, in descending order.
 ```{r}
-catdog_spr %>% 
+spr %>% 
   group_by(word) %>% 
   count() %>% 
   ungroup() %>% 
@@ -927,9 +863,9 @@ CSVs are often saved as .csv (this is also openable in Excel) and TSVs are often
 
 You can save CSVs and TSVs like so:
 ```{r}
-# write_tsv(catdog_spr, "catdog_spr_df.txt")
+# write_tsv(spr, "spr_df.txt")
 
-# write_csv(catdog_spr, "catdog_spr_df.csv")
+# write_csv(spr, "spr_df.csv")
 ```
 Syntax: write_tsv(dfname, "filename.ext")
 
@@ -1006,7 +942,7 @@ SPR:
 
 ```
 
-catdog_spr:
+spr:
 1. Return the most expensive bed.
 ```{r}
 
@@ -1020,7 +956,7 @@ catdog_spr:
 
 3. There is some junk in the designer column. Look at it using distinct(), then remove it with the following code: 
 
-catdog_spr <- catdog_spr %>% 
+spr <- spr %>% 
   filter(!str_detect(designer, "[0-9]"))
   
 Note: str_detect looks for regular expressions. Here, the regular expression [0-9] matches any number. If this is true, str_detect returns TRUE -- However, it is proceeded by ! which means NOT. Thus, the filter is satisfied only if str_detect returns FALSE, i.e. there are no numbers present.
