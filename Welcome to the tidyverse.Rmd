@@ -56,7 +56,7 @@ R will often "talk" to you when you're running code. For example, when you insta
 When there's a mistake in the code (e.g. misspelling a variable name, forgetting to close quotation marks or brackets), R will give an *error* and be unable to run the line. The error message will give you important information about what went wrong.
 ```{r}
 hello <- "hi"
-Hello
+#Hello
 ```
 
 In contrast, *warnings* are shown when R thinks there could be an issue with your code or input, but it still runs the line. R is generally just telling you that you MIGHT be making a logical error, not that the code is impossible.
@@ -523,6 +523,12 @@ spr %>%
   filter(word == "relative")
 ```
 
+You can also use filter to easily drop rows. Let's drop all practice rows and save the output. 
+```{r}
+spr <- spr %>% 
+  filter(condition != "practice")
+```
+
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
 spr %>% 
@@ -545,12 +551,37 @@ spr %>%
 We can also "chain" different functions, which is one of the things that makes the pipe so useful. For example, we could filter for data in condition B, which is an incomplete sentence, and only look at the words and their response times:
 ```{r}
 spr %>% 
-  filter(condition == "cond_B") %>% 
+  filter(condition == "cond_B_dog") %>% 
   select(word, RT)
 ```
 
+One useful function that can be chained to `filter()` is `distinct()`, which will return only the unique rows. Without an argument, it returns all rows that are unique in all columns. 
+
+You can also add a column name as an argument to return only the unique values in a certain column (useful with factors)
+
+```{r}
+spr %>% 
+  filter(condition == "cond_B_dog") %>% 
+  distinct(sentence)
+```
+
+You can also use it on its own to return unique values or combinations of values.
+
+```{r}
+spr %>% 
+  distinct(sentence, condition)
+```
 
 # (7) Separating and uniting columns
+
+The condition column contains two pieces of information: which condition the item was in (condA or condB) and which animal was being read about (cat or dog)
+```{r}
+spr <- spr %>% 
+  separate(condition,
+           into = c("condition", "animal"),
+           sep = "_")
+```
+
 
 For the next two examples, we'll use a different dataset called `animal_corpus`. Read it in and familiarise yourself with its contents.
 ```{r}
@@ -640,20 +671,6 @@ With the `mutate()` function, you can change existing columns and add new ones.
 
 ![Mutate](img/dplyr_mutate.png){width=50%}
 
-## Change data type in a column
-
-For example, we could change data types by using `mutate()`. The syntax is:
-mutate(data, col_name = some_operation), or, with the pipe: data %>% mutate(col_name = some_operation).
-
-Instead of the code we used earlier to convert participant, item type, and condition to factors, we could write: 
-```{r}
-spr <- spr %>% 
-  mutate(participant = as_factor(participant),
-         item_type = as_factor(item_type),
-         condition = as_factor(condition))
-```
-As you can see, we can change several variables within one `mutate()`  call. In the same way, we could create several new columns at the same time. Here, dropping each new column onto a new line is considered good style and makes the code more readable (but it's not necessary).
-
 The response times are measured in ms. Let's convert them to seconds by dividing by 1000:
 ```{r}
 spr <- spr %>% 
@@ -672,6 +689,28 @@ You can also do operations to character columns - for example:
 spr %>% 
   mutate(word = tolower(word))
 ```
+
+## Helper functions
+```{r}
+str_remove()
+
+str_remove_all()
+```
+
+
+## Change data type in a column
+
+For example, we could change data types by using `mutate()`. The syntax is:
+mutate(data, col_name = some_operation), or, with the pipe: data %>% mutate(col_name = some_operation).
+
+Instead of the code we used earlier to convert participant, item type, and condition to factors, we could write: 
+```{r}
+spr <- spr %>% 
+  mutate(participant = as_factor(participant),
+         item_type = as_factor(item_type),
+         condition = as_factor(condition))
+```
+As you can see, we can change several variables within one `mutate()`  call. In the same way, we could create several new columns at the same time. Here, dropping each new column onto a new line is considered good style and makes the code more readable (but it's not necessary).
 
 ## Relabel factors
 In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is old label = "new label".
@@ -866,6 +905,13 @@ spr %>%
   arrange(desc(n))
 ```
 
+You can also group by more than one column to return the unique combinations of the variables.
+```{r}
+spr %>% 
+  group_by(condition, animal) %>% 
+  summarize(mean(RT))
+```
+
 
 # (10) across()
 
@@ -873,19 +919,19 @@ spr %>%
 
 For example, if we'd like to see the mean for columns that end with "num":
 ```{r}
-catdog_spr %>% 
+spr %>% 
   summarise(across(ends_with("num"), mean))
 ```
 
 This also works with a list of functions, e.g. the mean and the standard deviation:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   summarise(across(ends_with("num"), list(mean, sd)))
 ```
 
 Here's an example of `across()` in a `mutate()` function. This lets you easily convert all character variables into factors:
 ```{r}
-catdog_spr %>% 
+spr %>% 
   mutate(across(where(is.character), as.factor))
 ```
 

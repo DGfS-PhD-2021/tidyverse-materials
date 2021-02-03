@@ -95,7 +95,7 @@ RT <- rep(c(
 
 catdog_spr <- tibble(participant = rep(c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"), each = 23),
        item_type = rep("DashedSentence", 276), 
-       cond = rep(c(rep("practice", 3), rep("cond_A_cat", 5), rep("cond_A_dog", 5),  rep("cond_B_cat", 5),  rep("cond_B_dog", 5)), 12), 
+       cond = rep(c(rep("practice", 3), rep("condA_cat", 5), rep("condA_dog", 5),  rep("condB_cat", 5),  rep("condB_dog", 5)), 12), 
        sentence_num = rep(1:23, 12),
        full_sentence = rep(sentence_array, 12)) %>% 
   unnest_tokens(word, full_sentence, to_lower = FALSE, drop = FALSE) %>%
@@ -111,11 +111,11 @@ catdog_spr <- catdog_spr %>%
                                            ifelse(participant == "Par_H", RT + 500, #distracted
                                            RT)
                                     )))),
-         RT = ifelse(cond == "cond_B_cat", RT + 210, 
+         RT = ifelse(cond == "condB_cat", RT + 210, 
                      ifelse(cond == "practice", RT + 278,
-                            ifelse(cond == "cond_A_cat", RT - 27, 
-                                    ifelse(cond == "cond_A_dog", RT - 113, 
-                                           ifelse(cond == "cond_B_dog", RT + 410, 
+                            ifelse(cond == "condA_cat", RT - 27, 
+                                    ifelse(cond == "condA_dog", RT - 113, 
+                                           ifelse(cond == "condB_dog", RT + 410, 
                                            RT)
                                     )))),
          RT = ifelse(word_len > 4, RT - 100,
@@ -228,50 +228,50 @@ animal_survey <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par
 ## 10 true words / 10 foil words
 ## 40 items total, 20 participants
 
-ld_words <- c("'tidyverse'",
-           "'stringr'",
-           "'ggplot'",
+ld_words <- c("'TidyVerse'",
+           "'stringR'",
+           "'ggPlot'",
            "'viridis'", 
            "'devtools'",
-           "'dplyr'",
-           "'cowplot'",
+           "'dPlyr'",
+           "'CowPlot'",
            "'recipes'",
            "'reticulate'",
-           "'wordcloud2'",
-           "'messyverse'",
-           "'roper'",
-           "'ggdoodle'",
+           "'WordCloud2'",
+           "'MessyVerse'",
+           "'ropeR'",
+           "'ggDoodle'",
            "'sirisis'",
-           "'protips'",
-           "'fplier'",
-           "'chickenplot'",
+           "'ProTips'",
+           "'fPlier'",
+           "'ChickenPlot'",
            "'stories'",
            "'articulate'",
-           "'numbercloud2'",
+           "'NumberCloud2'",
            "'interesting'",
            "'freshness'",
-           "'cabinet'",
+           "'Cabinet'",
            "'football'",
-           "'destitude'",
+           "'Destitude'",
            "'painter'",
            "'throughout'",
            "'realize'",
            "'livelihood'",
-           "'treasure'",
+           "'Treasure'",
            "'hashtockle'",
            "'voictent'",
            "'dionlize'",
-           "'hocklorp'",
+           "'HockLorp'",
            "'parake'",
            "'aplicorter'",
            "'ifringe'",
            "'tablue'",
            "'brazedic'",
-           "'mustord'", 
+           "'Mustord'", 
            "'apple'",
            "'dog'",
            "'trust'",
-           "'program'")
+           "'Program'")
 
 RT <- rep(c(
   rnorm(10, mean=1100, sd= 153), #package_true_no
@@ -326,7 +326,7 @@ write_csv(participant_lex, "data/dgfs_pars_lexdec.csv")
 ```
 
 ```{r}
-ggplot(data=lexicaldec, aes(x=word_cond, y=RT, color= par_cond)) +
+ggplot(data=lexicaldec, aes(x=condB, y=RT, color= condB)) +
   geom_boxplot()
 ```
 

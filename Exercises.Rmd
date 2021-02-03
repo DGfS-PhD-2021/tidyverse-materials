@@ -9,6 +9,7 @@ output: html_document
 
 In a lexical decision task, you had participants listen to words in two conditions. In one condition, they were asked to assess whether the words were valid words of English. In the other, they were asked to assess whether the words were valid R package names. Some of your participants had just completed a full-day workshop on R and the tidyverse, but the others had not. 
 
+## (1)
 1. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information is in each column?
 ```{r}
 ld <- read_csv("data/dgfs_lexdec.csv")
@@ -16,6 +17,7 @@ ld <- read_csv("data/dgfs_lexdec.csv")
 head(ld, n = 10)
 ```
 
+## (2)
 2. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
 ```{r}
 ld <- ld %>% 
@@ -26,6 +28,7 @@ ld <- ld %>%
          item_id = as.factor(item_id))
 ```
 
+## (3)
 3. Look at summaries of the columns you changed above to answer the following questions: How many participants are included in this experiment? How many had attended the R workshop? How many items were included in each condition? 
 
 ```{r}
@@ -38,6 +41,7 @@ summary(ld$condB)
 summary(ld$item_id)
 ```
 
+## (4)
 4. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
 ```{r}
 ld <- ld %>% 
@@ -45,18 +49,21 @@ ld <- ld %>%
          word_cond = condB)
 ```
 
+## (5)
 5. The "row" column is in the final position, but generally, it might make more sense to have it as the first column. Move it to that position and save. 
 ```{r}
 ld <- ld %>% 
   relocate(row)
 ```
 
+## (6)
 6. Keep the word-level statistics together by moving the word_len column to right before the word column, and save. 
 ```{r}
 ld <- ld %>% 
   relocate(word_len, .before = word)
 ```
 
+## (7)
 7. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending, using arrange
 ```{r}
 ld %>% 
@@ -66,6 +73,7 @@ ld %>%
   arrange(desc(RT))
 ```
 
+## (8)
 8. What is the range of word lengths presented in this experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
 ```{r}
 ld %>% 
@@ -73,19 +81,29 @@ ld %>%
   range()
 ```
 
+## (9)
 9. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
 ```{r}
 ld <- ld %>% 
   select(-row)
 ```
 
+## (10)
 10. Return some information about the words used here by selecting columns that contain "word".
 ```{r}
 ld %>% 
   select(contains("word")) 
 ```
 
-11. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
+## (11)
+11. Participants completed 4 practice items before they started the experiment. You don't want these to be included in your analysis, since participants were just getting used to the format. Use filter to drop the rows in the condition "practice" and save.
+```{r}
+ld <- ld %>% 
+  filter(word_cond != "practice")
+```
+
+## (12)
+12. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
 ```{r}
 nrow(ld)
 
@@ -95,31 +113,135 @@ ld <- ld %>%
 nrow(ld)
 ```
 
+## (13)
+13. Run the following ggplot code to look at a boxplot of each participant's response times. One participant seems to be consistently slower. Filter the dataset to show just this participant (don't save!) and see if anything fishy is going on. 
 
-
-At the moment this is just a dump of exercises I took out of the main doc!
-
-# Functions and arguments
-Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
+ggplot(data=ld) +
+  aes(x=participant, y=RT, color=participant) +
+  geom_boxplot(show.legend=FALSE)
+  
 ```{r}
-
+ld %>% 
+  filter(participant == "NG2")
 ```
 
+## (14)
+14. You forgot to write down which participants were in which group. Find the distinct combinations of participants and par_groups and see if you can recreate this information. Save the table to a new variable called "participant_groups".
 
-# Reading in
-Read in the files you'll need for the exercises (in the exercises folder). Have a look at the data you read in. Is the separator recognised correctly? Are all variables the correct type? If not, convert them.
-
-# Piping 
-
-1. We tried piping catdog_spr to `head()` above. Try it now with `tail()`. What does this show you? 
 ```{r}
-
+participant_groups <- ld %>% 
+  distinct(participant, par_group)
 ```
 
-2. Pipe the 'catdog_spr' dataset to `colnames()` What does this command do? (Bonus, pipe the columnn names on to the `nchar()` function and figure out what that does.)
+## (15)
+15. What are the longest words that were presented in this experiment? Filter the dataframe to include only words with more than 11 letters and return the distinct words in this subset.
 ```{r}
-
+ld %>% 
+  filter(word_len > 11) %>% 
+  distinct(word)
 ```
+
+## (16)
+16. The information you have about conditions is two-fold: whether the participant was in the R package block (package/word) and whether the current item was valid or invalid (foil/true). It would be more helpful for the analysis to have these in separate columns. Separate them into two new columns: "condition" and "item_type". Then, convert the new columns to factors and be sure to save!
+```{r}
+ld <- ld %>% 
+  separate(word_cond, 
+           into = c("condition", "item_type"),
+           sep = "_")
+
+ld <- ld %>% 
+  mutate(condition = as.factor(condition),
+         item_type = as.factor(item_type))
+```
+
+## (17)
+17. The word column is a little bit messy. First of all, there is a mix of capital and lowercase letters. Use mutate to convert all words in this column to lowercase (and save).
+```{r}
+ld <- ld %>% 
+  mutate(word = tolower(word))
+```
+
+## (18)
+18. There are also quotation marks in the word column. Remove these using `str_remove_all()`.
+
+```{r}
+ld <- ld %>% 
+  mutate(word = str_remove_all(word, "'"))
+```
+## (19)
+19. We all realize that tidyverse is the best package in R. Create a new column called "best_package" and use an if-else statement to fill this with "yes" for tidyverse, and "no" for all other packages. (Okay, you don't have to save this one...)
+```{r}
+ld %>% 
+  mutate(best_package = ifelse(word == "tidyverse", "yes", "no"))
+```
+
+## (20)
+In a separate table, you have collected participant data. Read in this file ("data/dgfs_pars_lexdec.csv") and convert the appropriate columns to factors. 
+```{r}
+pars <- read_csv("data/dgfs_pars_lexdec.csv")
+
+pars <- pars %>% 
+  mutate(participant = as.factor(participant),
+         gender = as.factor(gender), 
+         education = as.factor(education))
+```
+
+## (21)
+21. The education column is a little difficult to understand. Change the factor labels to show that 1 is "no high school", 2 is "high school", 3 is "technical school", 4 is "university degree" and 5 is "graduate school degree"
+
+```{r}
+pars <- pars %>% 
+  mutate(education = recode(education,
+                            "1" = "no high school",
+                            "2" = "high school",
+                            "3" = "technical school",
+                            "4" = "university degree",
+                            "5" = "graduate school degree"
+                            ))
+```
+
+## (22)
+22. The r_interest column shows how much a participant reported being interested in R programming, on a scale of 1-10. However, this information is a little fine-grained. Let's combine it into a categorical variable, where 1-4 is "low", 5-7 is "medium" and 8-10 is "high". Save this as a new column called "r_cat" so that we preserved both, and make sure it's saved as a factor.
+
+```{r}
+pars <- pars %>% 
+  mutate(r_cat = case_when(
+    r_interest < 5 ~ "low", 
+    r_interest > 7 ~ "high",
+    TRUE ~ "medium"
+  ))
+```
+
+## (23)
+23. Using the numeric "r_interest" column, group by gender and summarize the average interest in R across your participants. Is there a difference?
+```{r}
+pars %>% 
+  group_by(gender) %>% 
+  summarize(mean(r_interest))
+```
+
+## (24)
+24. Return to the main dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
+```{r}
+ld %>% 
+  group_by(participant) %>% 
+  summarize(avgRT = mean(RT)) %>% 
+  arrange(avgRT)
+
+ld %>% 
+  group_by(participant) %>% 
+  summarize(avgRT = mean(RT)) %>% 
+  arrange(desc(avgRT))
+```
+
+## (25)
+25. Take a first look at the differences between conditions. Group by both item_type and par_group and return the average RT for each combination. 
+```{r}
+ld %>% 
+  group_by(item_type, par_group) %>% 
+  summarize(mean(RT))
+```
+
 
 
 # Fixing code errors
@@ -162,82 +284,6 @@ sumary(ikea)
 ```
 
 
-# filter
-
-2. Reading times lower than 150ms are pretty unusual and are sometimes removed from self-paced reading data. You decide that you want to remove these response times from your data. Filter out all RTs below 150ms from the spr dataset and save your result.
-```{r}
-nrow(spr)
-
-spr <- spr %>% 
-  filter(RT >= 150)
-
-nrow(spr)
-```
-
-3. You want to take a look at the results from Par_C only: Filter these data points but don't save the result. 
-```{r}
-spr %>% 
-  filter(participant == "Par_C")
-```
-
-4. You're not interested in the practice items in the spr dataframe. Filter the dataset to include everything BUT the practice items and save your result.
-```{r}
-spr <- spr %>% 
-  filter(cond != "practice")
-```
-
-
-# If-else
-
-1. Create a new column that shows whether or not the word is in the first half of a sentence. If the word number is less than or equal to 3, this new column should read 'first half', if not, it should read 'second half'.
-```{r}
-spr %>% 
-  mutate(sentence_half = ifelse(word_num <= 3, "first half", "second half"))
-```
-
-2. Create a new column that has the part of speech for a word. If the word is in following list, it should be labeled "content", otherwise, it should be labeled "function": c("practice", "sentence", "relative", "clause.", "cats.")
-```{r}
-spr %>% 
-  mutate(POS = ifelse(word %in% c("practice", "sentence", "relative", "clause.", "cats."), "content", "function"))
-```
-
-3. Create a new column that shows how fast a word was read. First, find the mean reading time over the entire dataset. You can do this in the console most easily using the base-R syntax `mean(spr$RT)`. If the RT is greater than or equal to this number, your new column should read "slow", otherwise, it should read "fast". 
-```{r}
-mean(spr$RT)
-
-spr %>% 
-  mutate(fastness = ifelse(RT >= mean(spr$RT), "slow", "fast"))
-```
-
-# Group by, summarise
-
-1. Starting with the spr dataset, group by participant and use summarize to find the max RT for each participant. 
-```{r}
-spr %>% 
-  group_by(participant) %>% 
-  summarize(max(RT)) %>% 
-  ungroup()
-```
-
-2. With the same dataset, group by condition and return the mean RT for each condition. This is already a first step towards statistical analysis of your data! Do conditions look like they have similar or very different means?
-```{r}
-spr %>% 
-  group_by(cond) %>% 
-  summarize(mean(RT)) %>% 
-  ungroup()
-```
-
-
-3. Summarize based on condition and count how many full sentences are in each condition. (Here you will realize that this example dataset doesn't make a ton of sense :D)
-```{r}
-spr %>% 
-  group_by(cond) %>% 
-  count(full_sentence) %>% 
-  ungroup()
-
-spr %>% 
-  count(full_sentence)
-```
 
 # Challenge questions / thinking tidyverse / chaining commands 
 
