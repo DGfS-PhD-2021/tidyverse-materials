@@ -104,7 +104,6 @@ catdog_spr <- tibble(participant = rep(c("Par_A", "Par_B", "Par_C", "Par_D", "Pa
 # had to interrupt here because you refer to nrow(catdog_spr) which hasn't been created yet
 catdog_spr <- catdog_spr %>% 
   mutate(word_len = nchar(word),
-         RT = round(RT),
          RT = ifelse(participant == "Par_C", RT - 100, #young, so faster
                      ifelse(participant == "Par_G", RT + 200, #old
                             ifelse( participant == "Par_E", RT + 50, #doesnt care about pets
@@ -123,10 +122,16 @@ catdog_spr <- catdog_spr %>%
                      ifelse(word_len > 6, RT,
                             ifelse(word_len > 8, RT + 100,
                                    RT + 200))),
-         RT = ifelse(RT < 95, sample(c(110:284), 1), RT),
-         X1 = 1:nrow(catdog_spr)
+         RT = ifelse(RT < 95, runif(n=n(), min=150, max=470), RT),
+         X1 = 1:nrow(catdog_spr), 
+         RT = round(RT)
                      ) %>% 
   select(X1, participant, item_type, sentence_num, cond, word, RT, full_sentence)
+
+catdog_spr <- catdog_spr  %>%
+  group_by(participant, full_sentence) %>%
+  mutate(word_num = row_number()) %>%
+  ungroup()
 
 participant_data <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"),
        age = c(24, 28, 18, 32, 36, 25, 21, 68, 34, 22, 28, 33),
@@ -190,12 +195,9 @@ mean(catdog_spr$RT)
 range(catdog_spr$RT)
 ```
 
-### Uhhhh not sure why this is happening? ideas?
-Not sure either but how do you get rid of the negative RT in the original RT variable? Maybe you're adding the same value to a bunch of RTs and that's why?
 ```{r}
 ggplot(data=full_data, aes(x=RT)) +
-  geom_histogram(bins = 50) + 
-  geom_vline(aes(xintercept=175))
+  geom_histogram(bins = 50) 
 ```
 
 # Questionnaire
@@ -214,3 +216,119 @@ animal_survey <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par
        )
 ```
 
+# Lexical decision 
+```{r}
+## Design: 
+## Lexical decision to either valid R package names, pseudonames, or filler words 
+## Cond: participant/not participant
+## Outcome: participants faster to real names, slower to pseudonames compared to not participant, filler words same
+## 10 true packages / 10 false packages
+## 10 true words / 10 foil words
+## 40 items total, 20 participants
+
+ld_words <- c("'tidyverse'",
+           "'stringr'",
+           "'ggplot'",
+           "'viridis'", 
+           "'devtools'",
+           "'dplyr'",
+           "'cowplot'",
+           "'recipes'",
+           "'reticulate'",
+           "'wordcloud2'",
+           "'messyverse'",
+           "'roper'",
+           "'ggdoodle'",
+           "'sirisis'",
+           "'protips'",
+           "'fplier'",
+           "'chickenplot'",
+           "'stories'",
+           "'articulate'",
+           "'numbercloud2'",
+           "'interesting'",
+           "'freshness'",
+           "'cabinet'",
+           "'football'",
+           "'destitude'",
+           "'painter'",
+           "'throughout'",
+           "'realize'",
+           "'livelihood'",
+           "'treasure'",
+           "'hashtockle'",
+           "'voictent'",
+           "'dionlize'",
+           "'hocklorp'",
+           "'parake'",
+           "'aplicorter'",
+           "'ifringe'",
+           "'tablue'",
+           "'brazedic'",
+           "'mustord'", 
+           "'apple'",
+           "'dog'",
+           "'trust'",
+           "'program'")
+
+RT <- rep(c(
+  rnorm(10, mean=1100, sd= 153), #package_true_no
+  rnorm(10, mean=1100, sd= 135), #package_false_no
+  rnorm(10, mean=680, sd = 130), #word_true_no
+  rnorm(10, mean=999, sd = 112), #word_false_no
+  rnorm(4, mean=700, sd = 70), #practice_no
+  rnorm(10, mean=500, sd= 253), #package_true_workshop
+  rnorm(10, mean=1500, sd= 235), #package_false_workshop
+  rnorm(10, mean=680, sd = 130), #word_true_workshop
+  rnorm(10, mean=999, sd = 112), #word_false_workshop
+  rnorm(4, mean=700, sd = 70) #practice_workshop
+  ), 10)
+
+
+lexicaldec <- tibble(participant = rep(c("AD4", "BH5", "HG8", "LK9", "YU0", "SD2", "RT4", "NG2", "PO9", "JL0", "WS8", "RN4", "XA7", "FG5", "RW1", "KL9", "BN0", "FN3", "YU7", "AQ2"), each = 44),
+       order = c(rep("word_package", 44*10), rep("package_word",44 * 10)),
+       condB = rep(c(rep("package_true", 10), rep("package_foil", 10), rep("word_true", 10),  rep("word_foil", 10), rep("practice", 4)), 20), 
+       condA = rep(c(rep("no_workshop", 44), rep("workshop", 44)), 10),
+       item_id = paste("item", rep(1:44, 20), sep="_"), 
+       word = rep(ld_words, 20), 
+       RT = round(abs(RT))) %>% 
+  mutate(item_id = ifelse(item_id %in% c("item_41", "item_42", "item_43", "item_44"), NA, item_id))
+
+lexicaldec <- lexicaldec %>% 
+  mutate(word_len = nchar(word),
+         RT = ifelse(participant == "KL9", RT - 100, #young, so faster
+                     ifelse(participant == "FN3", RT + 200, #old
+                            ifelse( participant == "SD2", RT + 50, #doesnt care about pets
+                                    ifelse(participant == "AQ2", RT - 80, #cares about pets
+                                           ifelse(participant == "NG2", RT + 500, #distracted
+                                                  ifelse(participant == "YU0", RT - 200,
+                                                         ifelse(participant == "XA7", RT + 120,
+                                           RT)))
+                                    )))),
+         RT = ifelse(word_len > 4, RT - 100,
+                     ifelse(word_len > 6, RT,
+                            ifelse(word_len > 8, RT + 100,
+                                   RT + 200))),
+         RT = ifelse(RT < 95, runif(n=n(), min=250, max=999), RT),
+         RT = round(RT),
+         row = 1:nrow(lexicaldec)) 
+
+participant_lex <- tibble(participant = c("AD4", "BH5", "HG8", "LK9", "YU0", "SD2", "RT4", "NG2", "PO9", "JL0", "WS8", "RN4", "XA7", "FG5", "RW1", "KL9", "BN0", "FN3", "YU7", "AQ2"),
+       age = c(24, 28, 18, 32, 36, 25, 21, 68, 34, 22, 28, 33, 45, 23, 19, 29, 37, 41, 28, 29),
+       gender = c("female","male","female","male","female","female","male","female","nonbinary","male","male","female", "male", "nonbinary", "female", "female", "male", "female", "male", "male"),
+       education = c(4, 2, 3, 3, 1, 2, 2, 3, 2, 2, 3, 4, 5, 3, 2, 4, 1, 2, 3, 5),
+       r_interest = c(8, 5, 4, 6, 7, 9, 10, 2, 3, 5, 6, 4, 7, 8, 9, 10, 1, 2, 4, 5))
+  
+write_csv(lexicaldec, "data/dgfs_lexdec.csv")
+write_csv(participant_lex, "data/dgfs_pars_lexdec.csv")
+```
+
+```{r}
+ggplot(data=lexicaldec, aes(x=word_cond, y=RT, color= par_cond)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(data=lexicaldec, aes(x=participant, y=RT)) +
+  geom_boxplot()
+```

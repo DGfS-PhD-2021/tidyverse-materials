@@ -1,9 +1,101 @@
 ---
 title: "Exercises"
-author: "Julia Müller"
+author: "Julia Müller & Kyla McConnell"
 date: "1 2 2021"
 output: html_document
 ---
+
+# Lexical decision 
+
+In a lexical decision task, you had participants listen to words in two conditions. In one condition, they were asked to assess whether the words were valid words of English. In the other, they were asked to assess whether the words were valid R package names. Some of your participants had just completed a full-day workshop on R and the tidyverse, but the others had not. 
+
+1. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information is in each column?
+```{r}
+ld <- read_csv("data/dgfs_lexdec.csv")
+
+head(ld, n = 10)
+```
+
+2. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
+```{r}
+ld <- ld %>% 
+  mutate(participant = as.factor(participant),
+         order = as.factor(order),
+         condA = as.factor(condA),
+         condB = as.factor(condB),
+         item_id = as.factor(item_id))
+```
+
+3. Look at summaries of the columns you changed above to answer the following questions: How many participants are included in this experiment? How many had attended the R workshop? How many items were included in each condition? 
+
+```{r}
+summary(ld$participant)
+
+summary(ld$condA)
+
+summary(ld$condB)
+
+summary(ld$item_id)
+```
+
+4. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
+```{r}
+ld <- ld %>% 
+  rename(par_group = condA,
+         word_cond = condB)
+```
+
+5. The "row" column is in the final position, but generally, it might make more sense to have it as the first column. Move it to that position and save. 
+```{r}
+ld <- ld %>% 
+  relocate(row)
+```
+
+6. Keep the word-level statistics together by movingn the word_len column to right before the word column, and save. 
+```{r}
+ld <- ld %>% 
+  relocate(word_len, .before = word)
+```
+
+7. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending, using arrange
+```{r}
+ld %>% 
+  arrange(RT)
+
+ld %>% 
+  arrange(desc(RT))
+```
+
+8. What is the range of word lengths presented in this experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
+```{r}
+ld %>% 
+  select(word_len) %>% 
+  range()
+```
+
+9. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
+```{r}
+ld <- ld %>% 
+  select(-row)
+```
+
+10. Return some information about the words used here by selecting columns that contain "word".
+```{r}
+ld %>% 
+  select(contains("word")) 
+```
+
+11. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nnrow(ld)` both before and after filtering and report how many rows were removed. 
+```{r}
+nrow(ld)
+
+ld <- ld %>% 
+  filter(RT > 250)
+
+nrow(ld)
+```
+
+
 
 At the moment this is just a dump of exercises I took out of the main doc!
 

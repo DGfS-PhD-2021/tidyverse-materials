@@ -389,7 +389,6 @@ spr %>%
 ```
 
 
-<<<<<<< Updated upstream
 ### Preview vs. saving
 - Above: mostly previewing using `select()` for first insights
   - if you look at the spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
@@ -397,7 +396,6 @@ spr %>%
 - To save your changes: assigning your call back to the variable name
 =======
 ### Remove columns with select
->>>>>>> Stashed changes
 
 You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
 
