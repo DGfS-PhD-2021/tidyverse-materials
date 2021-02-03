@@ -697,18 +697,6 @@ animal_survey %>%
 ```
 Because these numbers should be treated as characters, we need to put them in quotation marks!
 
-We'd also like the information that it stored in the columns starting with "animals" to be summarised in one column called "pet_interest". Here's code that achieves that:
-```{r}
-animal_survey %>% 
-  mutate(pet_interest = (animals_cute + animals_look + animals_pet + animals_have)/4)
-```
-
-Here's more elegant code that uses a `select` statement to pick the relevant rows and `rowMeans` to return the averages: 
-```{r}
-animal_survey %>% 
-  mutate(pet_interest = rowMeans(select(., starts_with("animals"))))
-```
-
 
 ## If-else-statements
 
@@ -876,6 +864,45 @@ spr %>%
   count() %>% 
   ungroup() %>% 
   arrange(desc(n))
+```
+
+
+# (10) across()
+
+`across()` is a helper for `mutate()` and `summarise`. It lets you easily apply a change or create a summary for several variables because you can use `select()` semantics (`starts_with()`, `ends_with()`, `contains()`, etc.) with `across()`.
+
+For example, if we'd like to see the mean for columns that end with "num":
+```{r}
+catdog_spr %>% 
+  summarise(across(ends_with("num"), mean))
+```
+
+This also works with a list of functions, e.g. the mean and the standard deviation:
+```{r}
+catdog_spr %>% 
+  summarise(across(ends_with("num"), list(mean, sd)))
+```
+
+Here's an example of `across()` in a `mutate()` function. This lets you easily convert all character variables into factors:
+```{r}
+catdog_spr %>% 
+  mutate(across(where(is.character), as.factor))
+```
+
+## Row-wise operations
+Back to our questionnaire. For each participant, we'd like to calculate the average of the columns that start with "animals" to get one measure of their interest in animals. We might try something like this:  
+```{r}
+animal_survey %>% 
+  summarise(across(starts_with("animals"), mean))
+```
+
+As you can see, R gives us the averages for each of the columns, across all participants - not what we're looking for! The reason for this is that R is best at computing over columns. To solve our problem, we need to add `rowwise()`. This is similar to the grouping idea (`group_by()`) we came across a little earlier. Here, we're telling R to treat every row as a single "group". We can then use `c_across()`, which is the version of `across` that works with row-wise operations. We also need `mutate()` because we want to create a new column rather than see a summary:
+```{r}
+animal_survey %>% 
+  rowwise() %>% 
+  mutate(
+    pet_interest = mean(c_across(starts_with("animals")))
+  )
 ```
 
 
@@ -1158,72 +1185,4 @@ vingettes
 
 ## Workflows/code conventions
 -add- 
-
-
-## Challenge questions / thinking tidyverse / chaining commands 
-### Chaining commands
-
-Thinking tidyverse: Now you have a lot of tidy tools that can all be combined or "chained".
-
-See if you can figure out the following challenges. (Some may be a bit tricky, it's alright if you have to skip a couple or come back to them later.)
-
-Penguins: 
-
-1. Make a new column converting body mass to kg, then filter out all penguins under 6kg and save the result to a new tibble called "small_penguins".
-```{r}
-
-```
-
-2. Which penguin species occur on Biscoe island? Filter first to include only this island, then return the distinct species that are found there. 
-```{r}
-
-```
-
-3. Remember that the flipper_length column is represented in mm. Return how many penguins measured in this dataset had a flipper length longer than 2.5cm. Try to do this in one step, without having to permanently add the column to the dataframe (and without using 250cm)
-```{r}
-
-```
-
-
-SPR: 
-1. "Center" the response times around the average. This means take the mean RT and subtract it from every RT, so that 0 is now the average RT and the numbers reflect how much faster or slower the RT was from average. Save these centered RTs as a column called RT_c
-```{r}
-
-```
-
-2. Create a new column that is called word_length and assign it to the number of characters in the word. Save the output.
-```{r}
-
-```
-
-spr:
-1. Return the most expensive bed.
-```{r}
-
-```
-
-2. Count how many chairs are available in other colors.
-```{r}
-
-```
-
-
-3. There is some junk in the designer column. Look at it using distinct(), then remove it with the following code: 
-
-spr <- spr %>% 
-  filter(!str_detect(designer, "[0-9]"))
-  
-Note: str_detect looks for regular expressions. Here, the regular expression [0-9] matches any number. If this is true, str_detect returns TRUE -- However, it is proceeded by ! which means NOT. Thus, the filter is satisfied only if str_detect returns FALSE, i.e. there are no numbers present.
-  
-Then, find which designer makes the most expensive furniture. Return the average price for each designer's products, and arrange them from largest to smallest. (Hint, give your summary column a name.)
-```{r}
-
-```
-
-
-4. How many products did each designer design? You can use count, but can also just save this variable as a factor and look at a summary. 
-```{r}
-
-```
-
 

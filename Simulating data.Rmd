@@ -200,7 +200,7 @@ ggplot(data=full_data, aes(x=RT)) +
   geom_histogram(bins = 50) 
 ```
 
-# Questionnaire
+## Questionnaire
 ```{r}
 animal_survey <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"),
        age = c(24, 28, 18, 32, 36, 25, 21, 68, 34, 22, 28, 33),
@@ -216,7 +216,9 @@ animal_survey <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par
        )
 ```
 
-# Lexical decision 
+# Exercise data
+
+## Lexical decision 
 ```{r}
 ## Design: 
 ## Lexical decision to either valid R package names, pseudonames, or filler words 

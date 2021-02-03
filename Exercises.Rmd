@@ -51,7 +51,7 @@ ld <- ld %>%
   relocate(row)
 ```
 
-6. Keep the word-level statistics together by movingn the word_len column to right before the word column, and save. 
+6. Keep the word-level statistics together by moving the word_len column to right before the word column, and save. 
 ```{r}
 ld <- ld %>% 
   relocate(word_len, .before = word)
@@ -85,7 +85,7 @@ ld %>%
   select(contains("word")) 
 ```
 
-11. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nnrow(ld)` both before and after filtering and report how many rows were removed. 
+11. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
 ```{r}
 nrow(ld)
 
@@ -237,5 +237,70 @@ spr %>%
 
 spr %>% 
   count(full_sentence)
+```
+
+# Challenge questions / thinking tidyverse / chaining commands 
+
+Thinking tidyverse: Now you have a lot of tidy tools that can all be combined or "chained".
+
+See if you can figure out the following challenges. (Some may be a bit tricky, it's alright if you have to skip a couple or come back to them later.)
+
+Penguins: 
+
+1. Make a new column converting body mass to kg, then filter out all penguins under 6kg and save the result to a new tibble called "small_penguins".
+```{r}
+
+```
+
+2. Which penguin species occur on Biscoe island? Filter first to include only this island, then return the distinct species that are found there. 
+```{r}
+
+```
+
+3. Remember that the flipper_length column is represented in mm. Return how many penguins measured in this dataset had a flipper length longer than 2.5cm. Try to do this in one step, without having to permanently add the column to the dataframe (and without using 250cm)
+```{r}
+
+```
+
+
+SPR: 
+1. "Center" the response times around the average. This means take the mean RT and subtract it from every RT, so that 0 is now the average RT and the numbers reflect how much faster or slower the RT was from average. Save these centered RTs as a column called RT_c
+```{r}
+
+```
+
+2. Create a new column that is called word_length and assign it to the number of characters in the word. Save the output.
+```{r}
+
+```
+
+spr:
+1. Return the most expensive bed.
+```{r}
+
+```
+
+2. Count how many chairs are available in other colors.
+```{r}
+
+```
+
+
+3. There is some junk in the designer column. Look at it using distinct(), then remove it with the following code: 
+
+spr <- spr %>% 
+  filter(!str_detect(designer, "[0-9]"))
+  
+Note: str_detect looks for regular expressions. Here, the regular expression [0-9] matches any number. If this is true, str_detect returns TRUE -- However, it is proceeded by ! which means NOT. Thus, the filter is satisfied only if str_detect returns FALSE, i.e. there are no numbers present.
+  
+Then, find which designer makes the most expensive furniture. Return the average price for each designer's products, and arrange them from largest to smallest. (Hint, give your summary column a name.)
+```{r}
+
+```
+
+
+4. How many products did each designer design? You can use count, but can also just save this variable as a factor and look at a summary. 
+```{r}
+
 ```
 
