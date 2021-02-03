@@ -926,7 +926,7 @@ spr %>%
 This also works with a list of functions, e.g. the mean and the standard deviation:
 ```{r}
 spr %>% 
-  summarise(across(ends_with("num"), list(mean, sd)))
+  summarise(across(ends_with("num"), c(mean, sd)))
 ```
 
 Here's an example of `across()` in a `mutate()` function. This lets you easily convert all character variables into factors:
