@@ -1,0 +1,13 @@
+participant,age,nationality,animals_cute,animals_look,animals_pet,animals_have,gender,education,cats,dogs
+Par_A,24,US,2,4,1,1,female,4,6,3
+Par_B,28,US,4,3,3,2,male,2,7,2
+Par_C,18,UK,4,4,5,3,female,3,3,8
+Par_D,32,US,3,3,4,2,male,3,8,4
+Par_E,36,UK,1,1,1,1,female,1,6,3
+Par_F,25,UK,5,5,5,1,female,2,5,2
+Par_G,21,UK,4,4,3,1,male,2,2,7
+Par_H,68,US,3,3,1,1,female,3,5,3
+Par_I,34,DE,5,5,5,5,nonbinary,2,6,3
+Par_J,22,UK,5,4,4,3,male,2,1,8
+Par_K,28,US,3,3,3,3,male,3,7,3
+Par_M,33,US,4,4,5,3,female,4,4,6

@@ -413,8 +413,8 @@ spr %>%
 Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
 Look at the error below:
 ```{r}
-spr %>% 
-  filter(word == relative)
+#spr %>% 
+  #filter(word == relative)
 ```
 
 The correct syntax is: (because you're matching to a string)
@@ -497,7 +497,7 @@ Luckily, the tidyverse has a command for that: `separate()`. It takes the follow
 
 ```{r}
 (animal_corpus <- animal_corpus %>% 
-  separate(col = collocate, 
+  separate(col = coll, 
            into = c("coll", "coll_tag"), 
            sep = "_"))
 ```
@@ -585,7 +585,7 @@ In our SPR experiment, condition A represents a match (i.e. cat/dog is presented
 
 Let's look at our third dataset, animal_survey. It contains data from the same participants who answered a few sociodemographic questions and also indicated how cute they think animals are, how much they('d) like look at, pet, and own an animal (scale: 1-5). Besides that, they were also asked to rate cats and dogs (scale: 1-7).
 ```{r}
-animal_survey <- read_csv("animal_survey.csv")
+animal_survey <- read_csv("data/animal_survey.csv")
 ```
 
 In our animal_survey data, education is represented by numeric codes, 1-4. We could turn these into labels like so:
@@ -857,10 +857,13 @@ spr_acc <- left_join(spr, acc_judge, by = "sentence")
 spr_acc_participants <- left_join(spr_acc, animal_survey, by = "participant")
 
 
-corpus_frequencies <- read_tsv("data/corpus_frequencies.txt")
+corpus_frequencies <- read_tsv("data/corpus_frequencies.csv")
 
-animal_data_complete <- left_join(spr_acc_participants, corpus_frequencies, by = c("word" = "token"))
+spr_complete <- left_join(spr_acc_participants, corpus_frequencies, by = c("word" = "token"))
+
+rm(spr_acc, spr_acc_participants) #remove dfs to keep the environment clean
 ```
+
 
 
 - left_join, right_join, inner_join, full_join
@@ -876,79 +879,77 @@ CSVs are often saved as .csv (this is also openable in Excel) and TSVs are often
 
 You can save CSVs and TSVs like so:
 ```{r}
-# write_tsv(spr, "spr_df.txt")
+# write_tsv(spr_complete, "spr_df.txt")
 
-# write_csv(spr, "spr_df.csv")
+# write_csv(spr_complete, "spr_df.csv")
 ```
 Syntax: write_tsv(dfname, "filename.ext")
 
 Remember, something like data type in R (ex: character or factor) can't be saved into one of these files -- it just saves the values separated by the separator (and the column names). So you'll still have to do the conversions next time you read the file into R. 
 
 
-# (14) Intro to ggplot basics
-- working with subsets by directly piping them into a plotting/model call
+# (14) Intro to ggplot 
 
 ![ggplot2](img/ggplot2_exploratory.png){width=50%}
 ### The layered grammar of graphics
-ggplot follows the grammar of graphics. It starts with a blank graph that is fed a specific dataset, i.e. ggplot(data=DATASET). At this point, the graph doesn't have any idea of which of the many variables in the dataset you'd like to use, which will go on the x- or y- axis or what type of graph you're trying to produce.
+ggplot follows the grammar of graphics. 
+
+Layer 1: Data
 
 You can see, at this stage we have, well... nothing!
 ```{r}
-ggplot(data = animal_data_complete)
+ggplot(data = spr_complete)
 ```
 
-Then, you add layers to this graph. These layers include an *aesthetic mapping* which defines how data is matched to the graphics (e.g. which variable is shown on the x-axis, which one is shown on the y-axis).
-Similarly, you can change the shape, size, and color of some or all points/lines/bars. 
+Layer 2: *aesthetic mappings* -- how should the data be matched to the graphics (e.g. which variable is shown on the x-axis, which one is shown on the y-axis)?
 
-ggplot uses + to continue a line of code; this has to come at the END of the previous line, not at the beginning of the next line. These line breaks are optional, but make it a lot easier to read and understand the code.
+Note: ggplot uses + to continue a line of code; this has to come at the END of the previous line.
 
 When we tell ggplot how we want the aesthetics mapped, it can already start to set up the axes. However, it doesn't yet know what type of graph we're building:
 ```{r}
-ggplot(data = animal_data_complete) + 
-  aes(x = bill_length_mm, y = bill_depth_mm) 
+ggplot(data = spr_complete) + 
+  aes(x = condition) 
 ```
 
-Finally, we add a *geom* which defines the type of plot we're making. This may be a bar chart, a line graph, a scatterplot, or many more options we'll explore below!
+Layer 3: *geom*  -- the type of plot we're making. This may be a bar chart, a line graph, a scatterplot, or many more options we'll explore below!
 
-As a first example, let's just put a point or dot on each data point using the axes above:
+Let's try a bar chart -- ggplot automatically counts up how many items are left in each condition.
 ```{r}
-ggplot(data = animal_data_complete) +
-  aes(x = RT, y = rating) +
-  geom_point()
+ggplot(data = spr_complete) + 
+  aes(x = condition) +
+  geom_bar()
 ```
 
 ### Other geoms
 
 #### For one variable
 
-Let's look at the number of penguins per species. A bar plot is useful for this. The `aes()` only needs an argument for the x-axis, i.e. the category it should visualise. R then helpfully counts how many data points there are for each category, i.e. how many penguins per species.
+Bar charts show how many rows are in each group, like above.
 
 ```{r}
-ggplot(data = animal_data_complete) +
+ggplot(data = spr_complete) +
   aes(x = education) +
   geom_bar()
 ```
 
-To show the distribution of one continuous variable, a histogram is useful. Histograms take a continuous variable and divide it into *bins*. These bins divide the data into equally sized containers or ranges, and then show how many data points fall inside of these ranges. This shows you if the data comes from a smooth range or if more are coming from a certain part of the distribution. 
-
-Like bar plots, you only need to specify one variable and R does the counting for you.
+To show the distribution of one continuous variable, a histogram is useful. Histograms take a continuous variable and divide it into *bins*. 
 ```{r histogram}
-ggplot(data = animal_data_complete) +
+ggplot(data = spr_complete) +
   aes(x = RT) +
   geom_histogram()
 ```
 
-You also see that R throws a warning about the bin size. By default, R will try to pick a reasonable amount of bins to check your data on. However, you can change this and see how it changes your idea of the distribution. Change this with the argument `bins=` inside of the geom_histogram()
+R warns you that it has simply used the default number of bins (30).  However, you can change this and see how it changes your idea of the distribution. Change this with the argument `bins=` inside of the geom_histogram()
 
 ```{r}
-ggplot(data = animal_data_complete) +
+ggplot(data = spr_complete) +
   aes(x = RT) +
   geom_histogram(bins = 50)
 ```
 
-Density plots are a variation of histograms where a smooth line instead of separate bars is drawn. This can be useful for a larger number of data points but can also hide some observations, so for this data, wouldn't be advisable.
+Density plots are a variation of histograms where a smooth line instead of separate bars is drawn. This can be useful for a larger number of data points but can also hide some nuance.
 ```{r density plot}
-ggplot(data = animal_data_complete) +
+ggplot(data = spr_complete) +
   aes(x = RT) +
   geom_density()
 ```
@@ -959,48 +960,47 @@ ggplot(data = animal_data_complete) +
 For two continuous variables, we can use a scatterplot with `geom_point()` to show one dot per data point, defined against two continuous axes, like we saw in the example.
 
 ```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm) +
+ggplot(data = spr_complete) +
+  aes(x = RT, y = log(frequency)) +
   geom_point() 
 ```
 
 We can also use a (smoothed) line to represent the same data:
 ```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm) +
+ggplot(data = spr_complete) +
+  aes(x = RT, y = log(frequency)) +
   geom_smooth() 
 ```
 
 Here comes the cool part about ggplot.. you can also do both at the same time! Simply add both geoms to the same plot:
 
 ```{r}
-ggplot(data = penguins) +
-  aes(x = body_mass_g, y = bill_length_mm) +
+ggplot(data = spr_complete) +
+  aes(x = RT, y = log(frequency)) +
   geom_point() +
   geom_smooth()
 ```
 
 
-
 In the boxplot below, the thick line in the middle is the median, the bottom of the box is the 1st Quartile and the lines reach up to the minimum and maximum values (shown as dots if they are extreme, i.e. they are outside of 1.5x the range from 1st to 3rd quartile: the interquartile range).
 
-In this way, boxplots show you where the data is located, and how this differs between groups.
-
 ```{r boxplot}
-ggplot(data = penguins) +
-  aes(x = species, y = bill_depth_mm) +
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT) +
   geom_boxplot()
 ```
 
+A violin plot is a bit like a histogram turned on its side and mirrored, and also shows where the data is located for each group.
 ```{r violin plot}
-ggplot(data = penguins) +
-  aes(x = species, y = bill_depth_mm) +
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT) +
   geom_violin() 
 ```
 
+It pairs well with a boxplot!
 ```{r plot}
-ggplot(data = penguins) +
-  aes(x = species, y = bill_depth_mm) +
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT) +
   geom_violin() + 
   geom_boxplot() #try adding alpha = 0.5
 ```
@@ -1009,78 +1009,87 @@ ggplot(data = penguins) +
 
 ### Fill vs. color
 
-ggplot distinguishes between `fill=` and `color=`. Both have to do with colors, but the difference is pretty intuitive. Fill is used for filling in larger spaced like entire bars. Color is used for smaller sections like dots or lines. In general, if your fill/color argument doesn't work, try switching it to the other option and see if that fixes it!
+Fill is used for filling in larger spaced like entire bars. Color is used for smaller sections like dots or lines. 
 
 ### colour
 Let's return to one of the first plots we made. Here, we can add a color argument to the *geom* call that calls a normal color (*in quotes*). This will make all the points this color. 
 Note: if you know what hex codes are (or just use a hex code finder online), you can use all sorts of custom colors.
 ```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm) +
-  geom_point(color = "blue") 
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT) +
+  geom_boxplot(color= "pink")
 ```
 
 However, we can also use the color argument to introduce a third variable into the picture. If we are calling a variable/column, we do *not* need quotes AND we need to put it in the *aes* part of the call, becuase it is a -mapping- not a simple color.
 ```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm, color = species) +
-  geom_point() 
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT, color = animal) +
+  geom_boxplot()
 ```
 
 Here's what happens if you try to put a plain color inside of the aes mapping... R doesn't find this variable, so it just randomly creates it..
 ```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm, color = "blue") +
-  geom_point() 
-```
-
-The same idea works regardless of the type of plot, as long as it is one that takes color and not fill:
-```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm, color = species) +
-  geom_smooth()
-```
-
-So you see that adding a mapping to color (that is related to a categorical variable) always makes the assigned groups visible in the plot. In a way, it's like adding a third variable to the plot.
-
-The example above showed a *categorical/discrete* variable applied to color. However, you can also do it with a *numeric* variable, in which case the colors will range from light to dark blue.
-
-```{r}
-ggplot(data = penguins) +
-  aes(x = bill_length_mm, y = bill_depth_mm, color = body_mass_g) +
-  geom_point() 
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT, color = "pink") +
+  geom_boxplot()
 ```
 
 ### fill
 Bar charts and other charts with pretty large open spaces usually need fill. Fill works the same as color in that it can either go *inside aes() as a mapping* or *inside the geom, with quotes, as a plain color*.
 ```{r}
-ggplot(data = penguins) +
-  aes(x = species) +
-  geom_bar(fill = "pink")
-```
-
-Here, we can use the variable "species" to color code the bars by species. This is a *mapping to a variable*, but it is the same variable that the x-axis is showing:
-```{r}
-ggplot(data = penguins) +
-  aes(x = species, fill = species) +
+ggplot(data = spr_complete) +
+  aes(x = education, fill = gender) +
   geom_bar()
 ```
 
 
-Similarly to color, you can also use fill to add an additional variable to your plot. This will change the type of the plot to a stacked bar chart, which can handle the additional variable.
-```{r}
-ggplot(data = penguins) +
-  aes(x = species, fill= sex) +
-  geom_bar()
-```
 
 Bar plots can actually also take color, but this affects the color of the lines only:
 ```{r}
-ggplot(data = penguins) +
-  aes(x = species, color= species) +
+ggplot(data = spr_complete) +
+  aes(x = education, color = gender) +
   geom_bar()
 ```
 
+Or mix and match!
+```{r}
+ggplot(data = spr_complete) +
+  aes(x = education, fill = gender) +
+  geom_bar(color = "yellow")
+```
+
+## Labels
+
+You can change most labels by using the `labs()` command, which as a lot of arguments for changing different parts of text.
+```{r}
+ggplot(data = spr_complete) +
+  aes(x = condition, y = RT, color = animal) +
+  geom_boxplot() +
+  labs(x = "Condition", 
+       y = "Response Time",
+       colour = "Animal in stimulus", # this works the same way for fill
+       title = "Response times by condition",
+       subtitle = "To cat and dog collocates",
+       caption = "Made by me")
+```
+
+## Piping into a ggplot
+A great feature of ggplot is that it works with the pipe, so that you can also do:
+```{r}
+spr_complete %>% 
+ggplot() +
+  aes(x = education, fill = gender) +
+  geom_bar()
+```
+
+And naturally, edit the dataframe before using any of the commands above!
+```{r}
+spr_complete %>% 
+  filter(education != "elementary school") %>% 
+ggplot() +
+  aes(x = education, fill = gender) +
+  geom_bar()
+```
 
 # (15) Getting help
 

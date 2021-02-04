@@ -5,20 +5,44 @@ date: "1 2 2021"
 output: html_document
 ---
 
-# Lexical decision 
+# Exercises
 
-In a lexical decision task, you had participants listen to words in two conditions. In one condition, they were asked to assess whether the words were valid words of English. In the other, they were asked to assess whether the words were valid R package names. Some of your participants had just completed a full-day workshop on R and the tidyverse, but the others had not. 
-
+The following questions accompany the Intro to the Tidyverse workshop and are based on the same dataset. In a lexical decision task, you had participants listen to words in two conditions. In one condition, they were asked to assess whether the words were valid words of English. In the other, they were asked to assess whether the words were valid R package names. Some of your participants had just completed a full-day workshop on R and the tidyverse, but the others had not. 
 ## (1)
-1. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information is in each column?
+A. All of the following code snippets produce errors. What have I done wrong? Uncomment each line by removing the hashtag. Then, run the line and read the error. Correct what is wrong so that the code runs without errors.
+
+```{r}
+#party_invites <- c(Tracey, Karen, Sandra)
+```
+
+```{r}
+#1, 4, 5 + 1
+```
+
+```{r}
+#42 + "5"
+```
+
+```{r}
+#name <- "Jenny"
+#ncar(name)
+```
+
+B. Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
+```{r}
+
+```
+
+
+## (2)
+A. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information is in each column?
 ```{r}
 ld <- read_csv("data/dgfs_lexdec.csv")
 
 head(ld, n = 10)
 ```
 
-## (2)
-2. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
+B. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
 ```{r}
 ld <- ld %>% 
   mutate(participant = as.factor(participant),
@@ -28,8 +52,7 @@ ld <- ld %>%
          item_id = as.factor(item_id))
 ```
 
-## (3)
-3. Look at summaries of the columns you changed above to answer the following questions: How many participants are included in this experiment? How many had attended the R workshop? How many items were included in each condition? 
+C. Look at summaries of the columns you changed above to answer the following questions: How many participants are included in this experiment? How many had attended the R workshop? How many items were included in each condition? 
 
 ```{r}
 summary(ld$participant)
@@ -41,30 +64,20 @@ summary(ld$condB)
 summary(ld$item_id)
 ```
 
-## (4)
-4. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
+D. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
 ```{r}
 ld <- ld %>% 
   rename(par_group = condA,
          word_cond = condB)
 ```
 
-## (5)
-5. The "row" column is in the final position, but generally, it might make more sense to have it as the first column. Move it to that position and save. 
+E. The "row" column is in the final position, but generally, it might make more sense to have it as the first column. Move it to that position and save. 
 ```{r}
 ld <- ld %>% 
-  relocate(row)
+  select(row, everything())
 ```
 
-## (6)
-6. Keep the word-level statistics together by moving the word_len column to right before the word column, and save. 
-```{r}
-ld <- ld %>% 
-  relocate(word_len, .before = word)
-```
-
-## (7)
-7. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending, using arrange
+F. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending, using arrange
 ```{r}
 ld %>% 
   arrange(RT)
@@ -73,37 +86,27 @@ ld %>%
   arrange(desc(RT))
 ```
 
-## (8)
-8. What is the range of word lengths presented in this experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
+G. What is the range of word lengths presented in this experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
 ```{r}
 ld %>% 
   select(word_len) %>% 
   range()
 ```
 
-## (9)
-9. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
+## (3)
+A. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
 ```{r}
 ld <- ld %>% 
   select(-row)
 ```
 
-## (10)
-10. Return some information about the words used here by selecting columns that contain "word".
-```{r}
-ld %>% 
-  select(contains("word")) 
-```
-
-## (11)
-11. Participants completed 4 practice items before they started the experiment. You don't want these to be included in your analysis, since participants were just getting used to the format. Use filter to drop the rows in the condition "practice" and save.
+B. Participants completed 4 practice items before they started the experiment. You don't want these to be included in your analysis, since participants were just getting used to the format. Use filter to drop the rows in the condition "practice" and save.
 ```{r}
 ld <- ld %>% 
   filter(word_cond != "practice")
 ```
 
-## (12)
-12. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
+C. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
 ```{r}
 nrow(ld)
 
@@ -113,8 +116,14 @@ ld <- ld %>%
 nrow(ld)
 ```
 
-## (13)
-13. Run the following ggplot code to look at a boxplot of each participant's response times. One participant seems to be consistently slower. Filter the dataset to show just this participant (don't save!) and see if anything fishy is going on. 
+
+Bonus1: Return some information about the words used here by selecting columns that contain "word". Hint: try the `contains()` helper function.
+```{r}
+ld %>% 
+  select(contains("word")) 
+```
+
+Bonus2: Run the following ggplot code to look at a boxplot of each participant's response times. One participant seems to be consistently slower. Filter the dataset to show just this participant (don't save!) and see if anything fishy is going on. 
 
 ggplot(data=ld) +
   aes(x=participant, y=RT, color=participant) +
@@ -125,24 +134,23 @@ ld %>%
   filter(participant == "NG2")
 ```
 
-## (14)
-14. You forgot to write down which participants were in which group. Find the distinct combinations of participants and par_groups and see if you can recreate this information. Save the table to a new variable called "participant_groups".
+Bonus3: You forgot to write down which participants were in which group. Find the distinct combinations of participants and par_groups and see if you can recreate this information. Save the table to a new variable called "participant_groups".
 
 ```{r}
 participant_groups <- ld %>% 
   distinct(participant, par_group)
 ```
 
-## (15)
-15. What are the longest words that were presented in this experiment? Filter the dataframe to include only words with more than 11 letters and return the distinct words in this subset.
+Bonus4: What are the longest words that were presented in this experiment? Filter the dataframe to include only words with more than 11 letters and return the distinct words in this subset.
 ```{r}
 ld %>% 
   filter(word_len > 11) %>% 
   distinct(word)
 ```
 
-## (16)
-16. The information you have about conditions is two-fold: whether the participant was in the R package block (package/word) and whether the current item was valid or invalid (foil/true). It would be more helpful for the analysis to have these in separate columns. Separate them into two new columns: "condition" and "item_type". Then, convert the new columns to factors and be sure to save!
+
+## (4)
+A. The information you have about conditions is two-fold: whether the participant was in the R package block (package/word) and whether the current item was valid or invalid (foil/true). It would be more helpful for the analysis to have these in separate columns. Separate them into two new columns: "condition" and "item_type". Then, convert the new columns to factors and be sure to save!
 ```{r}
 ld <- ld %>% 
   separate(word_cond, 
@@ -154,42 +162,22 @@ ld <- ld %>%
          item_type = as.factor(item_type))
 ```
 
-## (17)
-17. The word column is a little bit messy. First of all, there is a mix of capital and lowercase letters. Use mutate to convert all words in this column to lowercase (and save).
-```{r}
-ld <- ld %>% 
-  mutate(word = tolower(word))
-```
-
-## (18)
-18. There are also quotation marks in the word column. Remove these using `str_remove_all()`.
-
-```{r}
-ld <- ld %>% 
-  mutate(word = str_remove_all(word, "'"))
-```
-## (19)
-19. We all realize that tidyverse is the best package in R. Create a new column called "best_package" and use an if-else statement to fill this with "yes" for tidyverse, and "no" for all other packages. (Okay, you don't have to save this one...)
+B. We all realize that tidyverse is the best package in R. Create a new column called "best_package" and use an if-else statement to fill this with "yes" for tidyverse, and "no" for all other packages. (Okay, you don't have to save this one...)
 ```{r}
 ld %>% 
   mutate(best_package = ifelse(word == "tidyverse", "yes", "no"))
 ```
 
-## (20)
-In a separate table, you have collected participant data. Read in this file ("data/dgfs_pars_lexdec.csv") and convert the appropriate columns to factors. 
+C. The word column is a little bit messy. First of all, there is a mix of capital and lowercase letters. Use mutate to convert all words in this column to lowercase (and save).
+```{r}
+ld <- ld %>% 
+  mutate(word = tolower(word))
+```
+
+D. In a separate table, you have collected participant data. Read in this file ("data/dgfs_pars_lexdec.csv") and take a look. The education column is a little difficult to understand. Change the factor labels to show that 1 is "no high school", 2 is "high school", 3 is "technical school", 4 is "university degree" and 5 is "graduate school degree"
 ```{r}
 pars <- read_csv("data/dgfs_pars_lexdec.csv")
 
-pars <- pars %>% 
-  mutate(participant = as.factor(participant),
-         gender = as.factor(gender), 
-         education = as.factor(education))
-```
-
-## (21)
-21. The education column is a little difficult to understand. Change the factor labels to show that 1 is "no high school", 2 is "high school", 3 is "technical school", 4 is "university degree" and 5 is "graduate school degree"
-
-```{r}
 pars <- pars %>% 
   mutate(education = recode(education,
                             "1" = "no high school",
@@ -200,8 +188,14 @@ pars <- pars %>%
                             ))
 ```
 
-## (22)
-22. The r_interest column shows how much a participant reported being interested in R programming, on a scale of 1-10. However, this information is a little fine-grained. Let's combine it into a categorical variable, where 1-4 is "low", 5-7 is "medium" and 8-10 is "high". Save this as a new column called "r_cat" so that we preserved both, and make sure it's saved as a factor.
+Bonus1: There are also quotation marks in the word column. A useful command is `str_remove_all()`. Check out the documentation and see if you can use mutate and str_remove_all to remove all single quotation marks.
+
+```{r}
+ld <- ld %>% 
+  mutate(word = str_remove_all(word, "'"))
+```
+
+Bonus2: The r_interest column shows how much a participant reported being interested in R programming, on a scale of 1-10. However, this information is a little fine-grained. Let's combine it into a categorical variable, where 1-4 is "low", 5-7 is "medium" and 8-10 is "high". Save this as a new column called "r_cat" so that we preserved both, and make sure it's saved as a factor.
 
 ```{r}
 pars <- pars %>% 
@@ -212,16 +206,23 @@ pars <- pars %>%
   ))
 ```
 
-## (23)
-23. Using the numeric "r_interest" column, group by gender and summarize the average interest in R across your participants. Is there a difference?
+## (5)
+
+A. Using the numeric "r_interest" column, group by gender and summarize the average interest in R across your participants. Is there a difference?
 ```{r}
 pars %>% 
   group_by(gender) %>% 
   summarize(mean(r_interest))
 ```
 
-## (24)
-24. Return to the main dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
+B. Take a first look at the differences between conditions. Group by both item_type and par_group and return the average RT for each combination. 
+```{r}
+ld %>% 
+  group_by(item_type, par_group) %>% 
+  summarize(mean(RT))
+```
+
+Bonus1: Return to the main dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
 ```{r}
 ld %>% 
   group_by(participant) %>% 
@@ -233,154 +234,29 @@ ld %>%
   summarize(avgRT = mean(RT)) %>% 
   arrange(desc(avgRT))
 ```
-
-## (25)
-25. Take a first look at the differences between conditions. Group by both item_type and par_group and return the average RT for each combination. 
+C. The participant info dataframe needs some columns converted to factor. Convert all character columns to factors using `across()`
 ```{r}
-ld %>% 
-  group_by(item_type, par_group) %>% 
-  summarize(mean(RT))
-```
-
-
-
-# Fixing code errors
-
-All of the following code snippets produce errors. What have I done wrong? Correct each snippet.
-
-```{r}
-party_invites <- c(Tracey, Karen, Sandra)
-```
-
-```{r}
-1, 4, 5 + 1
-```
-
-```{r}
-max(price) #from the ikea tibble
-```
-
-```{r}
-ikea %>% 
-  filter(item = "BILLY")
-```
-
-```{r}
-ikea %>% 
-  select(starts_with(item))
-```
-
-```{r}
-ikea %>% 
-  mutate(price * 2 = new_price)
-```
-
-```{r}
-sumary(ikea)
-```
-
-```{r}
-42 + "5"
-```
-
-
-
-# Challenge questions / thinking tidyverse / chaining commands 
-
-Thinking tidyverse: Now you have a lot of tidy tools that can all be combined or "chained".
-
-See if you can figure out the following challenges. (Some may be a bit tricky, it's alright if you have to skip a couple or come back to them later.)
-
-Penguins: 
-
-1. Make a new column converting body mass to kg, then filter out all penguins under 6kg and save the result to a new tibble called "small_penguins".
-```{r}
+pars <- pars %>% 
+  mutate(across(where(is.character), as.factor))
 
 ```
 
-2. Which penguin species occur on Biscoe island? Filter first to include only this island, then return the distinct species that are found there. 
-```{r}
+## (6) 
 
-```
+Add exercises for joining and pivoting -- should be able to pivot and join the participant info (pars) df? If its not messy we can mess it up in the simulate data file.
 
-3. Remember that the flipper_length column is represented in mm. Return how many penguins measured in this dataset had a flipper length longer than 2.5cm. Try to do this in one step, without having to permanently add the column to the dataframe (and without using 250cm)
-```{r}
+## (7) 
 
-```
+A. Congratulations, your data is now all prepared and ready for analysis! As a first step, make a bar chart showing how many data points were collected by participant education level. 
 
+B. Let's see how the RTs look. Are they normally distributed (like a bell curved)? Make a histogram of RTs and take a look. 
 
-SPR: 
-1. "Center" the response times around the average. This means take the mean RT and subtract it from every RT, so that 0 is now the average RT and the numbers reflect how much faster or slower the RT was from average. Save these centered RTs as a column called RT_c
-```{r}
+C. A good first step to any analysis is to make a boxplot. Create a boxplot showing the distributions of RT by condition. Add a color argument to show the participant group. Do there seem to be differences?
 
-```
+Bonus1: Add a fill argument to your plot from A that adds information about participant gender. 
 
-2. Create a new column that is called word_length and assign it to the number of characters in the word. Save the output.
-```{r}
+Bonus2: Take your histogram from B and color it entirely pink. Make the lines purple. 
 
-```
+Bonus3: Takee your boxplot from C and add a violin plot BEHIND the boxplot. Try adding `alpha = 0.5` to the boxplot geom to make it more transparent. 
 
-spr:
-1. Return the most expensive bed.
-```{r}
-
-```
-
-2. Count how many chairs are available in other colors.
-```{r}
-
-```
-
-
-3. There is some junk in the designer column. Look at it using distinct(), then remove it with the following code: 
-
-spr <- spr %>% 
-  filter(!str_detect(designer, "[0-9]"))
-  
-Note: str_detect looks for regular expressions. Here, the regular expression [0-9] matches any number. If this is true, str_detect returns TRUE -- However, it is proceeded by ! which means NOT. Thus, the filter is satisfied only if str_detect returns FALSE, i.e. there are no numbers present.
-  
-Then, find which designer makes the most expensive furniture. Return the average price for each designer's products, and arrange them from largest to smallest. (Hint, give your summary column a name.)
-```{r}
-
-```
-
-
-4. How many products did each designer design? You can use count, but can also just save this variable as a factor and look at a summary. 
-```{r}
-
-```
-
-# case when exercise with corpus tags
-
-To use another example: In the corpus data, we'd like to simplify the part-of-speech tags a bit. To see the different tags that are in the data right now, we can use `unique()`, which will show us all factor labels.
-```{r}
-unique(animal_corpus$coll_tag)
-```
-
-Then, within a `case_when()` command, we can create a simplified tag variable to tell us whether something is a noun, adjective, or verb. As you can see in the code below, we can immediately convert this new variable into a factor within the same `mutate()` command.
-```{r}
-(animal_corpus <- animal_corpus %>% 
-  mutate(coll_tag_simple = case_when(
-    coll_tag %in% c("np1", "nn1") ~ "noun",
-    coll_tag %in% c("jj", "jjt") ~ "adjective",
-    coll_tag %in% c("vhz", "vvg", "vv0", "vvi") ~ "verb"
-  ),
-  coll_tag_simple = as_factor(coll_tag_simple)))
-```
- 
-Let's have a look:
-```{r}
-summary(animal_corpus$coll_tag_simple)
-```
-
-Some NAs were introduced! The `case_when()` function assigns NA to any value that isn't covered in the code unless you have an "else" case with `TRUE ~ "do something"`. To figure out where the NAs are, let's use `is.na` within a `filter()` command:
-```{r}
-animal_corpus %>% 
-  filter(is.na(coll_tag_simple))
-```
- 
-Looks like we didn't account for the "cs" (conjunction) tag. Since we know that "because" doesn't refer to "cat/dog", we might as well remove these cases from the data by adding an exclamation mark in front of `is.na`:
-```{r}
-animal_corpus <- animal_corpus %>% 
-  filter(!is.na(coll_tag_simple))
-```
+Bonus4: Add `theme_minimal()` to any plot above to change the overall look. Add labels to make your plots complete!
