@@ -53,7 +53,35 @@ write.csv2(animal_corpus, "data/cat_dog_corpus_data.csv")
 
 ## Corpus data - frequency
 ```{r}
+corpus_frequencies <- tibble(
+  token = c("mary", "saw", "a", "beautiful", "siamese", "cat", "on", "her", "way", "home", "from", "work", "joshua", "said", "that", "purring", "cats", "are", "one", "of", "the", "most", "relaxing", "things", "to", "him", "there", "was", "contented", "looking", "out", "bookstore", "window", "child", "told", "me", "ginger", "by", "far", "cutest", "them", "all", "large", "tom", "often", "seen", "hanging", "near", "butcher", "shop", "my", "closest", "neighbor", "has", "guide", "dog", "help", "navigate", "students", "were", "worried", "mad", "had", "been", "spotted", "in", "town", "although", "barking", "noisy", "he", "quite", "cute", "grandmother", "lap", "she", "loved", "very", "much", "tracey", "best", "family", "ever", "lisa", "heard", "dogs", "but", "never", "it", "reported", "not", "uncommon", "friend", "jerry", "loves", "lounge", "around", "walk", "through", "woods", "randy", "regal", "baker", "loose", "bay", "louise", "interested", "hear", "how", "adapting", "his", "new", "entire", "city", "talking", "about", "digging", "trash", "cans", "poppy", "read", "newspaper", "identified", "doctor", "keep", "company", "after", "shifts", "georgie", "taken", "part", "contest"),
+  frequency = c(
+    6791, 24941, 2136923, 8307, 83,
+    3788, 717612, 301315, 94797, 419572, 88643, 405,
+    193355, 1108428, 114, 1530, 459498, 291900, 3009801, 5973437,
+    96938, 665, 40472, 2565070, 152045, 316902, 872620,
+    344, 25102, 194816, 27, 9764,
+    23486, 34970, 127872, 609, 505413, 39147, 6, 
+    165536, 274124, 2136923, 33965, 5249, 36867, 36014,
+    2868, 17606, 842, 10310, 145250, 1017,
+    11, 253449, 5795, 7780, 36466, 128,
+    14395, 309605, 4320, 2921, 415007, 256779,
+    1559, 1914216, 17637, 42242, 459, 963,
+    633413, 39516, 291, 1306, 1242, 350294, 4525,
+    118500, 89035, 553, 34389, 33369, 26201, 1171,
+    18754, 4310, 440934, 52643, 1045013, 11548, 447618,
+    657, 16202, 513, 1319, 1360, 42775,
+    9962, 80364, 2089, 224, 302, 2091,
+    2932, 3308, 1414, 8673, 12995, 98107,
+    325, 404811, 121905, 4633, 22393, 12779,
+    189721, 911, 196, 567, 262, 16913,
+    4723, 6177, 10066, 26546, 39326,
+    111902, 1152, 81, 34146, 52916, 1624
+  )
+) %>% 
+  arrange(desc(frequency))
 
+write_tsv(corpus_frequencies, "data/corpus_frequencies.txt")
 ```
 
 

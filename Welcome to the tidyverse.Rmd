@@ -560,8 +560,8 @@ spr %>%
 
 You can also do operations to character columns - for example: 
 ```{r}
-spr %>% 
-  mutate(word = tolower(word))
+(spr <- spr %>% 
+  mutate(word = tolower(word)))
 ```
 
 
@@ -849,14 +849,17 @@ animal_corpus %>%
 
 
 # (12) Joining several data sets
-Let's add the acceptability judgement data to the SPR data: we want to "join" the two datasets  into one.
+Let's add the acceptability judgement data to the SPR data: we want to "join" the two datasets into one.
 There are several join commands, which differ in how they match up datasets and which cases are kept or discarded.
 ```{r}
 spr_acc <- left_join(spr, acc_judge, by = "sentence")
 
 spr_acc_participants <- left_join(spr_acc, animal_survey, by = "participant")
 
-animal_data_complete <- spr_acc_participants # need to join corpus frequency
+
+corpus_frequencies <- read_tsv("data/corpus_frequencies.txt")
+
+animal_data_complete <- left_join(spr_acc_participants, corpus_frequencies, by = c("word" = "token"))
 ```
 
 
