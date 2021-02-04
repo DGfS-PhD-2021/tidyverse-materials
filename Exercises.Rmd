@@ -350,3 +350,37 @@ Then, find which designer makes the most expensive furniture. Return the average
 
 ```
 
+# case when exercise with corpus tags
+
+To use another example: In the corpus data, we'd like to simplify the part-of-speech tags a bit. To see the different tags that are in the data right now, we can use `unique()`, which will show us all factor labels.
+```{r}
+unique(animal_corpus$coll_tag)
+```
+
+Then, within a `case_when()` command, we can create a simplified tag variable to tell us whether something is a noun, adjective, or verb. As you can see in the code below, we can immediately convert this new variable into a factor within the same `mutate()` command.
+```{r}
+(animal_corpus <- animal_corpus %>% 
+  mutate(coll_tag_simple = case_when(
+    coll_tag %in% c("np1", "nn1") ~ "noun",
+    coll_tag %in% c("jj", "jjt") ~ "adjective",
+    coll_tag %in% c("vhz", "vvg", "vv0", "vvi") ~ "verb"
+  ),
+  coll_tag_simple = as_factor(coll_tag_simple)))
+```
+ 
+Let's have a look:
+```{r}
+summary(animal_corpus$coll_tag_simple)
+```
+
+Some NAs were introduced! The `case_when()` function assigns NA to any value that isn't covered in the code unless you have an "else" case with `TRUE ~ "do something"`. To figure out where the NAs are, let's use `is.na` within a `filter()` command:
+```{r}
+animal_corpus %>% 
+  filter(is.na(coll_tag_simple))
+```
+ 
+Looks like we didn't account for the "cs" (conjunction) tag. Since we know that "because" doesn't refer to "cat/dog", we might as well remove these cases from the data by adding an exclamation mark in front of `is.na`:
+```{r}
+animal_corpus <- animal_corpus %>% 
+  filter(!is.na(coll_tag_simple))
+```

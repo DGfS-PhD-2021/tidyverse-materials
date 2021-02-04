@@ -216,24 +216,6 @@ spr %>%
 
 This produces the exact same output as `head(spr)`. Why would this be useful?
 
-Compare the following lines of pseudocode, which would produce the same output:
-
-A.
-bop(
-  scoop(
-    hop(foo_foo, through = forest),
-    up = field_mice
-  ), 
-  on = head
-)
-
-
-B.
-foo_foo %>%
-  hop(through = forest) %>%
-  scoop(up = field_mice) %>%
-  bop(on = head)
-  
 You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! 
 
 Here are some more examples:
@@ -243,24 +225,16 @@ spr %>%
   summary()
 
 # Equivalent to colnames(spr), which returns all column names
-colnames(spr)
-
 spr %>% 
   colnames() 
 
 # Equivalent to nrow(spr), which returns the number of rows in the df
-nrow(spr)
-
 spr %>% 
   nrow()
 ```
 
 And you can also stack commands by ending each row (except the last one) with a pipe:
 ```{r}
-spr %>% 
-  colnames() %>% #extracts column names
-  toupper() #converts them to uppercase
-
 spr %>% 
   colnames() %>% #extracts column names
   nchar() #counts the number of letters
@@ -296,35 +270,6 @@ There is no output when you simply save the response, but the spr dataframe has 
 
 If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
 
-## relocate()
-
-![Relocate](img/dplyr_relocate.png){width=50%}
-
-The `relocate` function lets you change the order of variables in the data. The following command moves the participant id, full sentence, and word columns to the beginning: 
-```{r}
-spr %>% 
-  relocate(participant, sentence, word)
-```
-
-You can also specify that a variable should be placed before or after another variable:
-```{r}
-spr %>% 
-  relocate(sentence, .before = sentence_num)
-```
-
-Another option is to sort by data type using `where()`:
-```{r}
-spr %>% 
-  relocate(where(is.character))
-
-spr %>% 
-  relocate(where(is.factor))
-
-spr %>% 
-  relocate(where(is.numeric))
-```
-
-Reordering variables is particularly useful if you have large datasets with lots of variables.
 
 ## arrange()
 
@@ -344,25 +289,9 @@ spr %>%
 
 The traditional syntax for dealing with columns is dataframe$column.
 A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `spr$RT` we can write:
-
 ```{r}
 spr %>% 
   select(RT) 
-```
-
-We can then use this column for further calculations, like piping it on to the summary call. This will provide the same result as `summary(spr$RT)`
-```{r}
-spr %>% 
-  select(RT) %>% 
-  summary()
-
-spr %>% 
-  select(RT) %>% 
-  max()
-
-spr %>% 
-  select(RT) %>% 
-  min()
 ```
 
 
@@ -395,7 +324,7 @@ Above, we're mostly previewing using `select()` for first insights. If you look 
 df <- df %>% 
   some operations here
 
-=======
+
 ### Remove columns with select
 
 You can also remove columns using select if you use the minus sign. For example, the item_type column is a factor with only one level - it always says "DashedSentence". So let's get rid of it:
@@ -423,30 +352,12 @@ spr %>%
   select(ends_with("_num"))
 ```
 
-The opposite is also possible, e.g.
-```{r}
-spr %>% 
-  select(starts_with("sentence"))
-```
-returns all columns that start with "sentence".
+The opposite is also possible using `starts_with()` 
 
 `contains` is another helper function. Here, we're using it to show all columns that contain an underscore:
 ```{r}
 spr %>% 
   select(contains("_"))
-```
-
-If we try to select a column that doesn't exist, we get an error message:
-```{r}
-# spr %>% 
-#  select(word, word_number)
-```
-
-But if we combine select with any_of, we don't see an error. Instead, R just returns the columns that do exist:
-Note here that you have to use an array and enclose the names in quotes!
-```{r}
-spr %>% 
-  select(any_of(c("word", "word_number")))
 ```
 
 We can also select a range of  variables using a colon. This works both with variables and (a range of) numbers:
@@ -499,12 +410,6 @@ spr %>%
   filter(RT >= 250)
 ```
 
-...reaction times equal to 200 ms:
-```{r}
-spr %>% 
-  filter(RT == 200)
-```
-
 Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
 Look at the error below:
 ```{r}
@@ -527,7 +432,7 @@ spr <- spr %>%
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
 spr %>% 
-  filter(word %in% c("relative", "clause"))
+  filter(word %in% c("cat", "dog"))
 
 spr %>% 
   filter(sentence_num %in% c(2, 4))
@@ -566,6 +471,7 @@ You can also use it on its own to return unique values or combinations of values
 spr %>% 
   distinct(sentence, condition)
 ```
+
 
 # (7) Separating and uniting columns
 
@@ -607,12 +513,10 @@ Another example: In the SPR data, the condition column contains two pieces of in
 
 ## unite()
 
-
 The opposite of `separate()`. This lets you glue columns together. 
 - col is the name of the new column
 - the next argument, a vector, lists the columns that should be united
 - sep, as above, lets you specify how the values should be separated
-
 
 Let's say we'd like our data to be in the format "collocate cat/dog", so without the tag, but in one column, separated by a space. 
 ```{r}
@@ -622,16 +526,7 @@ animal_corpus %>%
         sep = " ")
 ```
 
-This leads to a lot of repetition - some bigrams appear several times in just our preview. To remedy this, we can use `distinct()`, which only keeps unique rows:
-```{r}
-animal_corpus %>% 
-  unite(col = "coll_word",
-        c("coll", "animal"),
-        sep = " ") %>% 
-  distinct()
-```
-
-Some entries still turn up several times because the same word can be tagged differently. To make clear that we want unique collocate cat/dog combinations, we can put `coll_word` into `distinct()` to make clear that this is the relevant column and tags should be ignored.
+This leads to a lot of repetition - some bigrams appear several times in just our preview. To remedy this, we can use `distinct()`, which only keeps unique rows. To make clear that we want unique collocate cat/dog combinations, we can put `coll_word` into `distinct()` to make clear that this is the relevant column and tags should be ignored.
 ```{r}
 animal_corpus %>% 
   unite(col = "coll_word",
@@ -669,15 +564,6 @@ spr %>%
   mutate(word = tolower(word))
 ```
 
-### Helper functions
-Let's clean up the "condition" column a bit more. Instead of "condA" and "condB", we want it to just say "A" and "B". The `str_remove()` function achieves that:
-```{r}
-spr <- spr %>% 
-  mutate(condition = str_remove(condition, "cond"))
-```
-
-**Example for str_remove_all?**
-
 
 ## Change data type in a column
 
@@ -693,7 +579,8 @@ As you can see, we can change several variables within one `mutate()`  call. In 
 In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is old label = "new label".
 ```{r}
 (spr <- spr %>% 
-  mutate(condition = recode(condition, A = "match", B = "mismatch")))
+  mutate(condition = recode(condition, 
+                            condA = "match", condB = "mismatch")))
 ```
 
 Let's look at our third dataset, animal_survey. It contains data from the same participants who answered a few sociodemographic questions and also indicated how cute they think animals are, how much they('d) like look at, pet, and own an animal (scale: 1-5). Besides that, they were also asked to rate cats and dogs (scale: 1-7).
@@ -724,37 +611,12 @@ spr %>%
   select(RT, RT_short)
 ```
 
-Here is another example (notice the output isn't being saved since we don't really need it):
-```{r}
-spr %>% 
-  mutate(RT_category = ifelse(RT < 100 | RT > 500, "extreme", "normal")) %>% 
-  select(RT, RT_category)
-```
-Here, we're once again using the logical operators.
-
 You can also use ifelse on categorical / character columns:
 ```{r}
 (spr <- spr %>% 
   mutate(position = ifelse(word %in% c("cat", "dog"), "critical", "not critical")))
 ```
 
-CHANGE EXAMPLE
-You can also use this to condense the groups in a certain column. For example, say we want to combine the categories "Beds", "Wardrobes", and "Chests of drawers & drawer units" into one category, "Bedroom":
-```{r}
-spr %>% 
-  mutate(category = ifelse(category %in% c("Beds", "Wardrobes","Chests of drawers & drawer units"), "Bedroom", category)) %>% 
-  select(category)
-```
-Notice here that if we want to affect the entry only if the condition is TRUE, leaving it unchanged if it is false, we leave the column name as the else condition. This tells R to take the value that is currently in that column if it finds the condition to be FALSE.
-
-Most of the examples above involve labeling different groupings with text, but you can use ifelse for all sorts of operations. Say the price of wood has gone up, so we want to add 100SAR to the price of any furniture taller than 1m. We could:
-CHANGE EXAMPLE
-```{r}
-spr %>% 
-  mutate(new_price = ifelse(height >= 100, price + 100, price)) %>% 
-  select(item_id, height, price, new_price)
-```
-Remember, you could also do this in-place by assigning the new column to "price" instead of "new_price".
 
 ## Several conditions: case_when()
 What if you have several conditions? For example, if RTs are shorter than 100 ms, they should be labelled "short", if they're longer than 500 ms, "long", and "normal" for all other RTs. While it's possible to chain several `if_else()` statements, it gets confusing and hard to read. Instead, we should use `case_when()`.
@@ -774,38 +636,6 @@ spr %>%
   select(RT, RT_category)
 ```
 
-To use another example: In the corpus data, we'd like to simplify the part-of-speech tags a bit. To see the different tags that are in the data right now, we can use `unique()`, which will show us all factor labels.
-```{r}
-unique(animal_corpus$coll_tag)
-```
-
-Then, within a `case_when()` command, we can create a simplified tag variable to tell us whether something is a noun, adjective, or verb. As you can see in the code below, we can immediately convert this new variable into a factor within the same `mutate()` command.
-```{r}
-(animal_corpus <- animal_corpus %>% 
-  mutate(coll_tag_simple = case_when(
-    coll_tag %in% c("np1", "nn1") ~ "noun",
-    coll_tag %in% c("jj", "jjt") ~ "adjective",
-    coll_tag %in% c("vhz", "vvg", "vv0", "vvi") ~ "verb"
-  ),
-  coll_tag_simple = as_factor(coll_tag_simple)))
-```
- 
-Let's have a look:
-```{r}
-summary(animal_corpus$coll_tag_simple)
-```
-
-Some NAs were introduced! The `case_when()` function assigns NA to any value that isn't covered in the code unless you have an "else" case with `TRUE ~ "do something"`. To figure out where the NAs are, let's use `is.na` within a `filter()` command:
-```{r}
-animal_corpus %>% 
-  filter(is.na(coll_tag_simple))
-```
- 
-Looks like we didn't account for the "cs" (conjunction) tag. Since we know that "because" doesn't refer to "cat/dog", we might as well remove these cases from the data by adding an exclamation mark in front of `is.na`:
-```{r}
-animal_corpus <- animal_corpus %>% 
-  filter(!is.na(coll_tag_simple))
-```
 
 Another example: In the questionnaire, participants were asked to indicate how much they like cats and dogs, respectively. We can convert this information into a category. To create a variable called "preference", we can use the following `case_when()` statement:
 ```{r}
@@ -891,7 +721,7 @@ For categorical columns, you can also count how many rows are in each category u
 ```{r}
 spr %>% 
   group_by(word) %>% 
-  freq = count() %>% 
+  count() %>% 
   ungroup()
 ```
 
@@ -1275,7 +1105,7 @@ If you encounter a specific problem but aren't sure which function to use (or if
 - [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
 
 
-# Workflows/code conventions
+# (16) Workflows/code conventions
 
 ## Packages
 When installing new packages, don't put the code for that in your script - you don't want packages to be installed every time you run a script when they're already there.
