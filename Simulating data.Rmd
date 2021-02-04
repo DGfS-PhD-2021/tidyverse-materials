@@ -12,7 +12,7 @@ library(tidyverse)
 ```
 
 
-## Corpus data
+## Corpus data - collocates
 
 collocates from BNC with tags, one position left of CAT/DOG lemma search
 ```{r}
@@ -48,8 +48,14 @@ animal_corpus <- data.frame(
 rows <- sample(nrow(animal_corpus))
 animal_corpus <- animal_corpus[rows, ]
 
-write.csv2(animal_corpus, "cat_dog_corpus_data.csv")
+write.csv2(animal_corpus, "data/cat_dog_corpus_data.csv")
 ```
+
+## Corpus data - frequency
+```{r}
+
+```
+
 
 ## SPR
 ```{r}
@@ -215,6 +221,36 @@ animal_survey <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par
        dogs = c(3, 2, 8, 4, 3, 2, 7, 3, 3, 8, 3, 6) # preference case when from cats and dogs
        )
 ```
+
+## Acceptability judgements
+
+```{r}
+acc_judge <- tibble(
+  "Mary saw a beautiful Siamese cat on her way home from work." = 4.8,
+  "Joshua said that purring cats are one of the most relaxing things to him." = 5.3,
+  "There was a contented cat looking out from the bookstore window." = 5.1,
+  "The child told me that ginger cats are by far the cutest of them all." = 4.9,
+  "A large tom cat was often seen hanging out near the butcher shop." = 4.3,
+  "My closest neighbor has a guide dog to help him navigate." = 5.5,
+  "The students were worried that a mad dog had been spotted in town." = 5.6,
+  "Although the barking dog was noisy, he was quite cute." = 5.3,
+  "My grandmother had a lap dog that she loved very much." = 5.7,
+  "Tracey was the best dog Jenny's family ever had." = 5.3,
+  "Lisa has heard of Siamese dogs, but has never seen one." = 3.5,
+  "It has been reported that purring dogs are not uncommon." = 1.3,
+  "My best friend Jerry has a contented dog that loves to lounge around." = 4.2,
+  "On a walk through the woods, Randy saw a ginger dog that was quite regal." = 3.2,
+  "The baker said that he saw a tom dog on the loose by the bay." = 1.5,
+  "Louise was interested to hear how the guide cat was adapting to his new home." = 1.2,
+  "The entire city was talking about a mad cat that was seen digging through trash cans." = 3.9,
+  "Poppy read in the newspaper that a barking cat had been identified." = 1.1,
+  "The doctor had a lap cat to keep her company after her shifts." = 4.5,
+  "Georgie was the best cat that had ever taken part in the contest." = 4.1
+)
+
+write_csv(acc_judge, "data/acceptability_judgements.csv")
+```
+
 
 # Exercise data
 
