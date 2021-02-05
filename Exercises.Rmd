@@ -244,7 +244,32 @@ ld %>%
 
 ## Exercise block 6
 
-Add exercises for joining and pivoting -- should be able to pivot and join the participant info (pars) df? If its not messy we can mess it up in the simulate data file.
+A*. Join the original participant data frame to the lexical decision data. Call the resulting dataframe "ld_pars".
+```{r}
+ld_pars <- full_join(ld, pars, by = "participant")
+```
+
+B. Have another look at the "pars" data. The last three columns contain each person's three most favourite R packages. Pivot the data so that instead, there's a column called "position" which contains "fave_1", "fave_2", and "fave_3", and a column called "package" which contains the package names. Call that dataframe "pars_long".
+```{r}
+pars_long <- pars %>% 
+  pivot_longer(
+    cols = c(fave_1, fave_2, fave_3),
+    names_to = "position",
+    values_to = "package"
+  )
+```
+
+C. Continue working with the "pars_long" data you just created. Make a summary table that shows how often each package is named in each position. Then, pivot this table so that the position is shown as row labels and the packages are shown as column labels.
+```{r}
+pars_long %>% 
+  group_by(position) %>% 
+  count(package) %>% 
+  ungroup() %>% 
+  pivot_wider(
+    names_from = package,
+    values_from = n
+  )
+```
 
 
 ## Exercise block 7

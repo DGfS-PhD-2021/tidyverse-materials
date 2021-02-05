@@ -1155,8 +1155,9 @@ In terms of actually writing code, ideally also build it up step by step and don
 # Additional materials
 
 ## Miscellanous commands we didn't have time for today
-- `relocate()` to change the order of columns
 - `package::command` for specifying which package a command should be taken from if you have packages loaded which use the same command names
+- `relocate()` to change the order of columns
+- `replace_na()` to replace NAs with a specific value and the reverse, `na_if()`to replace selected values with NA (e.g. when downloading questionnaire data, missing answers might be coded as -9)
 - `coalesce()` to combine two variables and replace missing values in either of them (which is often a result from joining dataframes with columns that have different names)
 - `lag()` and `lead()` to find previous or next values. Useful in e.g. SPR or eyetracking to look at the frequency or RT of the previous word.
 - `cumsum()`, `cumprod()`, `cummax()`, `cummin()` for cumulative sums, products, minima or maxima
