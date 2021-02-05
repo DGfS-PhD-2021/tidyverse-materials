@@ -1,15 +1,23 @@
 ---
 title: "Exercises"
 author: "Julia Müller & Kyla McConnell"
-date: "1 2 2021"
+date: "23 2 2021"
 output: html_document
 ---
 
-# Exercises
 
-The following questions accompany the Intro to the Tidyverse workshop and are based on the same dataset. In a lexical decision task, you had participants listen to words in two conditions. In one condition, they were asked to assess whether the words were valid words of English. In the other, they were asked to assess whether the words were valid R package names. Some of your participants had just completed a full-day workshop on R and the tidyverse, but the others had not. 
-## (1)
-A. All of the following code snippets produce errors. What have I done wrong? Uncomment each line by removing the hashtag. Then, run the line and read the error. Correct what is wrong so that the code runs without errors.
+The following exercises accompany the Intro to the Tidyverse workshop. Please note that exercises marked with an asterisk * are essential, so if you're pressed for time, focus on those first before you take a look at the other questions.
+
+
+## Exercise block 1
+
+A. Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
+```{r}
+
+```
+
+
+B. All of the following code snippets produce errors. What have I done wrong? Uncomment each line by removing the hashtag. Then, run the line and read the error. Correct what is wrong so that the code runs without errors.
 
 ```{r}
 #party_invites <- c(Tracey, Karen, Sandra)
@@ -28,21 +36,19 @@ A. All of the following code snippets produce errors. What have I done wrong? Un
 #ncar(name)
 ```
 
-B. Call the `say()` function including the arguments what, by, and what_color. Try at least a few different options for each of these and find your favorite look. Try using "random" with the argument "by" or "catfact" or "fortune" with the argument "what".
-```{r}
 
-```
+## Exercise block 2
 
+For the next exercises, you'll work a file called "dgfs_lexdec.csv" (it's saved in the "data" folder). This contains data of a lexical decision task, during which participants listened to words in two conditions. In one condition, they were asked to assess whether the words were valid words of English. In the other, they were asked to assess whether the words were valid R package names. Some of your participants had just completed a full-day workshop on R and the tidyverse, but the others had not.
 
-## (2)
-A. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information is in each column?
+A*. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information does each column contain??
 ```{r}
 ld <- read_csv("data/dgfs_lexdec.csv")
 
 head(ld, n = 10)
 ```
 
-B. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
+B*. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
 ```{r}
 ld <- ld %>% 
   mutate(participant = as.factor(participant),
@@ -53,7 +59,6 @@ ld <- ld %>%
 ```
 
 C. Look at summaries of the columns you changed above to answer the following questions: How many participants are included in this experiment? How many had attended the R workshop? How many items were included in each condition? 
-
 ```{r}
 summary(ld$participant)
 
@@ -64,20 +69,14 @@ summary(ld$condB)
 summary(ld$item_id)
 ```
 
-D. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
+D*. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
 ```{r}
 ld <- ld %>% 
   rename(par_group = condA,
          word_cond = condB)
 ```
 
-E. The "row" column is in the final position, but generally, it might make more sense to have it as the first column. Move it to that position and save. 
-```{r}
-ld <- ld %>% 
-  select(row, everything())
-```
-
-F. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending, using arrange
+E. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending.
 ```{r}
 ld %>% 
   arrange(RT)
@@ -86,27 +85,22 @@ ld %>%
   arrange(desc(RT))
 ```
 
-G. What is the range of word lengths presented in this experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
-```{r}
-ld %>% 
-  select(word_len) %>% 
-  range()
-```
 
-## (3)
-A. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
+## Exercise block 3
+
+A*. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
 ```{r}
 ld <- ld %>% 
   select(-row)
 ```
 
-B. Participants completed 4 practice items before they started the experiment. You don't want these to be included in your analysis, since participants were just getting used to the format. Use filter to drop the rows in the condition "practice" and save.
+B*. Participants completed 4 practice items before they started the experiment. You don't want these to be included in your analysis, since participants were just getting used to the format. Use filter to drop the rows in the condition "practice" and save.
 ```{r}
 ld <- ld %>% 
   filter(word_cond != "practice")
 ```
 
-C. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
+C*. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed. 
 ```{r}
 nrow(ld)
 
@@ -116,14 +110,20 @@ ld <- ld %>%
 nrow(ld)
 ```
 
+G. What is the range of word lengths presented in this experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
+```{r}
+ld %>% 
+  select(word_len) %>% 
+  range()
+```
 
-Bonus1: Return some information about the words used here by selecting columns that contain "word". Hint: try the `contains()` helper function.
+Bonus 1: Return some information about the words used here by selecting columns that contain "word". Hint: try the `contains()` helper function.
 ```{r}
 ld %>% 
   select(contains("word")) 
 ```
 
-Bonus2: Run the following ggplot code to look at a boxplot of each participant's response times. One participant seems to be consistently slower. Filter the dataset to show just this participant (don't save!) and see if anything fishy is going on. 
+Bonus 2: Run the following ggplot code to look at a boxplot of each participant's response times. One participant seems to be consistently slower. Filter the dataset to show just this participant (don't save!) and see if anything fishy is going on. 
 
 ggplot(data=ld) +
   aes(x=participant, y=RT, color=participant) +
@@ -134,14 +134,14 @@ ld %>%
   filter(participant == "NG2")
 ```
 
-Bonus3: You forgot to write down which participants were in which group. Find the distinct combinations of participants and par_groups and see if you can recreate this information. Save the table to a new variable called "participant_groups".
+Bonus 3: You forgot to write down which participants were in which group. Find the distinct combinations of participants and par_groups and see if you can recreate this information. Save the table to a new variable called "participant_groups".
 
 ```{r}
 participant_groups <- ld %>% 
   distinct(participant, par_group)
 ```
 
-Bonus4: What are the longest words that were presented in this experiment? Filter the dataframe to include only words with more than 11 letters and return the distinct words in this subset.
+Bonus 4: What are the longest words that were presented in this experiment? Filter the dataframe to include only words with more than 11 letters and return the distinct words in this subset.
 ```{r}
 ld %>% 
   filter(word_len > 11) %>% 
@@ -149,8 +149,9 @@ ld %>%
 ```
 
 
-## (4)
-A. The information you have about conditions is two-fold: whether the participant was in the R package block (package/word) and whether the current item was valid or invalid (foil/true). It would be more helpful for the analysis to have these in separate columns. Separate them into two new columns: "condition" and "item_type". Then, convert the new columns to factors and be sure to save!
+## Exercise block 4
+
+A*. The information you have about conditions is two-fold: whether the participant was in the R package block (package/word) and whether the current item was valid or invalid (foil/true). It would be more helpful for the analysis to have these in separate columns. Separate them into two new columns: "condition" and "item_type". Then, convert the new columns to factors and be sure to save!
 ```{r}
 ld <- ld %>% 
   separate(word_cond, 
@@ -168,13 +169,13 @@ ld %>%
   mutate(best_package = ifelse(word == "tidyverse", "yes", "no"))
 ```
 
-C. The word column is a little bit messy. First of all, there is a mix of capital and lowercase letters. Use mutate to convert all words in this column to lowercase (and save).
+C*. The word column is a little bit messy. First of all, there is a mix of capital and lowercase letters. Use mutate to convert all words in this column to lowercase (and save).
 ```{r}
 ld <- ld %>% 
   mutate(word = tolower(word))
 ```
 
-D. In a separate table, you have collected participant data. Read in this file ("data/dgfs_pars_lexdec.csv") and take a look. The education column is a little difficult to understand. Change the factor labels to show that 1 is "no high school", 2 is "high school", 3 is "technical school", 4 is "university degree" and 5 is "graduate school degree"
+D*. In a separate table, you have collected participant data. Read in this file ("data/dgfs_pars_lexdec.csv") and take a look. The education column is a little difficult to understand. Change the factor labels to show that 1 is "no high school", 2 is "high school", 3 is "technical school", 4 is "university degree" and 5 is "graduate school degree"
 ```{r}
 pars <- read_csv("data/dgfs_pars_lexdec.csv")
 
@@ -188,15 +189,13 @@ pars <- pars %>%
                             ))
 ```
 
-Bonus1: There are also quotation marks in the word column. A useful command is `str_remove_all()`. Check out the documentation and see if you can use mutate and str_remove_all to remove all single quotation marks.
-
+Bonus 1: There are also quotation marks in the word column. A useful command is `str_remove_all()`. Check out the documentation and see if you can use mutate and str_remove_all to remove all single quotation marks.
 ```{r}
 ld <- ld %>% 
   mutate(word = str_remove_all(word, "'"))
 ```
 
-Bonus2: The r_interest column shows how much a participant reported being interested in R programming, on a scale of 1-10. However, this information is a little fine-grained. Let's combine it into a categorical variable, where 1-4 is "low", 5-7 is "medium" and 8-10 is "high". Save this as a new column called "r_cat" so that we preserved both, and make sure it's saved as a factor.
-
+Bonus 2: The r_interest column shows how much a participant reported being interested in R programming, on a scale of 1-10. However, this information is a little fine-grained. Let's combine it into a categorical variable, where 1-4 is "low", 5-7 is "medium" and 8-10 is "high". Save this as a new column called "r_cat" so that we preserved both, and make sure it's saved as a factor.
 ```{r}
 pars <- pars %>% 
   mutate(r_cat = case_when(
@@ -206,7 +205,8 @@ pars <- pars %>%
   ))
 ```
 
-## (5)
+
+## Exercise block 5
 
 A. Using the numeric "r_interest" column, group by gender and summarize the average interest in R across your participants. Is there a difference?
 ```{r}
@@ -222,7 +222,13 @@ ld %>%
   summarize(mean(RT))
 ```
 
-Bonus1: Return to the main dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
+C*. The participant info dataframe needs some columns converted to factor. Convert all character columns to factors using `across()`
+```{r}
+pars <- pars %>% 
+  mutate(across(where(is.character), as.factor))
+```
+
+Bonus 1: Return to the main dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
 ```{r}
 ld %>% 
   group_by(participant) %>% 
@@ -234,22 +240,18 @@ ld %>%
   summarize(avgRT = mean(RT)) %>% 
   arrange(desc(avgRT))
 ```
-C. The participant info dataframe needs some columns converted to factor. Convert all character columns to factors using `across()`
-```{r}
-pars <- pars %>% 
-  mutate(across(where(is.character), as.factor))
 
-```
 
-## (6) 
+## Exercise block 6
 
 Add exercises for joining and pivoting -- should be able to pivot and join the participant info (pars) df? If its not messy we can mess it up in the simulate data file.
 
-## (7) 
+
+## Exercise block 7
 
 A. Congratulations, your data is now all prepared and ready for analysis! As a first step, make a bar chart showing how many data points were collected by participant education level. 
 
-B. Let's see how the RTs look. Are they normally distributed (like a bell curved)? Make a histogram of RTs and take a look. 
+B. Let's see how the RTs look. Are they normally distributed (like a bell curve)? Make a histogram of RTs and take a look. 
 
 C. A good first step to any analysis is to make a boxplot. Create a boxplot showing the distributions of RT by condition. Add a color argument to show the participant group. Do there seem to be differences?
 
@@ -260,3 +262,4 @@ Bonus2: Take your histogram from B and color it entirely pink. Make the lines pu
 Bonus3: Takee your boxplot from C and add a violin plot BEHIND the boxplot. Try adding `alpha = 0.5` to the boxplot geom to make it more transparent. 
 
 Bonus4: Add `theme_minimal()` to any plot above to change the overall look. Add labels to make your plots complete!
+

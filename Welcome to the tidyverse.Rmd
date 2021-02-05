@@ -19,6 +19,7 @@ library(tidyverse)
 ```
 
 The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to *base-R*) that help you get your data into a useful format (among other things).
+Its commands/functions all have a similar structure and descriptive names to make them easier to remember and use.
 
 ![The tidyverse](img/tidyverse_celestial.png){width=50%}
 
@@ -27,7 +28,7 @@ The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to
 - *tibble*: for tweaked dataframes  
 - *tidyr*: for data wrangling  
 - *readr*: for reading in files  
-- *purrr*: for functional progamming  
+- *purrr*: for functional programming  
 - *dplyr*: for data manipulation  
 - *stringr*: for string manipulation  
 - *forcats*: for working with categorical variables (factors) 
@@ -43,7 +44,7 @@ The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to
 - a lot of wrangling commands are based on the assumption that your data is tidy 
 - is expected for many statistical models
 - works best for plotting 
-- "Tidy datasets are all alike, but every messy dataset is messy in its own way" Hadley Wickham
+- Hadley Wickham: "Tidy datasets are all alike, but every messy dataset is messy in its own way" 
 
 ![Why use tidy data?](img/tidydata_3.jpg){width=50%}
 
@@ -78,7 +79,7 @@ library(cowsay)
 Try the following code:
 ```{r}
 say(
-  what = "Good luck learning R!", 
+  what = "Good luck learning about the tidyverse!", 
   by = "rabbit")
 ```
 
@@ -108,26 +109,12 @@ Each of these can be fed the `say()` function to slightly alter what it does.
 
 Don't worry if you don't understand everything in the documentation when you're first starting out. Just try to get an idea for which arguments there are and which options for those arguments. It's good practice to look at help documents often -- this will also help you get more efficient at extracting the info you need from them.
 
+**-- Please work on Exercise block 1 now --**
+
 
 # (3) Reading in and exploring data
 
-What type of file are you working with? Specifically, what's used to separate the values in the different columns? To find out, open the file in a text editor. Common options are either commas or semicolons (in which cases, the file often has the ending .csv) or tabs (often .txt files).
-
-Where is the file saved? If you are working in a Markdown and the data file is saved in the same location as the script file, you can use the name of the file with its ending, e.g. "new_data.csv" or "final_data.txt". This is possible because RMarkdown automatically sets the working directory, i.e. the location R tries to find the file, to where it is saved. This is very convenient especially when you share your script and data. Your contributor doesn't need to type in any long paths but can directly start working.
-If the file is saved in a subfolder called "data", use  "data/example_file.csv"). ../ allows you to go backwards one folder.
-
-If you're working in a script, use `setwd()` (e.g.: `setwd(~Documents/PhD/Rscripts/...)` or `setwd(C:/Documents...)`), or Session -> Set Working Directory -> Choose Directory...)
-
-The commands to read in a file are:
-- base-R: `read.csv()` and `read.tsv()`
-  - tidyverse (improvements, reads as tibble instead of dataframe): `read_csv()` and `read_tsv()`
-    - must have tidyverse installed and loaded with a `library()` call
-    - `read_csv2()` for semicolon-separated csv 
-    - `read_delim(file, delim)` for any other delimiters
-    
-*Save the output to a variable using <- *
-
-So reading in data tends to follow this pattern:
+Reading in data tends to follow this pattern:
 ```{r eval=FALSE}
 name_of_data_in_R <- read_csv("data_file.csv") # equivalent to
 name_of_data_in_R <- read_delim("data_file.csv", delim = ",")
@@ -138,16 +125,15 @@ name_of_data_in_R <- read_delim("data_file.csv", delim = ";")
 name_of_data_in_R <- read_tsv("data_file.txt") # tab-separated file
 ```
 
-
-#### A note on the data we'll use today
+## Introducing our first dataset
 We've tried to tailor the workshop to be relevant to the kinds of data many of you said you used in the pre-workshop survey, so we'll start with self-paced reading data (which looks fairly similar to eye-tracking data, another common response), and later use examples of corpus data and a questionnaire output. However, everything we discuss is useful for any kind of data!
-We're also providing several files for you to practise on later, so you can pick data that looks closest to what you're actually working with.
 
-Let's read in a small self-paced reading dataset (saved in the data folder, so we need to add `data/` to tell R that):
+Let's read in a self-paced reading dataset (saved in the data folder, so we need to add `data/` to tell R that):
 ```{r}
 spr <- read_csv("data/dgfs_spr.csv")
 ```
-The current dataframe is a self-paced reading experiment where 12 participants read 20 sentences each, plus 3 practice sentences to get them warmed up. Half the sentences were about dogs and half the sentences were about cats. In one condition (A), all sentences were paired with appropriate adjectival collocates according to the BNC (lap dog vs. tortoiseshell cat), in the other, these were reverse (lap cat vs. tortoiseshell dog). All sentences were presented in otherwise natural-sounding sentences. 
+The current dataframe is a self-paced reading experiment where 12 participants read 20 sentences each, plus 3 practice sentences to get them warmed up. In a SPR experiment, participants see one word at a time and need to press a button to be shown the next word in the sentence. Their reaction times (RTs, i.e. how long it takes them to press that button) are recorded.
+Half the sentences were about dogs and half the sentences were about cats. In one condition (A), all sentences were paired with appropriate adjectival collocates according to the BNC (lap dog vs. tortoiseshell cat), in the other, these were reverse (lap cat vs. tortoiseshell dog). All sentences were presented in otherwise natural-sounding sentences. 
 
 ## Exploring our data
 
@@ -178,9 +164,6 @@ summary(spr)
 summary(spr$RT)
 ```
 
-### Exercise
-Read in and explore the example data
-How many rows and columns does it have?
 
 ## Character vs. factor columns
 
@@ -191,15 +174,14 @@ spr$item_type <- as_factor(spr$item_type)
 spr$cond <- as_factor(spr$cond)
 ```
 
-This way, the summary output also works as expected. For example, we can have a look at how many different participants and conditions:
+This way, the summary output also works as expected. For example, we can have a look at how many different participants and conditions we have:
 ```{r}
 summary(spr$participant)
 
 summary(spr$cond)
 ```
 
-If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: 
-`as.numeric()`, `as.character()` etc.
+If any other columns in your dataframe are read in wrong (for example, if you have a numeric column that looks like: "43", "18" and is being read as a character column) you can convert them with similar syntax: `as.numeric()`, `as.character()` etc.
 
 
 # (4) The pipe %>% 
@@ -214,9 +196,7 @@ spr %>%
   head()
 ```
 
-This produces the exact same output as `head(spr)`. Why would this be useful?
-
-You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! 
+This produces the exact same output as `head(spr)`.
 
 Here are some more examples:
 ```{r}
@@ -233,7 +213,8 @@ spr %>%
   nrow()
 ```
 
-And you can also stack commands by ending each row (except the last one) with a pipe:
+You can also stack commands by ending each row (except the last one) with a pipe. 
+You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! 
 ```{r}
 spr %>% 
   colnames() %>% #extracts column names
@@ -281,6 +262,9 @@ spr %>%
 spr %>% 
   arrange(desc(RT))
 ```
+
+
+**-- Please work on exercise block 2 now --**
 
 
 # (6) Subsets
@@ -352,7 +336,7 @@ spr %>%
   select(ends_with("_num"))
 ```
 
-The opposite is also possible using `starts_with()` 
+The opposite is also possible using `starts_with()`.
 
 `contains` is another helper function. Here, we're using it to show all columns that contain an underscore:
 ```{r}
@@ -471,6 +455,9 @@ You can also use it on its own to return unique values or combinations of values
 spr %>% 
   distinct(sentence, condition)
 ```
+
+
+**-- Please work on Exercise block 3 now --**
 
 
 # (7) Separating and uniting columns
@@ -649,6 +636,9 @@ Another example: In the questionnaire, participants were asked to indicate how m
 If we look at the output, we see that the "else/TRUE" condition wasn't necessary, strictly speaking, but it's good to account for all the potential cases in the data so you don't end up with superfluous NAs.
 
 
+**-- Please work on Exercise block 4 now --**
+
+
 # (9) Summary tables with groupings
 
 ## summarize()
@@ -746,6 +736,8 @@ spr %>%
 
 `across()` is a helper for `mutate()` and `summarise`. It lets you easily apply a change or create a summary for several variables because you can use `select()` semantics (`starts_with()`, `ends_with()`, `contains()`, etc.) with `across()`.
 
+![Across](img/dplyr_across.png)
+
 For example, if we'd like to see the mean for columns that end with "num":
 ```{r}
 spr %>% 
@@ -779,6 +771,8 @@ As you can see, R gives us the averages for each of the columns, across all part
     pet_interest = mean(c_across(starts_with("animals")))
   ))
 ```
+
+**-- Please work on exercise block 5 now--**
 
 
 # (11) Reshaping data 
@@ -849,26 +843,45 @@ animal_corpus %>%
 
 
 # (12) Joining several data sets
-Let's add the acceptability judgement data to the SPR data: we want to "join" the two datasets into one.
-There are several join commands, which differ in how they match up datasets and which cases are kept or discarded.
+Let's add the acceptability judgement data to the SPR data: we want to "join" the two datasets into one, so each sentence should be matched up with its average rating. There are several join commands, which differ in how they match up datasets and which cases are kept or discarded. Their syntax is:
+xxxx_join(dataframe1, dataframe2, by = "column that is present in both dfs")
+
+![Join options, from the data wrangling cheat sheet](img/dplyr-joins.png)
+
+The column "sentence" is what we need to match up acceptability judgements with the SPR data. When joining, it's often a good idea to create a new dataframe instead of overwriting any of the old ones.
 ```{r}
-spr_acc <- left_join(spr, acc_judge, by = "sentence")
+spr_acc <- full_join(spr, acc_judge, by = "sentence")
+```
 
-spr_acc_participants <- left_join(spr_acc, animal_survey, by = "participant")
+A quick glance at the Environment tab confirms that we now have a dataframe with the same number of rows ("observations") but one more column, just as we want. But when joining data, plenty of things can go wrong, so let's look at the data:
+```{r}
+spr_acc %>% 
+  select(sentence, rating) %>% 
+  distinct()
+```
 
+Looks fine! Let's follow the same procedure to add participant information to this new dataset:
+```{r}
+spr_acc_participants <- full_join(spr_acc, animal_survey, by = "participant")
+```
 
+As a final example, we'll read in one last, very simple, dataset. It contains the raw frequencies of each of the words participants read in the SPR experiment (word frequency tends to be a good predictor of reading times: more common words are usually read faster). Let's have a look:
+```{r}
 corpus_frequencies <- read_tsv("data/corpus_frequencies.csv")
+```
 
-spr_complete <- left_join(spr_acc_participants, corpus_frequencies, by = c("word" = "token"))
+We'd like to add the word frequency to our data, so the column to match by is "word" in the spr data but it's called "token" in the corpus data. To join this, we can either rename one of these or use a vector in `by()` which lists the two column names as they appear in the dataframes:
+```{r}
+spr_complete <- full_join(spr_acc_participants, corpus_frequencies, by = c("word" = "token"))
 
 rm(spr_acc, spr_acc_participants) #remove dfs to keep the environment clean
 ```
 
-
-
-- left_join, right_join, inner_join, full_join
-- semi_join, anti_join
-- bind_rows, bind_cols
+Other options: 
+- semi_join
+- anti_join
+- bind_rows
+- bind_cols
 
 
 # (13) Writing files to disk
@@ -886,6 +899,9 @@ You can save CSVs and TSVs like so:
 Syntax: write_tsv(dfname, "filename.ext")
 
 Remember, something like data type in R (ex: character or factor) can't be saved into one of these files -- it just saves the values separated by the separator (and the column names). So you'll still have to do the conversions next time you read the file into R. 
+
+
+**-- Please work on exercise block 6 now--**
 
 
 # (14) Intro to ggplot 
@@ -1005,6 +1021,7 @@ ggplot(data = spr_complete) +
   geom_boxplot() #try adding alpha = 0.5
 ```
 
+
 ## Adding more information
 
 ### Fill vs. color
@@ -1043,7 +1060,6 @@ ggplot(data = spr_complete) +
 ```
 
 
-
 Bar plots can actually also take color, but this affects the color of the lines only:
 ```{r}
 ggplot(data = spr_complete) +
@@ -1057,6 +1073,7 @@ ggplot(data = spr_complete) +
   aes(x = education, fill = gender) +
   geom_bar(color = "yellow")
 ```
+
 
 ## Labels
 
@@ -1077,7 +1094,7 @@ ggplot(data = spr_complete) +
 A great feature of ggplot is that it works with the pipe, so that you can also do:
 ```{r}
 spr_complete %>% 
-ggplot() +
+  ggplot() +
   aes(x = education, fill = gender) +
   geom_bar()
 ```
@@ -1086,10 +1103,14 @@ And naturally, edit the dataframe before using any of the commands above!
 ```{r}
 spr_complete %>% 
   filter(education != "elementary school") %>% 
-ggplot() +
+  ggplot() +
   aes(x = education, fill = gender) +
   geom_bar()
 ```
+
+
+**-- Please work on exercise block 7 now--**
+
 
 # (15) Getting help
 
@@ -1109,12 +1130,6 @@ By the way: We haven't had time to discuss *all* arguments that each of the func
 ## Working with Google results
 
 If you encounter a specific problem but aren't sure which function to use (or if you're trying to use a command you know in a very specific way), it's often a good idea to simply google the question (and the same goes for error messages - after you double-checked spelling, capitalisation, commas, missing brackets...). R generally has a large and helpful community, so you'll likely find answers on sites such as Stack Overflow or, if you're lucky, even entire blogposts written on a relevant issue.
-
-
-## Resources and cheat sheets
-
-- [R for Data Science](https://r4ds.had.co.nz/index.html)
-- [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
 
 
 # (16) Workflows/code conventions
@@ -1137,12 +1152,30 @@ When working on a (more) complex data wrangling problem, you'll often need to ta
 In terms of actually writing code, ideally also build it up step by step and don't save your changes until you're certain they are what you want. Sometimes, it can also be a good idea not to overwrite the original dataframe but to save it under a different name, e.g. for major restructuring such as pivoting.
 
 
-# Missing/questionable commands
-- package::command
-- nest_by  
-- coalesce  
-- lag and lead  
-- cumulative aggregates  
-- top_n()
-- sample()?
+# Additional materials
+
+## Miscellanous commands we didn't have time for today
+- `relocate()` to change the order of columns
+- `package::command` for specifying which package a command should be taken from if you have packages loaded which use the same command names
+- `coalesce()` to combine two variables and replace missing values in either of them (which is often a result from joining dataframes with columns that have different names)
+- `lag()` and `lead()` to find previous or next values. Useful in e.g. SPR or eyetracking to look at the frequency or RT of the previous word.
+- `cumsum()`, `cumprod()`, `cummax()`, `cummin()` for cumulative sums, products, minima or maxima
+- `top_n()` for the top results (e.g. to see the five most frequent collocates for each "cat" and "dog")
+- `sample()` or `sample_frac()` to take a random sample from your data, e.g. to extract sentences for qualitative analysis or to test commands on a smaller dataset when working with large data
+- `str_squish()` to remove superfluous whitespace (e.g. "cute      cat") in a string
+- `parse_number()` to extract only numbers from a string (e.g. "USD18" -> "18")
+
+
+## Additional exercises
+Check the "more exercises" folder to find:
+- More on ggplot
+- An advanced pivoting exercise
+
+
+## Resources and cheat sheets
+
+- [R for Data Science](https://r4ds.had.co.nz/index.html)
+- [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
+
+
 
