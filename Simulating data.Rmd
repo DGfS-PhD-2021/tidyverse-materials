@@ -9,6 +9,7 @@ output: html_document
 
 ```{r}
 library(tidyverse)
+library(synthpop)
 ```
 
 
@@ -416,4 +417,36 @@ ggplot(data=lexicaldec, aes(x=condB, y=RT, color= condB)) +
 ```{r}
 ggplot(data=lexicaldec, aes(x=participant, y=RT)) +
   geom_boxplot()
+```
+
+
+## Phonetic data
+
+Beke's original data:
+```{r}
+wh_split <- read_csv("archive/wh-split_output_Julia.xls")
+
+wh_split <- wh_split %>% 
+  mutate(harmonicity = as.numeric(harmonicity))
+
+wh_wh <- wh_split %>% 
+  filter(str_detect(word, "WH"))
+
+wh_w <- wh_split %>% 
+  filter(str_detect(word, "WH", negate = TRUE)) %>% 
+  filter(word %in% c("WAS", "WE", "WERE", "ONE", "WITH", "WELL", "WAY", "WENT", "WOULD", "ALWAYS", "WINTER", "WASN'T", "WOOD", "QUITE", "WORK", "WARTER", "ONCE", "WE'RE", "WOULDN'T", "WILL"))
+  
+wh_w %>% 
+  group_by(word) %>% 
+  count() %>% 
+  arrange(desc(n))
+
+wh_w <- wh_w %>% 
+  sample_n(429)
+
+wh_small <- bind_rows(wh_w, wh_wh)
+
+wh_syn <- syn(wh_small, maxfaclevels = 110)
+
+
 ```
