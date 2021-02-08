@@ -13,6 +13,9 @@ Unless indicated, artwork is by the wonderful @allison_horst - find her on [gith
 
 # (1) What is this "tidyverse"?
 
+![The tidyverse](img/tidyverse_celestial.png){width=50%}
+
+
 Let's jump right in and load the package:
 ```{r}
 library(tidyverse)
@@ -21,7 +24,6 @@ library(tidyverse)
 The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to *base-R*) that help you get your data into a useful format (among other things).
 Its commands/functions all have a similar structure and descriptive names to make them easier to remember and use.
 
-![The tidyverse](img/tidyverse_celestial.png){width=50%}
 
 **The following packages are included in the tidyverse:**  
 - *ggplot2*: for data visualisation  
@@ -126,7 +128,6 @@ name_of_data_in_R <- read_tsv("data_file.txt") # tab-separated file
 ```
 
 ## Introducing our first dataset
-We've tried to tailor the workshop to be relevant to the kinds of data many of you said you used in the pre-workshop survey, so we'll start with self-paced reading data (which looks fairly similar to eye-tracking data, another common response), and later use examples of corpus data and a questionnaire output. However, everything we discuss is useful for any kind of data!
 
 Let's read in a self-paced reading dataset (saved in the data folder, so we need to add `data/` to tell R that):
 ```{r}
@@ -186,7 +187,7 @@ If any other columns in your dataframe are read in wrong (for example, if you ha
 
 # (4) The pipe %>% 
 
-One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctr/Cmd + Shift + M) .
+One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctrl/Cmd + Shift + M).
 
 The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first argument, this can be used to string together multiple functions. 
 
@@ -254,7 +255,7 @@ If you make a mistake: arrow with a line under it in the code block of R-Markdow
 
 ## arrange()
 
-There's also a corresponding command that lets you sort by row values: `arrange()`. By default, this sorts by lowest to highest value, but you can add `desc()` to reverse that.
+This command lets you sort by row values: `arrange()`. By default, this sorts by lowest to highest value, but you can add `desc()` to reverse that.
 ```{r}
 spr %>% 
   arrange(RT)
@@ -728,7 +729,8 @@ You can also group by more than one column to return the unique combinations of 
 ```{r}
 spr %>% 
   group_by(condition, animal) %>% 
-  summarize(mean(RT))
+  summarize(mean(RT)) %>% 
+  ungroup()
 ```
 
 
@@ -785,10 +787,9 @@ Now, let's look into how to change the shape of your data. There are two options
   - not (as) common for tidying but for creating summary tables
   - command: `pivot_wider()` (older command: `spread()`)
 
-![Pivot](img/tidyr_spread_gather.png){width=50%}
 
 ## pivot_longer()
-Let's take another look at the questionnaire data.The format it is in is typical for questionnaire data as you would export it from host sites. The data from each person is represented on one line. This can be useful for some operations (like in the `case_when()` we used to create the "preference" variable) but a problem for other applications, so let's tidy this using `pivot_longer`. 
+Let's take another look at the questionnaire data. The format it is in is typical for questionnaire data as you would export it from host sites. The data from each person is represented on one line. This can be useful for some operations (like in the `case_when()` we used to create the "preference" variable) but a problem for other applications, so let's tidy this using `pivot_longer`. 
 Specifically, we have an issue with the dog and cat ratings being in separate columns. Instead, we should have a column called "animal", which contains either "cats" or "dogs", and another column that contains the rating.
 
 The basic `pivot_longer` arguments are:
@@ -827,7 +828,8 @@ animal_corpus %>%
   ungroup() 
 ```
 
-Looks like it's working! However, we'd like to reshape this data into a more typical contingency table-like format, with "cat" and "dog" as row labels, and the collocates as column labels. We can use `pivot_wider()` to achieve this. Its main arguments are:
+Looks like it's working! However, we'd like to reshape this data into a more typical contingency table-like format, with "cat" and "dog" as row labels, and the collocates as column labels.  
+We can use `pivot_wider()` to achieve this. Its main arguments are:
 names_from: where should the new column names come from?
 values_from: where should the corresponding values come from?
 ```{r}
@@ -843,7 +845,8 @@ animal_corpus %>%
 
 
 # (12) Joining several data sets
-Let's add the acceptability judgement data to the SPR data: we want to "join" the two datasets into one, so each sentence should be matched up with its average rating. There are several join commands, which differ in how they match up datasets and which cases are kept or discarded. Their syntax is:
+Let's add the acceptability judgement data to the SPR data: we want to "join" the two datasets into one, so each sentence should be matched up with its average rating. There are several join commands, which differ in how they match up datasets and which cases are kept or discarded. 
+Their syntax is:
 xxxx_join(dataframe1, dataframe2, by = "column that is present in both dfs")
 
 ![Join options, from the data wrangling cheat sheet](img/dplyr-joins.png)
@@ -1116,7 +1119,7 @@ spr_complete %>%
 
 We hope to have provided you with a lot of tools and knowledge today that will help you work with your data! However, it obviously isn't possible to cover all tidyverse functions that might be useful for your own data cleaning and analysis. Similarly, this often isn't as smooth a process as we've presented here today. Sometimes, you're not sure which commands to use, or which arguments a function has, or even which format your data actually needs to be in! This can be a frustrating experience, so we wanted to share some suggestions for how to re-frame negative thoughts and turn them into more positive and encouraging ones:
 
-![Hadley Wickham on how to deal with frustrating problems, from his keynote at the RStudio  conference 2021](img/SelfsoothingR.jpg)
+![Hadley Wickham on how to deal with frustrating problems, from his keynote at the RStudio conference 2021](img/SelfsoothingR.jpg)
 
 ## Function documentations & vignettes
 
@@ -1141,7 +1144,7 @@ Always list and load all packages at the top of your script!
 ## Naming conventions
 Give expressive names to your variables and dataframes/tibbles. Don't just call everything "data", "df", or "variable1", "var1", etc., but use names that immediately tell you what the variable contains.
 Use consistent naming conventions for variables. For example, if you use an underscore to separate words in one multi-word variable name, use the same symbol everywhere.
-Similarly, be consistent with capitalisation - the recommendation here is to use lowercase for all data and variable names to reduce the change of misspelling variables.
+Similarly, be consistent with capitalisation - the recommendation here is to use lowercase for all data and variable names to reduce the chance of misspelling variables.
 
 ## Line breaks
 Throughout these materials, we've been using line breaks after pipes and often also after each argument of a function. This is purely for readability's sake - optional, but highly recommended!
@@ -1149,7 +1152,7 @@ We've also consistently assigned to the dataframe (e.g. spr <- spr %>% some comm
 
 ## Building up code blocks/chaining commands
 When working on a (more) complex data wrangling problem, you'll often need to take several steps towards your goal, i.e. use several commands to arrive at a tidy and workable dataframe. If you're stuck at this step, think about what you want your data to look like, then identify single steps towards that form, then think about how to express each of these in R. It often helps to draw or take notes on paper to better think through this process!
-In terms of actually writing code, ideally also build it up step by step and don't save your changes until you're certain they are what you want. Sometimes, it can also be a good idea not to overwrite the original dataframe but to save it under a different name, e.g. for major restructuring such as pivoting.
+In terms of actually writing code, ideally also build it up step by step and don't save your changes until you're certain they are what you want. Sometimes, it can also be a good idea not to overwrite the original dataframe but to save it under a different name, e.g. for major restructuring such as pivoting or joining.
 
 
 # Additional materials
@@ -1163,7 +1166,7 @@ In terms of actually writing code, ideally also build it up step by step and don
 - `cumsum()`, `cumprod()`, `cummax()`, `cummin()` for cumulative sums, products, minima or maxima
 - `top_n()` for the top results (e.g. to see the five most frequent collocates for each "cat" and "dog")
 - `sample()` or `sample_frac()` to take a random sample from your data, e.g. to extract sentences for qualitative analysis or to test commands on a smaller dataset when working with large data
-- `str_squish()` to remove superfluous whitespace (e.g. "cute      cat") in a string
+- `str_squish()` to remove superfluous whitespace (e.g. "cute     cat") in a string
 - `parse_number()` to extract only numbers from a string (e.g. "USD18" -> "18")
 
 
@@ -1177,6 +1180,4 @@ Check the "more exercises" folder to find:
 
 - [R for Data Science](https://r4ds.had.co.nz/index.html)
 - [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
-
-
 
