@@ -126,6 +126,8 @@ name_of_data_in_R <- read_delim("data_file.csv", delim = ";")
 
 name_of_data_in_R <- read_tsv("data_file.txt") # tab-separated file
 ```
+This works as long as the data file is saved in the same location as this file! You can add e.g. "data/" before the file name if it is located in a subfolder.
+
 
 ## Introducing our first dataset
 
