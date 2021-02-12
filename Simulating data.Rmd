@@ -434,7 +434,7 @@ wh_wh <- wh_split %>%
 
 wh_w <- wh_split %>% 
   filter(str_detect(word, "WH", negate = TRUE)) %>% 
-  filter(word %in% c("WAS", "WE", "WERE", "ONE", "WITH", "WELL", "WAY", "WENT", "WOULD", "ALWAYS", "WINTER", "WASN'T", "WOOD", "QUITE", "WORK", "WARTER", "ONCE", "WE'RE", "WOULDN'T", "WILL"))
+  filter(word %in% c("WAS", "WE", "WERE", "ONE", "WITH", "WELL", "WAY", "WENT", "WOULD", "ALWAYS"))
   
 wh_w %>% 
   group_by(word) %>% 
@@ -442,11 +442,29 @@ wh_w %>%
   arrange(desc(n))
 
 wh_w <- wh_w %>% 
-  sample_n(429)
+  sample_n(334)
 
 wh_small <- bind_rows(wh_w, wh_wh)
 
-wh_syn <- syn(wh_small, maxfaclevels = 110)
+wh_small <- wh_small %>% 
+  select(file, word, fol_sound, harmonicity) %>% 
+  mutate(across(where(is.character), as.factor)) %>% 
+  relocate(file, fol_sound)
 
+wh_syn <- wh_small %>% 
+  select(-file) %>% 
+  syn(maxfaclevels = 40)
 
+wh_final <- wh_syn$syn %>% 
+  mutate(duration = rnorm(668, mean=0.5, sd= 0.2),
+         time = rnorm(668, mean=200, sd=100)) %>% 
+  mutate(duration = abs(duration),
+         time = abs(time),
+         file = wh_small$file) %>% 
+  mutate(harmonicity = if_else(file %in% c("59_1", "78_1", "80_1"),
+                               harmonicity + 12, harmonicity)) %>% 
+  replace_na(list(harmonicity = "--undefined--")) %>% 
+  relocate(file, word, fol_sound)
+
+write_tsv(wh_final, "data/wh_split.txt")
 ```

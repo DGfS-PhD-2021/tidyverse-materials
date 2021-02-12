@@ -1180,6 +1180,12 @@ Check the "more exercises" folder to find:
 
 ## Resources and cheat sheets
 
-- [R for Data Science](https://r4ds.had.co.nz/index.html)
+- [Online book: R for Data Science](https://r4ds.had.co.nz/index.html)
 - [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
+- [Article: Ten Up-To-Date Ways to do Common Data Tasks in R](https://towardsdatascience.com/ten-up-to-date-ways-to-do-common-data-tasks-in-r-4f15e56c92d)
+- [Article: Five Tidyverse Tricks You May Not Know About](https://towardsdatascience.com/five-tidyverse-tricks-you-may-not-know-about-c5026d5a19da)
+- dplyr tutorials: [Part 1](https://www.kaggle.com/jessemostipak/dive-into-dplyr-tutorial-1) and [part 2](https://www.kaggle.com/jessemostipak/dive-deeper-into-dplyr-tutorial-2)
+- [Article: 10 Must-Know Tidyverse Features](https://www.r-bloggers.com/2020/10/10-must-know-tidyverse-features/)
+- [Introductory tutorials on data vis and wrangling in R](https://r-bootcamp.netlify.app/)
+
 

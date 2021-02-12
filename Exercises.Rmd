@@ -9,9 +9,8 @@ The following exercises accompany the Intro to the Tidyverse workshop. Please no
 
 ```{r}
 library(tidyverse)
-
-wh_split <- read_csv("C:/Users/Lenovo/Desktop/wh-split_output_Julia.xls")
 ```
+
 
 ## Exercise block 1
 
@@ -122,8 +121,10 @@ ld <- ld %>%
 nrow(ld)
 ```
 
-
 E\*. The "wh-split" file contains data on the pronunciation of <wh> which can be pronounced as /w/ or /hw/ (the latter variant is more common in the US South and Ireland as well as Scotland). Specifically, the variable of interest is harmonicity, which roughly shows the proportion of voicing to friction. A lower harmonicity value indicates that a pronunciation was closer to "hwhat" than "what" because "hwhat" shows (more) friction noise. Read in this file as "wh_split" and have a look. What kind of information does it contain? What does each row represent?
+```{r}
+wh_split <- read_tsv("data/wh_split.txt")
+```
 
 F\*. Trim down the wh_split data so it only contains the following variables: "file", "time", "word", "fol_sound" (contains the following sound for each word), and "harmonicity".
 
@@ -140,6 +141,7 @@ wh_split <- wh_split %>%
 
 wh_split$harmonicity <- as.numeric(wh_split$harmonicity)
 ```
+
 
 ### Bonus questions - Lexical decision data
 
@@ -249,23 +251,29 @@ pars <- pars %>%
 ```
 
 
-### Bonus questions - phonetic data
+### Bonus questions - Phonetic data
 
-Bonus 1: In the wh_split data, let's create a column that is called "harmonicity_z" and contains the z-scores of "harmonicity". Z-scores are a method to standardize values. Each z-score is shown as how far away from the mean the original value is (more technically, how many standard deviations a value is from the mean). The formula for calculating z-scores for a value is: z-scores = (value - mean of the variable)/standard deviation of the variable.
+Bonus 1: The data in files 29_1 and 29_2 is from Scottish speakers. The rest of the data comes from RP speakers. Create a new column "speaker" that says either contains "Scottish" or "RP".
+```{r}
+wh_split <- wh_split %>% 
+  mutate(speaker = if_else(file %in% c("29_1", "29_2"), "Scottish", "RP"))
+```
+
+Bonus 2: In the wh_split data, let's create a column that is called "harmonicity_z" and contains the z-scores of "harmonicity". Z-scores are a method to standardize values. Each z-score is shown as how far away from the mean the original value is (more technically, how many standard deviations a value is from the mean). The formula for calculating z-scores for a value is: z-scores = (value - mean of the variable)/standard deviation of the variable.
 
 ```{r}
 wh_split <- wh_split %>% 
   mutate(harmonicity_z = (harmonicity-mean(harmonicity))/sd(harmonicity))
 ```
 
-Bonus 2: Narrow down the dataset to words that contain "wh" because these are the only words where variation in pronunciation (/w/ vs, /hw/) can occur. For this, you'll need another function within `filter()`: `str_detect()`. Look up its documentation and only keep words that contain "WH" (the function is case-sensitive!).
+Bonus 3: Narrow down the dataset to words that contain "wh" because these are the only words where variation in pronunciation (/w/ vs, /hw/) can occur. For this, you'll need another function within `filter()`: `str_detect()`. Look up its documentation and only keep words that contain "WH" (the function is case-sensitive!).
 
 ```{r}
 wh_split <- wh_split %>% 
   filter(str_detect(word, "WH"))
 ```
 
-Bonus 3: Create a new column in wh_split called fol_wells that categorises the vowels that follow <wh> according to Wells' lexical sets. Specifically, if the following sound is...
+Bonus 4: Create a new column in wh_split called fol_wells that categorises the vowels that follow <wh> according to Wells' lexical sets. Specifically, if the following sound is...
 
 -   AH1 or AH2: STRUT\
 -   IY1: FLEECE\
@@ -294,7 +302,7 @@ wh_split <- wh_split %>%
 Bonus 4: Create a new column called "stress". In this data, stress is indicated by numbers in the fol_sound column, e.g. EH1: primary stress, EH2: secondary stress, and 0 for unstressed. This is a process with several steps: first, extract just the number (have a look at the documentation for `parse_number()`), convert to a factor, and relabel the categories.
 
 ```{r}
-wh_split %>% 
+wh_split <- wh_split %>% 
   mutate(
     stress = parse_number(fol_sound),
     stress = recode(stress, 
@@ -331,7 +339,10 @@ pars <- pars %>%
   mutate(across(where(is.character), as.factor))
 ```
 
-Bonus 1: Return to the main dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
+
+### Bonus questions - Lexical decision
+
+Return to the ld dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
 
 ```{r}
 ld %>% 
@@ -343,6 +354,26 @@ ld %>%
   group_by(participant) %>% 
   summarize(avgRT = mean(RT)) %>% 
   arrange(desc(avgRT))
+```
+
+### Bonus questions - Phonetic data
+Show the average harmonicity per word. Expand your code to also show the standard deviations associated with the means. Name the columns of the summary table.
+If you completed the previous bonus exercises, also have a go at writing code that gives you the average (z-scored, if you completed that part) harmonicity for stress and/or for the following sound (sorted into Well's sets).
+```{r}
+wh_split %>% 
+  group_by(word) %>% 
+  summarise(harmonicity_mean = mean(harmonicity),
+            harmonicity_sd = sd(harmonicity))
+
+wh_split %>% 
+  group_by(stress) %>% 
+  summarise(harmonicity_mean = mean(harmonicity_z),
+            harmonicity_sd = sd(harmonicity_z))
+
+wh_split %>% 
+  group_by(fol_wells) %>% 
+  summarise(harmonicity_mean = mean(harmonicity_z),
+            harmonicity_sd = sd(harmonicity_z))
 ```
 
 
@@ -382,6 +413,8 @@ pars_long %>%
 ## Exercise block 7
 
 Congratulations, your data is now all prepared and ready for analysis! 
+
+### Lexical decision data
 
 A. As a first step, make a bar chart showing how many data points were collected by participant education level.
 ```{r}
@@ -450,4 +483,46 @@ ggplot(ld_pars) +
        colour = "workshop participation")
 ```
 
+### Phonetic data
+
+A. Create a bar chart showing how many data points were collected per word.
+```{r}
+ggplot(wh_split) +
+  aes(x = word) +
+  geom_bar()
+```
+
+B. Let's see how harmonicity is distributed. Create a histogram and check if it looks normally distributed (like a bell curve). If you completed the bonus exercises, also create a histogram of z-scored harmonicity.
+```{r}
+ggplot(wh_split) +
+  aes(x = harmonicity) +
+  geom_histogram()
+
+ggplot(wh_split) +
+  aes(x = harmonicity_z) +
+  geom_histogram()
+```
+
+C. A good first step to any analysis is to make a boxplot. Create a boxplot showing the distributions of harmonicity (optionally z-scored) by speaker. Do there seem to be differences? Next, add a color argument to show the stress pattern.
+```{r}
+ggplot(wh_split) +
+  aes(x = speaker, y = harmonicity) +
+  geom_boxplot()
+
+ggplot(wh_split) +
+  aes(x = speaker, y = harmonicity, colour = stress) +
+  geom_boxplot()
+```
+
+Bonus: Add `theme_minimal()` to your last plot (or play around with the themes - if you start typing "+ theme_" R will suggest a list of themes, see which one is your favourite). Add labels and a title to make it complete!
+```{r}
+ggplot(wh_split) +
+  aes(x = speaker, y = harmonicity_z, colour = stress) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = "variety",
+       y = "harmonicity (z-scored)",
+       title = "Pronunciation of <wh> by variety and stress pattern",
+       subtitle = "Lower harmonicity: tendency towards 'hw' pronunciation")
+```
 
