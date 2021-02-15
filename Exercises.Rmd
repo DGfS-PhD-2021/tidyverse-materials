@@ -5,7 +5,7 @@ date: "23 2 2021"
 output: html_document
 ---
 
-The following exercises accompany the Intro to the Tidyverse workshop. Please note that exercises marked with an asterisk \* are essential, so if you're pressed for time, focus on those first before you take a look at the other questions.
+The following exercises accompany the Intro to the Tidyverse workshop. Please note that exercises marked with an asterisk \* are essential (generally because these changes are saved and relied on later), so if you're pressed for time, focus on those first before you take a look at the other questions -- or just make sure you get them working when we go over them! 
 
 ```{r}
 library(tidyverse)

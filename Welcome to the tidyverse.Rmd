@@ -6,7 +6,7 @@ output: html_notebook
 **Part of the DGfS PhD students' forum, 23 February 2021**
 
 Instructors: Kyla McConnell and Julia Müller  
-Contact us on Twitter (@McconnellKyla, @JuliaMuellerFr)  
+Contact us on Twitter (@McConnellKyla, @JuliaMuellerFr)  
 
 Unless indicated, artwork is by the wonderful @allison_horst - find her on [github](https://github.com/allisonhorst/stats-illustrations).
 
@@ -286,9 +286,12 @@ spr %>%
 
 # (6) Subsets
 
+Taking a subset allows you to look at only a part of your data: tidyverse uses `select()` for columns and `filter()` for rows.
+
 ## select()
 
-The traditional syntax for dealing with columns is dataframe$column.
+You may have seen the traditional syntax: dataframe$column.
+
 A useful step in using pipes and tidyverse calls is the ability to *select* specific columns. That is, instead of writing `spr$RT` we can write:
 ```{r}
 spr %>% 
@@ -440,7 +443,9 @@ spr %>%
 ```
 Note that filter is case-sensitive, so capitalization matters.
 
-We can also specify several conditions in one `filter()` call, e.g. 
+We can also specify several conditions in one `filter()` call:
+- Use & for "and" (both conditions must be true)
+- Use | for "or" (one condition must be true)
 ```{r}
 spr %>% 
   filter(word == "relative" & RT > 200)
@@ -452,7 +457,7 @@ spr %>%
 We can also "chain" different functions, which is one of the things that makes the pipe so useful. For example, we could filter for data in condition B, which is an incomplete sentence, and only look at the words and their response times:
 ```{r}
 spr %>% 
-  filter(condition == "cond_B_dog") %>% 
+  filter(condition == "condB_dog") %>% 
   select(word, RT)
 ```
 
@@ -462,7 +467,7 @@ You can also add a column name as an argument to return only the unique values i
 
 ```{r}
 spr %>% 
-  filter(condition == "cond_B_dog") %>% 
+  filter(condition == "condB_dog") %>% 
   distinct(sentence)
 ```
 
@@ -592,7 +597,7 @@ Let's look at our third dataset, animal_survey. It contains data from the same p
 animal_survey <- read_csv("data/animal_survey.csv")
 ```
 
-In our animal_survey data, education is represented by numeric codes, 1-4. We could turn these into labels like so:
+In our animal_survey data, education is represented by the numbers 1-4. We can most easily change these labels using `recode()`:
 ```{r}
 (animal_survey <- animal_survey %>% 
   mutate(education = recode(education,
@@ -607,7 +612,11 @@ Because these numbers should be treated as characters, we need to put them in qu
 
 ## If-else-statements
 
-Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`. The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). For example, we could create a column called "RT_short" that contains "short" if the response time is faster than 100 ms and "long" if it isn't:
+Now for something fancy. You can also make new columns based on "if" conditions using the call `ifelse()`.
+
+The syntax of ifelse is: ifelse(this_is_true, this_happens, else_this_happens). 
+
+For example, we could create a column called "RT_short" that contains "short" if the response time is faster than 100 ms and "long" if it isn't:
 
 ```{r}
 spr %>% 
@@ -668,8 +677,11 @@ You can use multiple different operations in the summarize part, including:
 - max(col_name)
 - min(col_name)
 
-So to get the average RTs:
+So to get the average RTs -- note the extra step here to drop NAs, this is only because this dataset has NAs we currently want to ignore.
 ```{r}
+spr <- spr %>% 
+  drop_na(RT)
+
 spr %>% 
   summarise(mean(RT))
 ```
@@ -744,7 +756,7 @@ spr %>%
 You can also group by more than one column to return the unique combinations of the variables.
 ```{r}
 spr %>% 
-  group_by(condition, animal) %>% 
+  group_by(condition, participant) %>% 
   summarize(mean(RT)) %>% 
   ungroup()
 ```
@@ -928,6 +940,13 @@ Remember, something like data type in R (ex: character or factor) can't be saved
 ![ggplot2](img/ggplot2_exploratory.png){width=50%}
 ### The layered grammar of graphics
 ggplot follows the grammar of graphics. 
+
+We have a couple of NAs, lets make sure they're out of the way first. (REmember not to do this without extreme caution on real data, and check the number of rows before and after!)
+```{r}
+spr_complete <- spr_complete %>% 
+  drop_na()
+```
+
 
 Layer 1: Data
 
@@ -1155,7 +1174,7 @@ If you encounter a specific problem but aren't sure which function to use (or if
 
 ## Packages
 When installing new packages, don't put the code for that in your script - you don't want packages to be installed every time you run a script when they're already there.
-Always list and load all packages at the top of your script!
+Always list and load all packages at the top of your script (in the first code block if using an R-Markdown file)!
 
 ## Naming conventions
 Give expressive names to your variables and dataframes/tibbles. Don't just call everything "data", "df", or "variable1", "var1", etc., but use names that immediately tell you what the variable contains.
@@ -1164,7 +1183,7 @@ Similarly, be consistent with capitalisation - the recommendation here is to use
 
 ## Line breaks
 Throughout these materials, we've been using line breaks after pipes and often also after each argument of a function. This is purely for readability's sake - optional, but highly recommended!
-We've also consistently assigned to the dataframe (e.g. spr <- spr %>% some commands) at the beginning of a code block, although it's also possible to do that at the end of the code block. 
+We've also consistently assigned to the dataframe (e.g. spr <- spr %>% some commands) at the beginning of a code block, although it's also possible to do that at the end of the code block, which is not recommended in most cases. 
 
 ## Building up code blocks/chaining commands
 When working on a (more) complex data wrangling problem, you'll often need to take several steps towards your goal, i.e. use several commands to arrive at a tidy and workable dataframe. If you're stuck at this step, think about what you want your data to look like, then identify single steps towards that form, then think about how to express each of these in R. It often helps to draw or take notes on paper to better think through this process!
