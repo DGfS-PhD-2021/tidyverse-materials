@@ -21,8 +21,7 @@ Let's jump right in and load the package:
 library(tidyverse)
 ```
 
-The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to *base-R*) that help you get your data into a useful format (among other things).
-Its commands/functions all have a similar structure and descriptive names to make them easier to remember and use.
+The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to *base-R*) that help you get your data into a useful format (among other things). They all share "an underlying design philosophy, grammar, and data structures", according to the [tidyverse website](https://www.tidyverse.org/). In other words, its commands/functions all have a similar structure and descriptive names to make them easier to remember and use.
 
 
 **The following packages are included in the tidyverse:**  
@@ -191,7 +190,22 @@ If any other columns in your dataframe are read in wrong (for example, if you ha
 
 One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctrl/Cmd + Shift + M).
 
-The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first argument, this can be used to string together multiple functions. 
+The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first argument, this can be used to string together multiple functions. It also makes it easier to read sequential code in a more natural order.
+
+Compare the following lines of pseudocode (courtesy of @andrewheiss), which would produce the same output:
+![Pipe as explained by Andrew Heiss]("img/pipe_andrewheiss.png")
+  
+You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! In a chain of commands like this one, you can think of the pipe as meaning "and then". 
+
+Another example - maybe @hadleywickham's version of a typical morning speaks more to your own experience (it certainly does for us):
+I %>% 
+  tumble(out_of = "bed") %>% 
+  stumble(to = "the kitchen") %>% 
+  pour(who = "myself", unit = "cup", what = "ambition") %>% 
+  yawn() %>% 
+  stretch() %>% 
+  try(come_to_live())
+
 
 So to re-write the `head()` function with the pipe:
 ```{r}
@@ -1180,8 +1194,10 @@ Check the "more exercises" folder to find:
 
 ## Resources and cheat sheets
 
+- [Tidyverse website](https://www.tidyverse.org/)
 - [Online book: R for Data Science](https://r4ds.had.co.nz/index.html)
 - [Collection of cheat sheets](https://rstudio.com/resources/cheatsheets/)
+- [Allison Horst's tidyverse introduction](https://allisonhorst.shinyapps.io/edge-of-the-tidyverse)
 - [Article: Ten Up-To-Date Ways to do Common Data Tasks in R](https://towardsdatascience.com/ten-up-to-date-ways-to-do-common-data-tasks-in-r-4f15e56c92d)
 - [Article: Five Tidyverse Tricks You May Not Know About](https://towardsdatascience.com/five-tidyverse-tricks-you-may-not-know-about-c5026d5a19da)
 - dplyr tutorials: [Part 1](https://www.kaggle.com/jessemostipak/dive-into-dplyr-tutorial-1) and [part 2](https://www.kaggle.com/jessemostipak/dive-deeper-into-dplyr-tutorial-2)
