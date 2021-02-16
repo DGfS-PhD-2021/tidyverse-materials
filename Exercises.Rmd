@@ -126,20 +126,27 @@ E\*. The "wh-split" file contains data on the pronunciation of <wh> which can be
 wh_split <- read_tsv("data/wh_split.txt")
 ```
 
-F\*. Trim down the wh_split data so it only contains the following variables: "file", "time", "word", "fol_sound" (contains the following sound for each word), and "harmonicity".
-
-```{r}
-wh_split <- wh_split %>% 
-  select(file, time, word, fol_sound, harmonicity)
-```
-
-G\*. The "harmonicity" column contains some "--undefined--" cases. Remove those. Because of these cases, R initially treats this column as text ("character"). Convert it to numeric.
+F\*. The "harmonicity" column contains some "--undefined--" cases. Remove those. Because of these cases, R initially treats this column as text ("character"). Convert it to numeric.
 
 ```{r}
 wh_split <- wh_split %>% 
   filter(harmonicity != "--undefined--")
 
 wh_split$harmonicity <- as.numeric(wh_split$harmonicity)
+```
+
+Alternatively, you could tell R that "--undefined--" should be treated as a missing value when reading it in. In that case, you wouldn't have to convert the data type (and because R would correctly recognise it when reading in) and the `filter` command would also have to look a little different to remove the relevant rows.
+```{r}
+wh_split <- read_tsv("data/wh_split.txt", na = "--undefined--")
+
+wh_split <- wh_split %>% 
+  filter(!is.na(harmonicity))
+```
+
+G\*. Trim down the wh_split data so it only contains the following variables: "file", "time", "word", "fol_sound" (contains the following sound for each word), and "harmonicity".
+```{r}
+wh_split <- wh_split %>% 
+  select(file, time, word, fol_sound, harmonicity)
 ```
 
 
