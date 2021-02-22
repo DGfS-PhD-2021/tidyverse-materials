@@ -158,8 +158,7 @@ catdog_spr <- catdog_spr %>%
                             ifelse(word_len > 8, RT + 100,
                                    RT + 200))),
          RT = ifelse(RT < 95, runif(n=n(), min=150, max=470), RT),
-         X1 = 1:nrow(catdog_spr), 
-         RT = round(RT)
+         X1 = 1:nrow(catdog_spr)
                      ) %>% 
   select(X1, participant, item_type, sentence_num, cond, word, RT, full_sentence)
 
@@ -168,14 +167,16 @@ catdog_spr <- catdog_spr  %>%
   mutate(word_num = row_number()) %>%
   ungroup()
 
-corpus_frequencies <- read_tsv("data/corpus_frequencies.csv")
+corpus_frequencies <- read_tsv("../data/corpus_frequencies.csv")
 
-catdog_spr <- left_join(catdog_spr, corpus_frequencies, by = c("word" = "token"))
+catdog_spr <- left_join(catdog_spr, corpus_frequencies, by = c("word" = "token")) %>% 
+  mutate(frequency = ifelse(is.na(frequency), mean(frequency, na.rm = T), frequency))
 
  catdog_spr <- catdog_spr %>% 
   mutate(RT = RT - (log(frequency) * 10)) %>%
    select(-frequency) %>% 
-   mutate(RT = ifelse(RT < 0, abs(RT), RT))
+   mutate(RT = ifelse(RT < 0, abs(RT), RT)) %>% 
+   mutate(RT = round(RT))
 
 participant_data <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "Par_E", "Par_F", "Par_G", "Par_H", "Par_I", "Par_J", "Par_K", "Par_M"),
        age = c(24, 28, 18, 32, 36, 25, 21, 68, 34, 22, 28, 33),
@@ -185,8 +186,8 @@ participant_data <- tibble(participant = c("Par_A", "Par_B", "Par_C", "Par_D", "
        education = c(4, 2, 3, 3, 1, 2, 2, 3, 2, 2, 3, 4),
        preference = c("cats", "cats", "dogs", "cats", "cats", "cats", "dogs", "cats", "cats", "dogs", "cats", "dogs"))
   
-write_csv(catdog_spr, "data/dgfs_spr.csv")
-write_csv(participant_data, "data/dgfs_pars.csv")
+write_csv(catdog_spr, "../data/dgfs_spr.csv")
+write_csv(participant_data, "../data/dgfs_pars.csv")
 ```
 
 ### Check out that everything looks good
@@ -370,7 +371,7 @@ lexicaldec <- tibble(participant = rep(c("AD4", "BH5", "HG8", "LK9", "YU0", "SD2
        item_id = paste("item", rep(1:44, 20), sep="_"), 
        word = rep(ld_words, 20), 
        RT = round(abs(RT))) %>% 
-  mutate(item_id = ifelse(item_id %in% c("item_41", "item_42", "item_43", "item_44"), NA, item_id))
+  mutate(item_id = ifelse(item_id %in% c("item_41", "item_42", "item_43", "item_44"), "practice", item_id))
 
 lexicaldec <- lexicaldec %>% 
   mutate(word_len = nchar(word),
@@ -404,8 +405,8 @@ participant_lex <- tibble(participant = c("AD4", "BH5", "HG8", "LK9", "YU0", "SD
        fave_3 = c("WordCloud2", "viridis", "stringR", "recipes", "CowPlot", "WordCloud2", "viridis", "stringR", "recipes", "CowPlot", "WordCloud2", "viridis", "stringR", "recipes", "CowPlot", "WordCloud2", "viridis", "stringR", "recipes", "CowPlot")
        )
   
-write_csv(lexicaldec, "data/dgfs_lexdec.csv")
-write_csv(participant_lex, "data/dgfs_pars_lexdec.csv")
+write_csv(lexicaldec, "../data/dgfs_lexdec.csv")
+write_csv(participant_lex, "../data/dgfs_pars_lexdec.csv")
 ```
 
 ## Plots

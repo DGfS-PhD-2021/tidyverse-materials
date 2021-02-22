@@ -116,6 +116,8 @@ Don't worry if you don't understand everything in the documentation when you're 
 
 **-- Please work on Exercise block 1 now --**
 
+![say() pumpkin by](img/brownlie.jpg)
+By @E_Brownlie
 
 # (3) Reading in and exploring data
 
@@ -131,7 +133,7 @@ name_of_data_in_R <- read_tsv("data_file.txt") # tab-separated file
 ```
 This works as long as the data file is saved in the same location as this file! You can add e.g. "data/" before the file name if it is located in a subfolder.
 
-One useful additional argument is `na`. This controls how missing values in the file are recognised. By default, these functions assume that missing values are represented by either empty cells or "NA", but if that's not the case, you can tell R that. For example, if missing values are represented by -9 (as can be the case for questionnaire data), you could add `na = "-9"` to a `read()` command.
+One useful additional argument is `na`. This controls how missing values in the file are recognised. By default, these functions assume that missing values are represented by either empty cells or "NA", but if that's not the case, you can tell R that. For example, if missing values are represented by -9 (as can be the case for questionnaire data), you could add `na = "-9"` to a read command.
 
 
 ## Data we'll use today
@@ -140,7 +142,7 @@ One useful additional argument is `na`. This controls how missing values in the 
 - Self-paced reading (dgfs_spr.csv)
 - Corpus (cat_dog_corpus_data.csv, corpus_frequencies.csv)
 - Questionnaire (animal_survey.csv)
-- Acceptability judgements (acceptability_judgements.csv)
+- Acceptability judgments (acceptability_judgements.csv)
 
 We'll introduce each dataset in more detail when we start using it.
 
@@ -337,6 +339,8 @@ spr %>%
 
 Taking a subset allows you to look at only a part of your data: tidyverse uses `select()` for columns and `filter()` for rows.
 
+![Source: Kai Arzheimer](img/kai_arzheimer.jpg){width=50%}
+
 ## select()
 
 You may have seen the traditional syntax: dataframe$column.
@@ -356,12 +360,14 @@ spr %>%
   select(participant, word, RT)
 ```
 
+
 You can see that these columns are presented in the order you gave them to the select call, too:
 
 ```{r}
 spr %>% 
   select(RT, word, participant)
 ```
+
 
 You can also use this to reorder columns in that you give the name of the column(s) you want first, then finish with `everything()` to have all other columns follow:
 
@@ -408,19 +414,20 @@ spr %>%
   select(contains("_"))
 ```
 
-We can also select a range of  variables using a colon. This works both with variables and (a range of) numbers:
+We can also select a range of columns using a colon. This works both with variables and (a range of) numbers:
 ```{r}
 spr %>% 
-  select(condition:word) # shows condition, word_num, word
+  select(condition:RT) 
 
 spr %>% 
-  select(1:3) # first three columns
+  select(1:3)
 ```
 Here, the order of the columns matters!
 
 Other helper functions are:
 - matches: similar to contains, but can use regular expressions
 - num_range: in a dataset with the variables X1, X2, X3, X4, Y1, and Y2, select(num_range("X", 1:3)) returns X1, X2, and X3
+
 
 
 ## filter()
@@ -461,21 +468,28 @@ spr %>%
 Or you can use it to select all items in a given category. Notice here that you have to use quotation marks to show you're matching a character string.
 Look at the error below:
 ```{r}
-#spr %>% 
-  #filter(word == relative)
+# spr %>% 
+#   filter(condition == condA_cat)
 ```
 
 The correct syntax is: (because you're matching to a string)
 ```{r}
 spr %>% 
-  filter(word == "relative")
+  filter(condition == "condA_cat")
 ```
 
 You can also use filter to easily drop rows. Let's drop all practice rows and save the output. 
 ```{r}
+nrow(spr)
+
 spr <- spr %>% 
   filter(condition != "practice")
+
+nrow(spr)
 ```
+
+Useful to check `nrow()` before and after dropping rows to check how much data has been lost.
+
 
 To use %in%, give an array of options (formatted in the correct way based on whether the column is a character or numeric):
 ```{r}
@@ -483,7 +497,7 @@ spr %>%
   filter(word %in% c("cat", "dog"))
 
 spr %>% 
-  filter(sentence_num %in% c(2, 4))
+  filter(sentence_num %in% c(4, 14))
 ```
 Note that filter is case-sensitive, so capitalization matters.
 
@@ -492,10 +506,10 @@ We can also specify several conditions in one `filter()` call:
 - Use | for "or" (one condition must be true)
 ```{r}
 spr %>% 
-  filter(word == "relative" & RT > 200)
+  filter(word == "cat" & RT > 300)
 
 spr %>% 
-  filter(RT > 300 | RT < 150)
+  filter(RT > 600 | RT < 100)
 ```
 
 We can also "chain" different functions, which is one of the things that makes the pipe so useful. For example, we could filter for data in condition B, which is an incomplete sentence, and only look at the words and their response times:
@@ -521,6 +535,20 @@ You can also use it on its own to return unique values or combinations of values
 spr %>% 
   distinct(sentence, condition)
 ```
+You may also have NAs in your data at some point -- these appear when a cell is left empty for any reason. `is.na()` is a useful companion to `filter()`, especially paired with the not operator `!`
+```{r}
+spr %>% 
+  filter(!is.na(RT) & word == "cat")
+```
+
+Or tidyverse has its own version of a remove NA call: `drop_na()` which can be included in pipe sequences
+```{r}
+spr %>% 
+  drop_na(RT)
+```
+
+However, before you drop NAs, think about why they are there and if there is some better way to deal with them. Dropping NAs removes THE ENTIRE ROW that includes an NA (there is no way around this, if you think about it). Before permanently removing NAs, think about if they are indicative of an error you don't want to ignore, if they can be replaced by a usable value (check the `replace_na()` command), and if you want to permanently remove them or just discard those rows for some parts of the analysis. Always check the number of rows before and after removing NAs (`nrow()`).
+
 
 **-- Please work on Exercise block 3 now --**
 
@@ -600,8 +628,8 @@ data %>% mutate(col_name = some_operation).
 
 The response times are measured in ms. Let's convert them to seconds by dividing by 1000:
 ```{r}
-(spr <- spr %>% 
-  mutate(RT_s = RT / 1000))
+spr %>% 
+  mutate(RT_s = RT / 1000)
 ```
 Now, there's a new column called RT_s (it's at the very end by default).
 
@@ -617,6 +645,11 @@ You can also do operations to character columns - for example:
   mutate(word = tolower(word)))
 ```
 
+We can also easily calculate the length of each word (as number of characters):
+```{r}
+(spr <- spr %>% 
+  mutate(word_length = nchar(word)))
+```
 
 ## Change data type in a column
 
@@ -629,24 +662,27 @@ We can also change data types using `mutate()`. Instead of the code we used earl
 As you can see, we can change several variables within one `mutate()` call. In the same way, we could create several new columns at the same time. 
 
 ## Relabel factors
-In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is old label = "new label".
+In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is "old label" = "new label".
 ```{r}
 (spr <- spr %>% 
   mutate(condition = recode(condition, 
-                            condA = "match", condB = "mismatch")))
+                            "condA" = "match", "condB" = "mismatch")))
 ```
 
 Let's look at our third dataset, animal_survey. It contains data from the same participants who answered a few sociodemographic questions and also indicated how cute they think animals are, how much they('d) like look at, pet, and own an animal (scale: 1-5). Besides that, they were also asked to rate cats and dogs (scale: 1-7).
 ```{r}
 animal_survey <- read_csv("data/animal_survey.csv")
+
+animal_survey %>% 
+  head()
 ```
 
 In our animal_survey data, education is represented by the numbers 1-4. We can most easily change these labels using `recode()`:
 ```{r}
 (animal_survey <- animal_survey %>% 
   mutate(education = recode(education,
-                            "1" = "elementary school",
-                            "2" = "high school",
+                            "1" = "Elementary school",
+                            "2" = "High school",
                             "3" = "Bachelor's degree",
                             "4" = "Master's degree or higher"
                             )))
@@ -664,8 +700,7 @@ For example, we could create a column called "RT_short" that contains "short" if
 
 ```{r}
 spr %>% 
-  mutate(RT_short = ifelse(RT < 100, "short", "long")) %>% 
-  select(RT, RT_short)
+  mutate(RT_cat = ifelse(RT < 100, "short", "long"))
 ```
 
 You can also use ifelse on categorical / character columns:
@@ -685,17 +720,18 @@ condition ~ what to do if it is true (can be used as often as you want and can e
 TRUE ~ what to do in all other cases.
 ```{r}
 spr %>% 
-  mutate(RT_category = case_when(
+  mutate(RT_cat = case_when(
     RT < 100 ~ "short",
     RT > 500 ~ "long",
     TRUE ~ "normal"
-  )) %>% 
-  select(RT, RT_category)
+  )) 
 ```
 
 
 Another example: In the questionnaire, participants were asked to indicate how much they like cats and dogs, respectively. We can convert this information into a category. To create a variable called "preference", we can use the following `case_when()` statement:
 ```{r}
+head(animal_survey)
+
 (animal_survey <- animal_survey %>% 
   mutate(preference = case_when(
     cats > dogs ~ "cats",
@@ -720,11 +756,8 @@ You can use multiple different operations in the summarize part, including:
 - max(col_name)
 - min(col_name)
 
-So to get the average RTs -- note the extra step here to drop NAs, this is only because this dataset has NAs we currently want to ignore.
+Note that if you have NAs in your dataset, you would have to at least temporarily drop them to calculate the mean (could pipe in `drop_na()`, then you wouldn't have to drop any rows)
 ```{r}
-spr <- spr %>% 
-  drop_na(RT)
-
 spr %>% 
   summarise(mean(RT))
 ```
@@ -748,7 +781,7 @@ In our SPR experiment, we showed matching and mismatching collocate + cat/dog co
 To look at summary statistics for specific groupings like these, we have to use a two- (more like three-) step process. 
 
 First, group by your grouping variable (here: condition) using `group_by()`
-Then, summarize, which creates a column based on a transformation to another column, using `summarize()` or `summarise()`
+Then, summarize, which creates returns a summary statistic over multiple rows, using `summarize()` or `summarise()`
 Finally, ungroup (so that R forgets that this is a grouping and carries on as normal, with `ungroup()`
 Usually this makes no difference to what you see but is an important fail-safe if you're continuing in the code block. For example, if you need to drop the former grouping variable and don't use `ungroup()`, R will refuse to drop it.
 
@@ -778,6 +811,15 @@ spr %>%
   ungroup()
 ```
 
+You can also group by more than one column to return the unique combinations of the variables.
+```{r}
+spr %>% 
+  group_by(condition, animal) %>% 
+  summarize(mean(RT)) %>% 
+  ungroup()
+```
+
+
 ## count()
 For categorical columns, you can also count how many rows are in each category using `count()` instead of `summarize()`. Here, we're counting how often which word appeared in the experiment. The count is displayed in the new "n" column:
 ```{r}
@@ -795,15 +837,6 @@ spr %>%
   ungroup() %>% 
   arrange(desc(n))
 ```
-
-You can also group by more than one column to return the unique combinations of the variables.
-```{r}
-spr %>% 
-  group_by(condition, participant) %>% 
-  summarize(mean(RT)) %>% 
-  ungroup()
-```
-
 
 # (10) across()
 
@@ -984,13 +1017,6 @@ Remember, something like data type in R (ex: character or factor) can't be saved
 ### The layered grammar of graphics
 ggplot follows the grammar of graphics. 
 
-We have a couple of NAs, lets make sure they're out of the way first. (Remember not to do this without extreme caution on real data, and check the number of rows before and after!)
-```{r}
-spr_complete <- spr_complete %>% 
-  drop_na()
-```
-
-
 Layer 1: Data
 
 You can see, at this stage we have, well... nothing!
@@ -1021,6 +1047,7 @@ ggplot(data = spr_complete) +
 
 #### For one variable
 
+*One categorical variable* 
 Bar charts show how many rows are in each group, like above.
 
 ```{r}
@@ -1029,20 +1056,15 @@ ggplot(data = spr_complete) +
   geom_bar()
 ```
 
+*One continuous/numeric variable* 
 To show the distribution of one continuous variable, a histogram is useful. Histograms take a continuous variable and divide it into *bins*. 
 ```{r histogram}
 ggplot(data = spr_complete) +
   aes(x = RT) +
-  geom_histogram()
+  geom_histogram() #try bins=50
 ```
 
 R warns you that it has simply used the default number of bins (30).  However, you can change this and see how it changes your idea of the distribution. Change this with the argument `bins=` inside of the geom_histogram()
-
-```{r}
-ggplot(data = spr_complete) +
-  aes(x = RT) +
-  geom_histogram(bins = 50)
-```
 
 Density plots are a variation of histograms where a smooth line instead of separate bars is drawn. This can be useful for a larger number of data points but can also hide some nuance.
 ```{r density plot}
@@ -1054,31 +1076,32 @@ ggplot(data = spr_complete) +
 
 #### For two variables
 
+*Two continuous variables* 
 For two continuous variables, we can use a scatterplot with `geom_point()` to show one dot per data point, defined against two continuous axes, like we saw in the example.
 
 ```{r}
 ggplot(data = spr_complete) +
-  aes(x = RT, y = log(frequency)) +
-  geom_point() 
+  aes(x = word_length, y = log(frequency)) +
+  geom_point()
 ```
 
 We can also use a (smoothed) line to represent the same data:
 ```{r}
 ggplot(data = spr_complete) +
-  aes(x = RT, y = log(frequency)) +
-  geom_smooth() 
+  aes(x = word_length, y = log(frequency)) +
+  geom_smooth() #try method ="lm"
 ```
 
 Here comes the cool part about ggplot.. you can also do both at the same time! Simply add both geoms to the same plot:
 
 ```{r}
 ggplot(data = spr_complete) +
-  aes(x = RT, y = log(frequency)) +
+  aes(x = word_length, y = log(frequency)) +
   geom_point() +
   geom_smooth()
 ```
 
-
+*One continuous, one categorical variable* 
 In the boxplot below, the thick line in the middle is the median, the bottom of the box is the 1st Quartile and the lines reach up to the minimum and maximum values (shown as dots if they are extreme, i.e. they are outside of 1.5x the range from 1st to 3rd quartile: the interquartile range).
 
 ```{r boxplot}
@@ -1110,12 +1133,12 @@ ggplot(data = spr_complete) +
 Fill is used for filling in larger spaced like entire bars. Color is used for smaller sections like dots or lines. 
 
 ### colour
-Let's return to one of the first plots we made. Here, we can add a color argument to the *geom* call that calls a normal color (*in quotes*). This will make all the points this color. 
+Let's return to our boxplot of RTs by condition. Here, we can add a color argument to the *geom* call that calls a normal color (*in quotes*). This will make the lines of the boxplot that color.
 Note: if you know what hex codes are (or just use a hex code finder online), you can use all sorts of custom colors.
 ```{r}
 ggplot(data = spr_complete) +
   aes(x = condition, y = RT) +
-  geom_boxplot(color= "pink")
+  geom_boxplot(color = "pink")
 ```
 
 However, we can also use the color argument to introduce a third variable into the picture. If we are calling a variable/column, we do *not* need quotes AND we need to put it in the *aes* part of the call, becuase it is a -mapping- not a simple color.
@@ -1136,10 +1159,16 @@ ggplot(data = spr_complete) +
 Bar charts and other charts with pretty large open spaces usually need fill. Fill works the same as color in that it can either go *inside aes() as a mapping* or *inside the geom, with quotes, as a plain color*.
 ```{r}
 ggplot(data = spr_complete) +
-  aes(x = education, fill = gender) +
+  aes(x = education, fill = education) +
   geom_bar()
 ```
 
+Or (as with color), use it to introduce a new variable.
+```{r}
+ggplot(data = spr_complete) +
+  aes(x = education, fill = gender) +
+  geom_bar() #try position="dodge" and/or show.legend=FALSE
+```
 
 Bar plots can actually also take color, but this affects the color of the lines only:
 ```{r}
@@ -1183,12 +1212,11 @@ spr_complete %>%
 And naturally, edit the dataframe before using any of the commands above!
 ```{r}
 spr_complete %>% 
-  filter(education != "elementary school") %>% 
+  filter(education != "Elementary school") %>% 
   ggplot() +
   aes(x = education, fill = gender) +
   geom_bar()
 ```
-
 
 **-- Please work on exercise block 7 now--**
 
