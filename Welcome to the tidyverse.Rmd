@@ -42,10 +42,10 @@ The tidyverse is an extremely useful collection of R *packages* (i.e. add-ons to
 ![What does tidy data look like?](img/tidydata_1.jpg){width=50%}
 
 **Why this format?**  
-- a lot of wrangling commands are based on the assumption that your data is tidy 
-- is expected for many statistical models
-- works best for plotting 
+- Best format for most operations in R, especially plotting and running statistical models
 - Hadley Wickham: "Tidy datasets are all alike, but every messy dataset is messy in its own way" 
+- Tools/commands that work for one tidy dataset will also work for another tidy dataset
+- By getting the data in a tidy format, you can spend more time on the actual analysis
 
 ![Why use tidy data?](img/tidydata_3.jpg){width=50%}
 
@@ -195,7 +195,7 @@ One of the most noticeable features of the tidyverse is the pipe %>% (keyboard s
 The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first argument, this can be used to string together multiple functions. It also makes it easier to read sequential code in a more natural order.
 
 Compare the following lines of pseudocode (courtesy of @andrewheiss), which would produce the same output:
-![Pipe as explained by Andrew Heiss]("img/pipe_andrewheiss.png")
+![Pipe as explained by Andrew Heiss]("img/pipe_andrewheiss.jpg")
   
 You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! In a chain of commands like this one, you can think of the pipe as meaning "and then". 
 
