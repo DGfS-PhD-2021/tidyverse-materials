@@ -1,6 +1,11 @@
 ---
 title: "Welcome to the tidyverse!"
-output: html_notebook
+output:
+  html_document:
+    theme: cosmo
+    highlight: tango
+    toc: true
+    toc_float: true
 ---
 
 **Part of the DGfS PhD students' forum, 23 February 2021**
@@ -1043,6 +1048,9 @@ ggplot(data = spr_complete) +
   geom_bar()
 ```
 
+![Axis labels](img/axes.jpg){width=50%}
+Source unknown.
+
 ### Other geoms
 
 #### For one variable
@@ -1220,6 +1228,9 @@ spr_complete %>%
 
 **-- Please work on exercise block 7 now--**
 
+![ggplot masterpiece](img/ggplot2_masterpiece.png){width=50%}
+
+And if you're looking for something new, check out the [R Graph Gallery](https://www.r-graph-gallery.com)
 
 # (15) Getting help
 
@@ -1292,6 +1303,7 @@ The folder "advanced_pivoting_exercise" contains an exercise that covers a lot o
 - [Article: Data Vis for Likert Questions](https://lmudge13.github.io/sample_code/likert_graphs.html)
 - [Making Vowel Plots in R](https://joeystanley.com/blog/making-vowel-plots-in-r-part-1)
 - [Danielle Navarro's Youtube playlist on R-Markdown](https://www.youtube.com/playlist?list=PLRPB0ZzEYegM86awo590bP1MJjQbjdR9E)
+- [R Graph Gallery](https://www.r-graph-gallery.com)
 
 
 ![Hopefully, you feel a lot closer to the second picture than when we started!](img/r_first_then.png)

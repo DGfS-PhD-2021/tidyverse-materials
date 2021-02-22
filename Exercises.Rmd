@@ -6,7 +6,7 @@ output: html_document
 ---
 
 The following exercises accompany the Intro to the Tidyverse workshop. Please note that exercises marked with an asterisk \* are essential (generally because these changes are saved and relied on later), so if you're pressed for time, focus on those first before you take a look at the other questions -- or just make sure you get them working when we go over them! 
-
+Make sure to load in the tidyverse package to get started!
 ```{r}
 library(tidyverse)
 ```
@@ -47,58 +47,36 @@ For the next exercises, you'll work with a file called "dgfs_lexdec.csv" (it's s
 A\*. Read in your data and take a look at the first 10 rows. What are the column names? What kind of information does each column contain?
 
 ```{r}
-ld <- read_csv("data/dgfs_lexdec.csv")
 
-head(ld, n = 10)
 ```
 
 B\*. Some of these columns should definitely be factors. Identify which columns contain grouping information and change the data type to factor.
 
 ```{r}
-ld$participant <- as.factor(ld$participant)
-ld$order <- as.factor(ld$order)
-ld$condA <- as.factor(ld$condA)
-ld$condB <- as.factor(ld$condB)
-ld$item_id <- as.factor(ld$item_id)
+
 ```
 
 C. Look at summaries of the columns you changed above to answer the following questions: How many participants are included in this experiment? How many had attended the R workshop? How many items were included in each condition?
 
 ```{r}
-summary(ld$participant)
 
-summary(ld$condA)
-
-summary(ld$condB)
-
-summary(ld$item_id)
 ```
 
 D\*. The column names "condA" and "condB" are slightly confusing. Rename them so that "condA" is called "par_group" and "condB" is "word_cond". Make sure to save your output to use below!
 
 ```{r}
-ld <- ld %>% 
-  rename(par_group = condA,
-         word_cond = condB)
+
 ```
 
 E. Let's see what the longest and shortest response times were. Sort the dataframe by RT, first ascending, then descending.
 
 ```{r}
-ld %>% 
-  arrange(RT)
 
-ld %>% 
-  arrange(desc(RT))
 ```
 
 F. Sort by word_cond and then by word. Try to sort word in reverse alphabetical order.
 ```{r}
-ld %>% 
-  arrange(word_cond, word)
 
-ld %>% 
-  arrange(word_cond, desc(word))
 ```
 
 
@@ -107,54 +85,40 @@ ld %>%
 A\*. The "row" column is really just a side effect of how the data was read in by your experimental control software. Go ahead and drop that column and save the result.
 
 ```{r}
-ld <- ld %>% 
-  select(-row)
+
 ```
 
 B\*. Participants completed 4 practice items before they started the experiment. You don't want these to be included in your analysis, since participants were just getting used to the format. Use filter to drop the rows in the condition "practice" and save.
 
 ```{r}
-ld <- ld %>% 
-  filter(word_cond != "practice")
+
 ```
 
 C\*. It seems hard to believe that participants could recognize either a word or a package name in under 250ms. Filter the dataset to permanently remove any rows with an RT under this threshold. Bonus: Run `nrow(ld)` both before and after filtering and report how many rows were removed.
 
 ```{r}
-nrow(ld)
 
-ld <- ld %>% 
-  filter(RT > 250)
-
-nrow(ld)
 ```
 
 E\*. The "wh-split" file contains data on the pronunciation of <wh> which can be pronounced as /w/ or /hw/ (the latter variant is more common in the US South and Ireland as well as Scotland). Specifically, the variable of interest is harmonicity, which roughly shows the proportion of voicing to friction. A lower harmonicity value indicates that a pronunciation was closer to "hwhat" than "what" because "hwhat" shows (more) friction noise. Read in this file as "wh_split" and have a look. What kind of information does it contain? What does each row represent?
 ```{r}
-wh_split <- read_tsv("data/wh_split.txt")
+
 ```
 
 F\*. The "harmonicity" column contains some "--undefined--" cases. Remove those. Because of these cases, R initially treats this column as text ("character"). Convert it to numeric.
 
 ```{r}
-wh_split <- wh_split %>% 
-  filter(harmonicity != "--undefined--")
 
-wh_split$harmonicity <- as.numeric(wh_split$harmonicity)
 ```
 
 Alternatively, you could tell R that "--undefined--" should be treated as a missing value when reading it in. In that case, you wouldn't have to convert the data type (and because R would correctly recognise it when reading in) and the `filter` command would also have to look a little different to remove the relevant rows.
 ```{r}
-wh_split <- read_tsv("data/wh_split.txt", na = "--undefined--")
 
-wh_split <- wh_split %>% 
-  filter(!is.na(harmonicity))
 ```
 
-G\*. Trim down the wh_split data so it only contains the following variables: "file", "time", "word", "fol_sound" (contains the following sound for each word), and "harmonicity".
+G\*. Drop some columns from the wh_split data so it only contains: "file", "time", "word", "fol_sound" (contains the following sound for each word), and "harmonicity".
 ```{r}
-wh_split <- wh_split %>% 
-  select(file, time, word, fol_sound, harmonicity)
+
 ```
 
 
@@ -163,16 +127,13 @@ wh_split <- wh_split %>%
 Bonus 1: What is the range of word lengths presented in the lexical decision experiment? Select only the word_len column and pipe it to the `range()` command to show the minimum and maximum values.
 
 ```{r}
-ld %>% 
-  select(word_len) %>% 
-  range()
+
 ```
 
 Bonus 2: Return some information about the words used in the lexical decision experiment by selecting columns that contain "word". Hint: try the `contains()` helper function.
 
 ```{r}
-ld %>% 
-  select(contains("word")) 
+
 ```
 
 Bonus 3: Run the following ggplot code to look at a boxplot of each participant's response times. One participant seems to be consistently slower. Filter the dataset to show just this participant (don't save!) and see if anything fishy is going on.
@@ -180,23 +141,19 @@ Bonus 3: Run the following ggplot code to look at a boxplot of each participant'
 ggplot(data=ld) + aes(x=participant, y=RT, color=participant) + geom_boxplot(show.legend=FALSE)
 
 ```{r}
-ld %>% 
-  filter(participant == "NG2")
+
 ```
 
 Bonus 4: You forgot to write down which participants were in which group. Find the distinct combinations of participants and par_groups and see if you can recreate this information. Save the table to a new variable called "participant_groups".
 
 ```{r}
-participant_groups <- ld %>% 
-  distinct(participant, par_group)
+
 ```
 
 Bonus 5: What are the longest words that were presented in this experiment? Filter the dataframe to include only words with more than 11 letters and return the distinct words in this subset.
 
 ```{r}
-ld %>% 
-  filter(word_len > 11) %>% 
-  distinct(word)
+
 ```
 
 
@@ -205,41 +162,25 @@ ld %>%
 A\*. The information you have about conditions is two-fold: whether the participant was in the R package block (package/word) and whether the current item was valid or invalid (foil/true). It would be more helpful for the analysis to have these in separate columns. Separate them into two new columns: "condition" and "item_type". Then, convert the new columns to factors and be sure to save!
 
 ```{r}
-ld <- ld %>% 
-  separate(word_cond, 
-           into = c("condition", "item_type"),
-           sep = "_") %>% 
-  mutate(condition = as.factor(condition),
-         item_type = as.factor(item_type))
+
 ```
 
 B. We all realize that tidyverse is the best package in R. Create a new column called "best_package" and use an if-else statement to fill this with "yes" for tidyverse, and "no" for all other packages. (Okay, you don't have to save this one...)
 
 ```{r}
-ld %>% 
-  mutate(best_package = ifelse(word == "tidyverse", "yes", "no"))
+
 ```
 
 C\*. The word column is a little bit messy. First of all, there is a mix of capital and lowercase letters. Use mutate to convert all words in this column to lowercase (and save).
 
 ```{r}
-ld <- ld %>% 
-  mutate(word = tolower(word))
+
 ```
 
 D\*. In a separate table, you have collected participant data. Read in this file ("data/dgfs_pars_lexdec.csv") and take a look. The education column is a little difficult to understand. Change the factor labels to show that 1 is "no high school", 2 is "high school", 3 is "technical school", 4 is "university degree" and 5 is "graduate school degree"
 
 ```{r}
-pars <- read_csv("data/dgfs_pars_lexdec.csv")
 
-pars <- pars %>% 
-  mutate(education = recode(education,
-                            "1" = "no high school",
-                            "2" = "high school",
-                            "3" = "technical school",
-                            "4" = "university degree",
-                            "5" = "graduate school degree"
-                            ))
 ```
 
 
@@ -251,19 +192,13 @@ For the following bonus questions, you can choose whether you'd like to work wit
 Bonus 1: There are also quotation marks in the word column. A useful command is `str_remove_all()`. Check out the documentation and see if you can use mutate and str_remove_all to remove all single quotation marks.
 
 ```{r}
-ld <- ld %>% 
-  mutate(word = str_remove_all(word, "'"))
+
 ```
 
 Bonus 2: The r_interest column shows how much a participant reported being interested in R programming, on a scale of 1-10. However, this information is a little fine-grained. Let's combine it into a categorical variable, where 1-4 is "low", 5-7 is "medium" and 8-10 is "high". Save this as a new column called "r_cat" so that we preserved both, and make sure it's saved as a factor.
 
 ```{r}
-pars <- pars %>% 
-  mutate(r_cat = case_when(
-    r_interest < 5 ~ "low", 
-    r_interest > 7 ~ "high",
-    TRUE ~ "medium"
-  ))
+
 ```
 
 
@@ -271,22 +206,19 @@ pars <- pars %>%
 
 Bonus 1: The data in files 29_1 and 29_2 is from Scottish speakers. The rest of the data comes from RP speakers. Create a new column "speaker" that says either contains "Scottish" or "RP".
 ```{r}
-wh_split <- wh_split %>% 
-  mutate(speaker = if_else(file %in% c("29_1", "29_2"), "Scottish", "RP"))
+
 ```
 
 Bonus 2: In the wh_split data, let's create a column that is called "harmonicity_z" and contains the z-scores of "harmonicity". Z-scores are a method to standardize values. Each z-score is shown as how far away from the mean the original value is (more technically, how many standard deviations a value is from the mean). The formula for calculating z-scores for a value is: z-scores = (value - mean of the variable)/standard deviation of the variable.
 
 ```{r}
-wh_split <- wh_split %>% 
-  mutate(harmonicity_z = (harmonicity-mean(harmonicity))/sd(harmonicity))
+
 ```
 
 Bonus 3: Narrow down the dataset to words that contain "wh" because these are the only words where variation in pronunciation (/w/ vs, /hw/) can occur. For this, you'll need another function within `filter()`: `str_detect()`. Look up its documentation and only keep words that contain "WH" (the function is case-sensitive!).
 
 ```{r}
-wh_split <- wh_split %>% 
-  filter(str_detect(word, "WH"))
+
 ```
 
 Bonus 4: Create a new column in wh_split called fol_wells that categorises the vowels that follow <wh> according to Wells' lexical sets. Specifically, if the following sound is...
@@ -301,32 +233,13 @@ Bonus 4: Create a new column in wh_split called fol_wells that categorises the v
 Convert this new variable to a factor.
 
 ```{r}
-wh_split <- wh_split %>% 
-  mutate(
-    fol_wells = case_when(
-    fol_sound %in% c("AH1", "AH2") ~ "STRUT",
-    fol_sound == "IY1"  ~ "FLEECE",
-    fol_sound %in% c("EH0", "EH1", "EH2") ~ "DRESS",
-    fol_sound == "ER1" ~ "NURSE",
-    fol_sound == "IH1" ~ "KIT",
-    fol_sound == "AY1" ~ "PRICE"  
-    ),
-    fol_wells = as_factor(fol_wells)
-  )
+
 ```
 
 Bonus 4: Create a new column called "stress". In this data, stress is indicated by numbers in the fol_sound column, e.g. EH1: primary stress, EH2: secondary stress, and 0 for unstressed. This is a process with several steps: first, extract just the number (have a look at the documentation for `parse_number()`), convert to a factor, and relabel the categories.
 
 ```{r}
-wh_split <- wh_split %>% 
-  mutate(
-    stress = parse_number(fol_sound),
-    stress = recode(stress, 
-                    "0" = "unstressed",
-                    "1" = "primary",
-                    "2" = "secondary"),
-    stress = as_factor(stress)
-  )
+
 ```
 
 
@@ -335,24 +248,19 @@ wh_split <- wh_split %>%
 A. Using the numeric "r_interest" column in the participant data, group by gender and summarize the average interest in R across your participants. Is there a difference?
 
 ```{r}
-pars %>% 
-  group_by(gender) %>% 
-  summarize(mean(r_interest))
+
 ```
 
 B. In the lexical decision data, take a first look at the differences between conditions. Group by both item_type and par_group and return the average RT for each combination.
 
 ```{r}
-ld %>% 
-  group_by(item_type, par_group) %>% 
-  summarize(mean(RT))
+
 ```
 
 C\*. The participant info dataframe needs some columns converted to factor. Convert all character columns to factors using `across()`
 
 ```{r}
-pars <- pars %>% 
-  mutate(across(where(is.character), as.factor))
+
 ```
 
 
@@ -364,35 +272,14 @@ For the following bonus questions, you can choose whether you'd like to work wit
 Return to the ld dataframe and take a look at the average response time per participant. Arrange the dataframe to answer: which participants are the fastest? Which are slowest? It will be helpful to arrange if you give the summary column a name.
 
 ```{r}
-ld %>% 
-  group_by(participant) %>% 
-  summarize(avgRT = mean(RT)) %>% 
-  arrange(avgRT)
 
-ld %>% 
-  group_by(participant) %>% 
-  summarize(avgRT = mean(RT)) %>% 
-  arrange(desc(avgRT))
 ```
 
 ### Bonus questions - Phonetic data
 Show the average harmonicity per word. Expand your code to also show the standard deviations associated with the means. Name the columns of the summary table.
 If you completed the previous bonus exercises, also have a go at writing code that gives you the average (z-scored, if you completed that part) harmonicity for stress and/or for the following sound (sorted into Well's sets).
 ```{r}
-wh_split %>% 
-  group_by(word) %>% 
-  summarise(harmonicity_mean = mean(harmonicity),
-            harmonicity_sd = sd(harmonicity))
 
-wh_split %>% 
-  group_by(stress) %>% 
-  summarise(harmonicity_mean = mean(harmonicity_z),
-            harmonicity_sd = sd(harmonicity_z))
-
-wh_split %>% 
-  group_by(fol_wells) %>% 
-  summarise(harmonicity_mean = mean(harmonicity_z),
-            harmonicity_sd = sd(harmonicity_z))
 ```
 
 
@@ -401,148 +288,83 @@ wh_split %>%
 A\*. Join the original participant data frame to the lexical decision data. Call the resulting dataframe "ld_pars".
 
 ```{r}
-ld_pars <- full_join(ld, pars, by = "participant")
+
 ```
 
 B. Have another look at the "pars" data. The last three columns contain each person's three most favourite R packages. Pivot the data so that instead, there's a column called "position" which contains "fave_1", "fave_2", and "fave_3", and a column called "package" which contains the package names. Call that dataframe "pars_long".
 
 ```{r}
-pars_long <- pars %>% 
-  pivot_longer(
-    cols = c(fave_1, fave_2, fave_3),
-    names_to = "position",
-    values_to = "package"
-  )
+
 ```
 
 C. Continue working with the "pars_long" data you just created. Make a summary table that shows how often each package is named in each position. Then, pivot this table so that the position is shown as row labels and the packages are shown as column labels.
 
 ```{r}
-pars_long %>% 
-  group_by(position) %>% 
-  count(package) %>% 
-  ungroup() %>% 
-  pivot_wider(
-    names_from = package,
-    values_from = n
-  )
+
 ```
 
 
 ## Exercise block 7
 
-Congratulations, your data is now all prepared and ready for analysis! For this set of exercises, you can choose whether you'd like to work with the lexical decision or the phonetic data.
-
-
-### Lexical decision data
+Congratulations, your data is now all prepared and ready for analysis! Start with the lexical decision data, or do the bonus questions for the phonetic data.
 
 A. As a first step, make a bar chart showing how many data points were collected by participant education level.
 ```{r}
-ggplot(ld_pars) +
-  aes(x = education) +
-  geom_bar()
+
 ```
 
 
 B. Let's see how the RTs look. Are they normally distributed (like a bell curve)? Make a histogram of RTs and take a look.
 ```{r}
-ggplot(ld_pars) +
-  aes(x = RT) +
-  geom_histogram()
+
 ```
 
 C. A good first step to any analysis is to make a boxplot. Create a boxplot showing the distributions of RT by condition. Add a color argument to show the participant group. Do there seem to be differences?
 ```{r}
-ggplot(ld_pars) +
-  aes(x = condition, y = RT, colour = par_group) +
-  geom_boxplot()
+
 ```
 
-
+### Bonus questions - Lexical decision
 Bonus 1: Add a fill argument to your plot from A that adds information about participant gender. Try to figure out how to have the bars next to each other (i.e. separate bars per gender category) instead of stacked.
 ```{r}
-ggplot(ld_pars) +
-  aes(x = education, fill = gender) +
-  geom_bar(position="dodge")
+
 ```
 
 
 Bonus 2: Take your histogram from B and color it entirely pink. Make the lines purple.
 ```{r}
-ggplot(ld_pars) +
-  aes(x = RT) +
-  geom_histogram(colour = "purple", fill = "pink")
+
 ```
 
 Bonus 3: Take your boxplot from C and add a violin plot BEHIND the boxplot. Try adding `alpha = 0.5` to the boxplot geom to make it more transparent.
 ```{r}
-ggplot(ld_pars) +
-  aes(x = condition, y = RT, colour = par_group) +
-  geom_violin() +
-  geom_boxplot(alpha = 0.5)
+
 ```
 
 Bonus 4: Add `theme_minimal()` to any plot above to change the overall look. Add labels to make your plots complete!
 ```{r}
-ggplot(ld_pars) +
-  aes(x = education, fill = gender) +
-  geom_bar(position="dodge") +
-  theme_minimal() +
-  labs(x = "level of education",
-       y = "number of data points",
-       title = "Participants by education and gender")
 
-ggplot(ld_pars) +
-  aes(x = condition, y = RT, colour = par_group) +
-  geom_violin() +
-  geom_boxplot(alpha = 0.5) +
-  theme_minimal() +
-  labs(x = "condition",
-       y = "reaction times (in ms)",
-       title = "Reaction times by condition and workshop participation",
-       colour = "workshop participation")
 ```
 
-### Phonetic data
+### Bonus questions - Phonetic data
 
 A. Create a bar chart showing how many data points were collected per word.
 ```{r}
-ggplot(wh_split) +
-  aes(x = word) +
-  geom_bar()
+
 ```
 
 B. Let's see how harmonicity is distributed. Create a histogram and check if it looks normally distributed (like a bell curve). If you completed the bonus exercises, also create a histogram of z-scored harmonicity.
 ```{r}
-ggplot(wh_split) +
-  aes(x = harmonicity) +
-  geom_histogram()
 
-ggplot(wh_split) +
-  aes(x = harmonicity_z) +
-  geom_histogram()
 ```
 
 C. A good first step to any analysis is to make a boxplot. Create a boxplot showing the distributions of harmonicity (optionally z-scored) by speaker. Do there seem to be differences? Next, add a color argument to show the stress pattern.
 ```{r}
-ggplot(wh_split) +
-  aes(x = speaker, y = harmonicity) +
-  geom_boxplot()
 
-ggplot(wh_split) +
-  aes(x = speaker, y = harmonicity, colour = stress) +
-  geom_boxplot()
 ```
 
 Bonus: Add `theme_minimal()` to your last plot (or play around with the themes - if you start typing "+ theme_" R will suggest a list of themes, see which one is your favourite). Add labels and a title to make it complete!
 ```{r}
-ggplot(wh_split) +
-  aes(x = speaker, y = harmonicity_z, colour = stress) +
-  geom_boxplot() +
-  theme_minimal() +
-  labs(x = "variety",
-       y = "harmonicity (z-scored)",
-       title = "Pronunciation of <wh> by variety and stress pattern",
-       subtitle = "Lower harmonicity: tendency towards 'hw' pronunciation")
+
 ```
 
