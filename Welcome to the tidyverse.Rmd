@@ -1224,5 +1224,7 @@ Check the "more exercises" folder to find:
 - dplyr tutorials: [Part 1](https://www.kaggle.com/jessemostipak/dive-into-dplyr-tutorial-1) and [part 2](https://www.kaggle.com/jessemostipak/dive-deeper-into-dplyr-tutorial-2)
 - [Article: 10 Must-Know Tidyverse Features](https://www.r-bloggers.com/2020/10/10-must-know-tidyverse-features/)
 - [Introductory tutorials on data vis and wrangling in R](https://r-bootcamp.netlify.app/)
-
+- [Article: Data Vis for Likert Questions](https://lmudge13.github.io/sample_code/likert_graphs.html)
+- [Making Vowel Plots in R](https://joeystanley.com/blog/making-vowel-plots-in-r-part-1)
+- [Danielle Navarro's Youtube playlist on R-Markdown](https://www.youtube.com/playlist?list=PLRPB0ZzEYegM86awo590bP1MJjQbjdR9E)
 
