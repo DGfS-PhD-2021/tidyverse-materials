@@ -1,0 +1,273 @@
+---
+title: "Data wrangling, pivoting and joining review KEY"
+author: "Julia Müller & Kyla McConnell"
+output:
+  html_document:
+    code_folding: hide
+    theme: lumen
+    toc: true
+---
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+```
+
+
+This review focuses on the new `pivot_longer` and `pivot_wider` commands. The first part ("Ice cream data") also works as a review of other data wrangling commands and covers basic pivoting along the lines of what we discussed during the workshop. Before you dive into the exercises, read the vignette on pivoting by running the code `vignette("pivot")`. Alternatively, you can follow [this link](https://tidyr.tidyverse.org/articles/pivot.html).
+
+Please use the html version of this document when working on the exercises. That way, you won't see the correct code straight away but need to click on "Code".
+
+Let's load the tidyverse first.
+```{r message = FALSE}
+library(tidyverse)
+```
+
+# 1 Ice cream data
+For the first part, load and explore the file "icecream.csv" -- it shows how many scoops of ice cream of each flavor a participant eats per week.
+
+```{r message = FALSE}
+icecream <- read_csv("icecream.csv")
+print(icecream)
+```
+
+## (a) Summary tables
+
+First, we want to total up the number of scoops per participant, regardless of flavor. If you need a hint, click "Code" below, but first try to think of what you could do. Don't save the table, just view it.
+
+Additionally, sort the preview so that its sorted from the person who consumes the most ice cream to the one who consumes the least.
+Hint: It's helpful to give your new summary column a name for this.
+
+```{r message = FALSE}
+icecream %>% 
+  rowwise() %>% 
+  mutate(total_scoops = sum(c_across(where(is.numeric)))) %>% 
+  arrange(desc(total_scoops))
+
+# or:
+icecream %>%
+  group_by(id) %>%
+  summarize(total_scoops = sum(c(chocolate, vanilla, strawberry, pistachio))) %>%
+  arrange(desc(total_scoops)) %>%
+  ungroup()
+```
+
+## (b) Make a new column
+Next, we want to denote the "chocolate lovers" from the rest of the group. For this, make a new column which is filled with "lover" if they are a chocolate lover, and "not" if they are not. Save the new dataframe with the same name as you loaded it in with.
+
+```{r message = FALSE}
+(icecream <- icecream %>%
+  mutate(chocolate_lover = ifelse(chocolate > vanilla & chocolate > pistachio & chocolate > strawberry, "lover", "not")))
+```
+
+## (c) Remove data points
+Now, we want to remove all the chocolate lovers and just look at the others. Also, drop the chocolate column entirely. You will need two different commands, one for dropping the participants and one for dropping the column. See the hint below only if you need it. 
+
+Don't save the output, just take a look.
+```{r message = FALSE}
+icecream %>%
+  filter(chocolate_lover != "lover") %>%
+  select(-chocolate)
+```
+
+## (d) Tidy data
+The data is currently not in a tidy format. To be considered "tidy", it would have to have one observation per row. 
+
+Which transformation would you have to make to tidy the data? First, think of what the data should look like, before you have a look at the output below:
+```{r message = FALSE}
+read_csv("icecream_tidy.csv")
+```
+
+Now, perform the transformation to tidy the data. Give the columns appropriate names.
+```{r results = FALSE}
+icecream %>%
+  pivot_longer(
+    cols=chocolate:pistachio, 
+    names_to="flavor", 
+    values_to="scoops_weekly")
+```
+
+
+# 2 Questionnaire data
+The small dataset "quest" (file name: QuestionnaireExample.csv) is in a format that you might encounter when downloading data from a questionnaire site such as Soscisurvey. There's one line per participant. Their task was to listen to short recordings that were either in English or German (Eng or Ger) spoken by a man or a woman (m or f), and then to transcribe what they heard, rate the difficulty of the recording, and the intelligence of the speaker.  
+In this dataset, there's data from three participants. They heard and rated one female English speaker who said "I love cats so much" and one male German speaker who said "Hunde sind auch ganz nett".
+Here's what it looks like:
+```{r}
+quest <- read_csv2("QuestionnaireExample.csv")
+print(quest)
+```
+
+**What's the problem?**  
+Why is this dataset not tidy? What does it need to look like in order for it to be tidy?  
+
+```{r eval=FALSE}
+- We need one line per recording, followed by the ratings.  
+=> The data is currently in the wide format and needs to be long instead.  
+- And: Gender and language need to be in separate columns.
+```
+
+Try to imagine (or draw on a piece of paper) what the tidy data needs to look like, then have a look at the output below.
+```{r}
+read_csv("QuestionnaireExampleTidy.csv")
+```
+
+
+## 2.1 Wrangling
+
+### a) Reformat the data
+
+The data is too wide, so we need to use `pivot_longer()`. This is a more complicated case than the ice cream data. Have another look at the vignette to help you figure out which additional command we need and how to use it. Try to find the dataframe that looks the most like the one we're working with here.
+Which section of the vignette is relevant?
+```{r, eval = FALSE}
+We need what's described in the section of the vignette that's titled "Multiple observations per row".
+```
+
+Try to apply this to our data. Click on "code" to see an important hint...
+```{r, eval = FALSE}
+We need names_sep = "\\." (just "." won't work as it's a special character that R doesn't interpret correctly).
+```
+
+Here's the solution:
+```{r}
+quest <- quest %>% pivot_longer(
+    -participant, 
+    names_to = c(".value", "type"), 
+    names_sep = "\\."
+    )
+```
+
+
+### b) Put "gender" and "language" in separate columns
+
+Nearly there! The last thing we need to do is split the "type" column into a gender column that contains f and m, and a language column with Eng and Ger.
+
+Which command do you need?
+```{r, eval = FALSE}
+separate()
+```
+
+Here's the finished code:
+```{r}
+quest <- quest %>% 
+  separate(type, c("gender", "language"), sep = "_")
+```
+
+
+## 2.2 Adding more data (joining)
+
+### a) Adding sociodemographic info
+The file personal_info.csv contains sociodemographic information (gender, age, whether the person prefers cats or dogs, and their native language). The participants were asked to answer these questions before they rated the recordings. Participant 4 quit the experiment after giving their sociodemographic information, so we have their data in personal_info but not in the questionnaire data.
+```{r}
+personal_info <- read_csv2("personal_info.csv")
+print(personal_info)
+```
+
+**Some more wrangling fun first!**  
+Later, we want to add the sociodemographic information to the questionnaire data. Each line of the questionnaire data frame should not only contain the transcriptions and ratings, but also people's age, gender, etc.
+However, the format that personal_info is in doesn't work for that (and isn't tidy - why not?).
+```{r, eval = FALSE}
+We need the information as one line per participant and extra columns for gender, age, preference (for dogs or cats!), and native language. 
+```
+
+So we need to do some more wrangling first! Try to imagine what the dataframe should look like, then check your intuition against the output below:
+```{r}
+read_csv("personal_info_.csv")
+```
+
+Which command do you need? 
+```{r, eval = FALSE}
+pivot_wider() - have another look at the vignette to help you!
+```
+
+Here's the code:
+```{r}
+personal_info_wide <- personal_info %>% 
+  pivot_wider(
+    names_from = "info", 
+    values_from = "answer")
+```
+
+
+**Joining**  
+
+Next, we'd like to add that information to our original quest_tidy dataset so we need to "join" them. Which variable is present in both datasets? That variable is the identifier that will help us link the two datasets. Click on "Code" to see the answer.
+```{r, eval=FALSE}
+"participant"
+```
+
+Now, think about how the datasets should be joined. Refer to the data wrangling cheat sheet or a tutorial like [this one](https://cran.r-project.org/web/packages/dplyr/vignettes/two-table.html) if you'd like a refresher on joining operations.
+
+First, write code that keeps participant 4's data (but don't assign it to a dataframe).
+```{r}
+right_join(quest, personal_info_wide, by = "participant")
+#or:
+full_join(quest, personal_info_wide, by = "participant")
+# keeps participant 4's data, with NAs in the other columns
+```
+
+Now, use a different join command to only keep the complete lines, i.e. without participant 4. Once you're happy with that, assign it to a new data frame.
+```{r}
+complete <- left_join(quest, personal_info_wide, by = "participant")
+print(complete)
+```
+
+**Fixing the column names**  
+Looking at the dataset, you'll notice that since both dataframes contained "language" and "gender" variables, R very cleverly didn't overwrite them but instead added .x if they came from the first dataframe and .y if they came from the second one. Rename the columns to t_gender, t_language if that information refers to the transcription and p_gender, p_language if it refers to the participants. Also add p_ or t_ to the other column names depending on if they have to do with the transcription or the participants's sociodemographic information.
+```{r}
+complete <- complete %>% rename(t_gender = gender.x,
+                    t_language = language.x,
+                    t_easy = easy,
+                    t_intelligent = intelligent,
+                    p_gender = gender.y,
+                    p_age = age,
+                    p_preference = preference,
+                    p_language = language.y)
+```
+
+### b) Adding reading times
+Last dataset! After the participant heard and rated sentences, they also read the words "cat" and "dog", among distractor words, while their reading times were measured. The data are in reading_times.csv.
+```{r}
+reading <- read_csv2("reading_times.csv")
+print(reading)
+```
+We want to join this data with the data we just created so that if the transcription included "cat", the reading times for cats should be added, and the same for dogs.
+
+**Joining**  
+There are two ways to do this: One easier but risky way and one harder but a lot safer way. Try to find both and then add the reading times to our final dataset.
+
+Hint for the easier risky way:
+```{r, eval = FALSE}
+It involves matching the columns by position (which is what makes it potentially risky).
+```
+
+Code for the easier risky way:
+```{r}
+bind_cols(complete, reading)
+```
+
+The safer way is a bit complicated. You need to join the datasets first by participant and then by the word that is read. However, the original questionnaire data only has the transcriptions, so your first task will be to create a column named "word" that contains "cat" if the transcription featured "cat" or "cats" and "dog" if the transcription contained "Hund". You've already used two of the three necessary commands when you created the chocolate_lover column in the icecream data. Click on "code" to see them. 
+```{r, eval = FALSE}
+mutate to create a new column
+ifelse to fill it
+```
+
+The last command you need is grepl which allows you to search for words in texts. Have a look at the documentation (`?grepl`) to help you use it. Click on "code" to reveal the complete answer.
+```{r}
+complete <- complete %>% 
+  mutate(word = ifelse(grepl("cats?", transcription), "cat", "dog")) 
+#the ? is a regular expression which makes the "s" optional so that both cat and cats are matched
+```
+
+So now we need to join the data first by participant, then by the word column. The relevant matching columns for participant have different names (participant and person) but the command expects them to be the same. You can either rename one of them or use a small tweak in the join command to tell R that the columns contain the same information despite the different names. Try it, then check your answer:
+```{r}
+final <- full_join(complete, reading, by = c("participant" = "person", "word")) 
+# you need a list in by to join first by participant, then by word
+# "participant = person" tells R that the relevant column is called "participant" in the left but "person" in the right dataset
+```
+
+Let's imagine that participant 4 changed their mind and returned to finish the questionnaire. Which command would you need to add their data? Write (but don't execute) it, assuming that the dataset is called "part_4".
+```{r, eval = FALSE}
+bind_rows(complete, part_4)
+```
+
+
+**All done! Great job =)**

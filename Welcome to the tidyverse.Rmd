@@ -67,6 +67,10 @@ In contrast, *warnings* are shown when R thinks there could be an issue with you
 c(1, 2, 3) + c(1, 2)
 ```
 
+It's normal that you'll encounter both warnings and errors while coding! This debugging (= finding and fixing errors in code) bingo gives a few suggestions of what might have gone wrong.
+
+![Debugging bingo, by Dr Ji Son, @cogscimom on Twitter](img/debugging_bingo.jpg)
+
 
 ## Reading function documentation
 We'll get to know a number of R *functions* today. These functions can take one or more `arguments`. As an example, let's try out the `say()` function from the cowsay package.
@@ -127,7 +131,26 @@ name_of_data_in_R <- read_tsv("data_file.txt") # tab-separated file
 ```
 This works as long as the data file is saved in the same location as this file! You can add e.g. "data/" before the file name if it is located in a subfolder.
 
-One useful additional argument is `na`. This controls how missing values in the file are recognised. By default, these functions assume that missing values are represented by either empty cells or "NA", but if that's not the case, you can tell R that. For example, if missing values are represented by -9 (as can be the case for questionnaire data), you could add `na = "-9"` to a `read` command.
+One useful additional argument is `na`. This controls how missing values in the file are recognised. By default, these functions assume that missing values are represented by either empty cells or "NA", but if that's not the case, you can tell R that. For example, if missing values are represented by -9 (as can be the case for questionnaire data), you could add `na = "-9"` to a `read()` command.
+
+
+## Data we'll use today
+
+**During the workshop:**
+- Self-paced reading (dgfs_spr.csv)
+- Corpus (cat_dog_corpus_data.csv, corpus_frequencies.csv)
+- Questionnaire (animal_survey.csv)
+- Acceptability judgements (acceptability_judgements.csv)
+
+We'll introduce each dataset in more detail when we start using it.
+
+
+**In the exercise blocks:**
+- Lexical decision experiment (dgfs_lexdec.csv)
+- Questionnaire data - information on the participants in that lexical decision experiment (dgfs_pars_lexdec.csv)
+- Phonetic data (wh_split.txt)
+
+Here, you can often choose which data you'd like to focus on - lexical decision or phonetic data!
 
 
 ## Introducing our first dataset
@@ -138,6 +161,7 @@ spr <- read_csv("data/dgfs_spr.csv")
 ```
 The current dataframe is a self-paced reading experiment where 12 participants read 20 sentences each, plus 3 practice sentences to get them warmed up. In a SPR experiment, participants see one word at a time and need to press a button to be shown the next word in the sentence. Their reaction times (RTs, i.e. how long it takes them to press that button) are recorded.
 Half the sentences were about dogs and half the sentences were about cats. In one condition (A), all sentences were paired with appropriate adjectival collocates according to the BNC (lap dog vs. tortoiseshell cat), in the other, these were reverse (lap cat vs. tortoiseshell dog). All sentences were presented in otherwise natural-sounding sentences. 
+
 
 ## Exploring our data
 
@@ -152,9 +176,7 @@ You can change the amount of rows with the `n` *argument*:
 head(spr, n=3)
 ```
 
-Or: click name of dataframe in Environment tab
-  - can also sort columns and Filter rows -- just for viewing purposes
-  - bit slow if you start having huge dataframes but often a good first look
+Or: Click on the name of dataframe in the Environment tab (top right) to open a preview in a new tab. You can also sort columns and filter rows (just for viewing purposes). If the dataframe is large, however, this can get very slow.
 
 There's also an easy way to see what the columns are:
 ```{r}
@@ -192,10 +214,10 @@ If any other columns in your dataframe are read in wrong (for example, if you ha
 
 One of the most noticeable features of the tidyverse is the pipe %>% (keyboard shortcut: Ctrl/Cmd + Shift + M).
 
-The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and some non-tidyverse) functions take the dataframe as the first argument, this can be used to string together multiple functions. It also makes it easier to read sequential code in a more natural order.
+The pipe takes the item before it and feeds it to the following command as the first argument. Since all tidyverse (and many non-tidyverse) functions take the dataframe as the first argument, this can be used to string together multiple functions. It also makes it easier to read sequential code in a more natural order.
 
 Compare the following lines of pseudocode (courtesy of @andrewheiss), which would produce the same output:
-![Pipe as explained by Andrew Heiss]("img/pipe_andrewheiss.jpg")
+![Pipe as explained by Andrew Heiss](img/pipe_andrewheiss.jpg)
   
 You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! In a chain of commands like this one, you can think of the pipe as meaning "and then". 
 
@@ -233,7 +255,7 @@ spr %>%
 ```
 
 You can also stack commands by ending each row (except the last one) with a pipe. 
-You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! 
+You can see that the version with the pipe is easier to read when more than one function is called on the same dataframe! The line breaks are optional, but make the code more readable.
 ```{r}
 spr %>% 
   colnames() %>% #extracts column names
@@ -250,13 +272,15 @@ spr %>%
   rename(condition = cond)
 ```
 
-This is just a preview because we didn't assign the changed dataframe to any name. This is useful for testing code and making sure it does what you expect and want it to do.
 
-- if you look at the spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed
+### Preview vs. saving
 
-- To save your changes: assigning your call back to the variable name
+This is just a preview because we didn't assign the changed dataframe to any name. If you look at the spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed. This is useful for testing code and making sure it does what you expect and want it to do. To save the changes, we need to assign the call back to the variable name, i.e.
+dataframe <- dataframe %>% 
+  some operations here
 
-- Good work flow: Preview then save when you're sure you're happy with the output
+
+### Renaming multiple columns
 
 You can also rename multiple columns at once (no need for an array here):
 ```{r}
@@ -264,11 +288,11 @@ spr <- spr %>%
   rename(condition = cond, 
          sentence = full_sentence)
 ```
-Notice above that I've saved output over the spr dataframe to make the changes 'permanent'.
+Notice above that we've saved output over the spr dataframe to make the changes 'permanent'.
 
-There is no output when you simply save the response, but the spr dataframe has been permanently updated (within the R session, not in your file system)
+There is no output when you save the changes, but the spr dataframe has been permanently updated (within the R session, not in your file system). To save the changes, but also show the output of a function, we can put brackets around the code.
 
-If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one)
+If you make a mistake: arrow with a line under it in the code block of R-Markdown, runs all blocks above (but not the current one).
 
 
 ## arrange()
@@ -282,6 +306,29 @@ spr %>%
   arrange(desc(RT))
 ```
 
+Or in alphabetical order if the column is a character type:
+```{r}
+spr %>% 
+  arrange(word)
+```
+
+Wrapping `desc()` around character or category variable reverses the sorting:
+```{r}
+spr %>% 
+  arrange(desc(word))
+```
+
+It's also possible to sort by several variables:
+```{r}
+spr %>% 
+  arrange(word, RT)
+```
+
+And again, `desc()` can be used to reverse the order:
+```{r}
+spr %>% 
+  arrange(word, desc(RT))
+```
 
 **-- Please work on exercise block 2 now --**
 
@@ -323,12 +370,7 @@ spr %>%
   select(RT, everything())
 ```
 
-
-### Preview vs. saving
-
-Above, we're mostly previewing using `select()` for first insights. If you look at the spr dataframe, for example in the Environment panel on the upper-right, the dataframe hasn't changed. To save your changes, assign your call back to the variable name, i.e.
-df <- df %>% 
-  some operations here
+Or have a look at the documentation for a command we won't have time to discuss today: `relocate()`.
 
 
 ### Remove columns with select
@@ -345,7 +387,7 @@ You can also remove multiple columns at once by writing them in an array `c()`. 
 spr <- spr %>% 
   select(-c(item_type, X1))
 ```
-This overwrites the data as it is saved in R. It does **not** overwrite the file that is saved on your computer.
+This overwrites the data as it is saved in R. It does **not** overwrite the file that is saved on your computer. 
 
 
 ### Leveling up select()
@@ -480,7 +522,6 @@ spr %>%
   distinct(sentence, condition)
 ```
 
-
 **-- Please work on Exercise block 3 now --**
 
 
@@ -546,6 +587,7 @@ animal_corpus %>%
   distinct(coll_word)
 ```
 
+
 # (8) Creating and changing columns with mutate()
 
 With the `mutate()` function, you can change existing columns and add new ones. 
@@ -584,7 +626,7 @@ We can also change data types using `mutate()`. Instead of the code we used earl
   mutate(participant = as_factor(participant),
          condition = as_factor(condition)))
 ```
-As you can see, we can change several variables within one `mutate()`  call. In the same way, we could create several new columns at the same time. Here, dropping each new column onto a new line is considered good style and makes the code more readable (but it's not necessary).
+As you can see, we can change several variables within one `mutate()` call. In the same way, we could create several new columns at the same time. 
 
 ## Relabel factors
 In our SPR experiment, condition A represents a match (i.e. cat/dog is presented with a matching collocate: purring cat, guide dog) and condition B is a mismatch (e.g. guide cat, purring dog). To make this clear in the data, we should label this explicitly. Within a `mutate()` command, we can use `recode()` to change the factor labels. The format for this is old label = "new label".
@@ -662,7 +704,6 @@ Another example: In the questionnaire, participants were asked to indicate how m
   )))
 ```
 If we look at the output, we see that the "else/TRUE" condition wasn't necessary, strictly speaking, but it's good to account for all the potential cases in the data so you don't end up with superfluous NAs.
-
 
 **-- Please work on Exercise block 4 now --**
 
@@ -766,9 +807,7 @@ spr %>%
 
 # (10) across()
 
-`across()` is a helper for `mutate()` and `summarise`. It lets you easily apply a change or create a summary for several variables because you can use `select()` semantics (`starts_with()`, `ends_with()`, `contains()`, etc.) with `across()`.
-
-![Across](img/dplyr_across.png)
+`across()` is a helper for `mutate()` and `summarise`. It lets you easily apply a change or create a summary for several variables because you can use `select()` helpers (`starts_with()`, `ends_with()`, `contains()`, etc.) with `across()`.
 
 For example, if we'd like to see the mean for columns that end with "num":
 ```{r}
@@ -787,6 +826,9 @@ Here's an example of `across()` in a `mutate()` function. This lets you easily c
 spr %>% 
   mutate(across(where(is.character), as.factor))
 ```
+
+![Across](img/dplyr_across.png)
+
 
 ## Row-wise operations
 Back to our questionnaire. For each participant, we'd like to calculate the average of the columns that start with "animals" to get one measure of their interest in animals. We might try something like this:  
@@ -933,7 +975,6 @@ Syntax: write_tsv(dfname, "filename.ext")
 
 Remember, something like data type in R (ex: character or factor) can't be saved into one of these files -- it just saves the values separated by the separator (and the column names). So you'll still have to do the conversions next time you read the file into R. 
 
-
 **-- Please work on exercise block 6 now--**
 
 
@@ -943,7 +984,7 @@ Remember, something like data type in R (ex: character or factor) can't be saved
 ### The layered grammar of graphics
 ggplot follows the grammar of graphics. 
 
-We have a couple of NAs, lets make sure they're out of the way first. (REmember not to do this without extreme caution on real data, and check the number of rows before and after!)
+We have a couple of NAs, lets make sure they're out of the way first. (Remember not to do this without extreme caution on real data, and check the number of rows before and after!)
 ```{r}
 spr_complete <- spr_complete %>% 
   drop_na()
@@ -1169,7 +1210,7 @@ By the way: We haven't had time to discuss *all* arguments that each of the func
 
 ## Working with Google results
 
-If you encounter a specific problem but aren't sure which function to use (or if you're trying to use a command you know in a very specific way), it's often a good idea to simply google the question (and the same goes for error messages - after you double-checked spelling, capitalisation, commas, missing brackets...). R generally has a large and helpful community, so you'll likely find answers on sites such as Stack Overflow or, if you're lucky, even entire blogposts written on a relevant issue.
+If you encounter a specific problem but aren't sure which function to use (or if you're trying to use a command you know in a very specific way), it's often a good idea to simply google the question (and the same goes for error messages - after you double-checked common mistakes regarding spelling, capitalisation, commas, missing brackets...). R generally has a large and helpful community, so you'll likely find answers on sites such as Stack Overflow or, if you're lucky, even entire blogposts written on a relevant issue.
 
 
 # (16) Workflows/code conventions
@@ -1181,7 +1222,7 @@ Always list and load all packages at the top of your script (in the first code b
 ## Naming conventions
 Give expressive names to your variables and dataframes/tibbles. Don't just call everything "data", "df", or "variable1", "var1", etc., but use names that immediately tell you what the variable contains.
 Use consistent naming conventions for variables. For example, if you use an underscore to separate words in one multi-word variable name, use the same symbol everywhere.
-Similarly, be consistent with capitalisation - the recommendation here is to use lowercase for all data and variable names to reduce the chance of misspelling variables.
+Similarly, be consistent with capitalisation - our recommendation is to use lowercase for all data and variable names to reduce the chance of misspelling variables.
 
 ## Line breaks
 Throughout these materials, we've been using line breaks after pipes and often also after each argument of a function. This is purely for readability's sake - optional, but highly recommended!
@@ -1207,13 +1248,9 @@ In terms of actually writing code, ideally also build it up step by step and don
 - `parse_number()` to extract only numbers from a string (e.g. "USD18" -> "18")
 
 
-## Additional exercises
-Check the "more exercises" folder to find:
-- More on ggplot
-- An advanced pivoting exercise
-
-
 ## Resources and cheat sheets
+
+The folder "advanced_pivoting_exercise" contains an exercise that covers a lot of the data wrangling commmands we discussed today and goes into a lot more detail on pivoting and joining.
 
 - [Tidyverse website](https://www.tidyverse.org/)
 - [Online book: R for Data Science](https://r4ds.had.co.nz/index.html)
@@ -1228,3 +1265,5 @@ Check the "more exercises" folder to find:
 - [Making Vowel Plots in R](https://joeystanley.com/blog/making-vowel-plots-in-r-part-1)
 - [Danielle Navarro's Youtube playlist on R-Markdown](https://www.youtube.com/playlist?list=PLRPB0ZzEYegM86awo590bP1MJjQbjdR9E)
 
+
+![Hopefully, you feel a lot closer to the second picture than when we started!](img/r_first_then.png)
